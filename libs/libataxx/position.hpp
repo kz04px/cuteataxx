@@ -331,8 +331,20 @@ class Position {
     }
 
     [[nodiscard]] bool gameover() const {
-        return pieces[0] == 0ULL || pieces[1] == 0ULL ||
-               (gaps | pieces[0] | pieces[1]) == Bitboards::All;
+        const std::uint64_t both = pieces[Side::Black] | pieces[Side::White];
+        const std::uint64_t empty = Bitboards::All ^ (both | gaps);
+        const std::uint64_t moves = single_moves(single_moves(both));
+
+        if (!pieces[Side::Black]) {
+            return true;
+        }
+        if (!pieces[Side::White]) {
+            return true;
+        }
+        if (moves & empty) {
+            return false;
+        }
+        return true;
     }
 
     [[nodiscard]] std::uint64_t perft(const int depth) {
