@@ -2,8 +2,11 @@
 #define LIBATAXX_UAIENGINE_HPP
 
 #include <condition_variable>
+#include <functional>
 #include <mutex>
+#include <string>
 #include <tuple>
+#include <vector>
 #include "engine.hpp"
 #include "move.hpp"
 #include "position.hpp"
@@ -72,6 +75,11 @@ class Engine : public EngineBase {
 
     void position(const libataxx::Position &pos) {
         send("position fen " + pos.fen() + "\n");
+    }
+
+    void register_info_handler(
+        std::function<void(const std::string &)> info_handler) {
+        info_handlers.push_back(info_handler);
     }
 
     std::tuple<libataxx::Move, libataxx::Move> go(const SearchOptions &opts) {
@@ -181,7 +189,9 @@ class Engine : public EngineBase {
                     set_author(author);
                 }
             } else if (word == "info") {
-                break;
+                for (auto &info_handler : info_handlers) {
+                    info_handler(str);
+                }
             }
         }
     }
@@ -193,6 +203,7 @@ class Engine : public EngineBase {
     std::condition_variable readyok_;
     std::condition_variable bestmove_;
     std::condition_variable nodes_;
+    std::vector<std::function<void(const std::string &)>> info_handlers;
 };
 
 }  // namespace uai
