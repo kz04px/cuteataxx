@@ -10,6 +10,8 @@
 #include <thread>
 #include "move.hpp"
 
+namespace libataxx {
+
 namespace ba = boost::asio;
 namespace bp = boost::process;
 namespace chr = std::chrono;
@@ -134,5 +136,7 @@ class EngineBase {
     bp::async_pipe out_;
     bp::child child_;
 };
+
+}  // namespace libataxx
 
 #endif
