@@ -228,7 +228,24 @@ class Position {
     }
 
     [[nodiscard]] bool legal_move(const Move &move) const {
-        return true;
+        const int from = move.from();
+        const int to = move.to();
+        const std::uint64_t filled =
+            pieces[Side::Black] | pieces[Side::White] | gaps;
+
+        // Make sure the destination square is empty
+        if (sq_to_bb(to) & filled) {
+            return false;
+        }
+
+        // Single moves
+        if (move.type() == MoveType::Single) {
+            return single_moves(to) & pieces[turn];
+        }
+        // Double moves
+        else {
+            return double_moves(to) & pieces[turn] & sq_to_bb(from);
+        }
     }
 
     [[nodiscard]] bool legal_pv(const PV &pv) const {
