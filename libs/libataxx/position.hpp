@@ -266,8 +266,22 @@ class Position {
                (gaps | pieces[0] | pieces[1]) == Bitboards::All;
     }
 
-    [[nodiscard]] std::uint64_t perft(const int depth) const {
-        return 0ULL;
+    [[nodiscard]] std::uint64_t perft(const int depth) {
+        if (depth < 1) {
+            return 1ULL;
+        }
+
+        std::uint64_t nodes = 0ULL;
+
+        libataxx::Move moves[256];
+        const int num_moves = legal_moves(moves);
+        for (int i = 0; i < num_moves; ++i) {
+            makemove(moves[i]);
+            nodes += perft(depth - 1);
+            undomove();
+        }
+
+        return nodes;
     }
 
     [[nodiscard]] const PV &history() const {
