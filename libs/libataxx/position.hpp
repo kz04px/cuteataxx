@@ -119,7 +119,7 @@ class Position {
         // Single moves
         std::uint64_t singles = single_moves(pieces[turn]) & empty;
         while (singles) {
-            assert(num_moves < MAX_MOVES);
+            assert(num_moves < max_moves);
             const Square to = static_cast<Square>(lsbll(singles));
             moves[num_moves] = Move(to);
             assert(moves[num_moves].type() == MoveType::Single);
@@ -133,7 +133,7 @@ class Position {
             const Square from = static_cast<Square>(lsbll(copy));
             std::uint64_t destinations = double_moves(from) & empty;
             while (destinations) {
-                assert(num_moves < MAX_MOVES);
+                assert(num_moves < max_moves);
                 const Square to = static_cast<Square>(lsbll(destinations));
                 moves[num_moves] = Move(from, to);
                 assert(moves[num_moves].type() == MoveType::Double);
@@ -342,7 +342,7 @@ class Position {
 
         std::uint64_t nodes = 0ULL;
 
-        libataxx::Move moves[MAX_MOVES];
+        libataxx::Move moves[max_moves];
         const int num_moves = legal_moves(moves);
         for (int i = 0; i < num_moves; ++i) {
             makemove(moves[i]);

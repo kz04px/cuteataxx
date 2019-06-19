@@ -5,7 +5,7 @@
 
 namespace libataxx {
 
-#define MAX_MOVES 256
+const int max_moves = 256;
 
 enum Bitboards : std::uint64_t
 {

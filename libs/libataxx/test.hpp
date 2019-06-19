@@ -95,7 +95,7 @@ bool test_legal_move() {
     const std::string fens[]{"startpos"};
     for (const auto &fen : fens) {
         Position pos(fen);
-        Move moves[MAX_MOVES];
+        Move moves[max_moves];
         int num_moves = pos.legal_moves(moves);
 
         for (int to = 0; to < 49; ++to) {
