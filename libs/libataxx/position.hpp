@@ -25,6 +25,10 @@ enum class Result : int
     None
 };
 
+struct Irreversible {
+    std::uint64_t captured;
+};
+
 class Position {
    public:
     Position() {
@@ -140,6 +144,10 @@ class Position {
             copy &= copy - 1;
         }
 
+        for (int i = 0; i < num_moves; ++i) {
+            assert(legal_move(moves[i]));
+        }
+
         return num_moves;
     }
 
@@ -240,7 +248,7 @@ class Position {
 
         // Single moves
         if (move.type() == MoveType::Single) {
-            return single_moves(to) & pieces[turn];
+            return single_moves(sq_to_bb(to)) & pieces[turn];
         }
         // Double moves
         else {
@@ -263,12 +271,56 @@ class Position {
         if (!legal_move(move)) {
             return;
         }
+
+        const Side us = turn;
+        const Side them = static_cast<Side>(!us);
+        const int to = move.to();
+        const int from = move.from();
+        const std::uint64_t to_bb = sq_to_bb(to);
+        const std::uint64_t from_bb = sq_to_bb(from);
+        const std::uint64_t neighbours = single_moves(to_bb);
+        const std::uint64_t captured = neighbours & pieces[them];
+
+        // Remove and replace our stone
+        pieces[us] ^= from_bb | to_bb;
+
+        // Flip any captured stones
+        pieces[them] ^= captured;
+        pieces[us] ^= captured;
+
+        turn = them;
+
         history_.push_back(move);
+        irreversible_.push_back(Irreversible{.captured = captured});
+        assert(history_.size() == irreversible_.size());
     }
 
     void undomove() {
+        assert(history_.size() > 0);
+        assert(history_.size() == irreversible_.size());
         const Move move = history_.back();
+        const Irreversible irreversible = irreversible_.back();
+
+        const Side us = static_cast<Side>(!turn);
+        const Side them = turn;
+        const int to = move.to();
+        const int from = move.from();
+        const std::uint64_t to_bb = sq_to_bb(to);
+        const std::uint64_t from_bb = sq_to_bb(from);
+        const std::uint64_t neighbours = single_moves(to_bb);
+        const std::uint64_t captured = irreversible.captured;
+
+        // Remove and replace our stone
+        pieces[us] ^= from_bb | to_bb;
+
+        // Flip any captured stones
+        pieces[them] ^= captured;
+        pieces[us] ^= captured;
+
+        turn = us;
+
         history_.pop_back();
+        irreversible_.pop_back();
     }
 
     [[nodiscard]] Result result() const {
@@ -290,7 +342,7 @@ class Position {
 
         std::uint64_t nodes = 0ULL;
 
-        libataxx::Move moves[256];
+        libataxx::Move moves[MAX_MOVES];
         const int num_moves = legal_moves(moves);
         for (int i = 0; i < num_moves; ++i) {
             makemove(moves[i]);
@@ -311,6 +363,7 @@ class Position {
     int halfmoves_;
     Side turn;
     PV history_;
+    std::vector<Irreversible> irreversible_;
 };
 
 }  // namespace libataxx
