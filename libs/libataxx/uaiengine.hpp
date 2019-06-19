@@ -53,7 +53,7 @@ class Engine : public EngineBase {
         }
         send("uai\n");
         std::unique_lock<std::mutex> lock(mtx_);
-        uaiok_.wait(lock);
+        cv_uaiok_.wait(lock);
         lock.unlock();
         uaiok = true;
     }
@@ -69,7 +69,7 @@ class Engine : public EngineBase {
     void isready() {
         send("isready\n");
         std::unique_lock<std::mutex> lock(mtx_);
-        readyok_.wait(lock);
+        cv_readyok_.wait(lock);
         lock.unlock();
     }
 
@@ -116,7 +116,7 @@ class Engine : public EngineBase {
 
         start_searching();
         std::unique_lock<std::mutex> lock(mtx_);
-        bestmove_.wait(lock);
+        cv_bestmove_.wait(lock);
         lock.unlock();
 
         stop_searching();
@@ -129,7 +129,7 @@ class Engine : public EngineBase {
         }
         send("perft " + std::to_string(depth) + "\n");
         std::unique_lock<std::mutex> lock(mtx_);
-        nodes_.wait(lock);
+        cv_nodes_.wait(lock);
         lock.unlock();
 
         return 1;
@@ -156,15 +156,22 @@ class Engine : public EngineBase {
         std::stringstream ss{str};
 
         std::string word;
-        while (ss >> word) {
+        if (ss >> word) {
             if (word == "uaiok") {
-                uaiok_.notify_one();
+                cv_uaiok_.notify_one();
             } else if (word == "readyok") {
-                readyok_.notify_one();
+                cv_readyok_.notify_one();
             } else if (word == "bestmove") {
-                bestmove_.notify_one();
+                ss >> word;
+                bestmove_ = Move::from_san(word);
+                // Catch ponder here
+                if (ss >> word && word == "ponder") {
+                    ss >> word;
+                    pondermove_ = Move::from_san(word);
+                }
+                cv_bestmove_.notify_one();
             } else if (word == "nodes") {
-                nodes_.notify_one();
+                cv_nodes_.notify_one();
             } else if (word == "id") {
                 ss >> word;
                 if (word == "name") {
@@ -199,10 +206,10 @@ class Engine : public EngineBase {
    private:
     bool uaiok{false};
     std::mutex mtx_;
-    std::condition_variable uaiok_;
-    std::condition_variable readyok_;
-    std::condition_variable bestmove_;
-    std::condition_variable nodes_;
+    std::condition_variable cv_uaiok_;
+    std::condition_variable cv_readyok_;
+    std::condition_variable cv_bestmove_;
+    std::condition_variable cv_nodes_;
     std::vector<std::function<void(const std::string &)>> info_handlers;
 };
 

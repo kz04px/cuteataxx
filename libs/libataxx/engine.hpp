@@ -120,13 +120,14 @@ class EngineBase {
         ios_thread_ = std::thread([&]() { ios_.run(); });
     }
 
+    libataxx::Move bestmove_{libataxx::Square::None};
+    libataxx::Move pondermove_{libataxx::Square::None};
+
    private:
     // Engine
     std::string name_{"Engine"};
     std::string author_{"Author"};
     bool searching_{false};
-    libataxx::Move bestmove_{libataxx::Square::None};
-    libataxx::Move pondermove_{libataxx::Square::None};
     bool debug_{false};
     // Process
     std::thread ios_thread_;
