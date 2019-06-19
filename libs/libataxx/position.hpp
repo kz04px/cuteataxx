@@ -202,9 +202,9 @@ class Position {
 
         // Turn
         if (turn == Side::Black) {
-            fen += " b";
+            fen += " x";
         } else {
-            fen += " w";
+            fen += " o";
         }
 
         return fen;
