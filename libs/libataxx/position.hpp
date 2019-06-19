@@ -104,6 +104,45 @@ class Position {
         }
     }
 
+    int legal_moves(Move *moves) const {
+        const Side us = turn;
+        const Side them = static_cast<Side>(!us);
+        const std::uint64_t filled =
+            pieces[Side::Black] | pieces[Side::White] | gaps;
+        const std::uint64_t empty = Bitboards::All ^ filled;
+        int num_moves = 0;
+
+        // Single moves
+        std::uint64_t singles = single_moves(pieces[turn]) & empty;
+        while (singles) {
+            assert(num_moves < MAX_MOVES);
+            const Square to = static_cast<Square>(lsbll(singles));
+            moves[num_moves] = Move(to);
+            assert(moves[num_moves].type() == MoveType::Single);
+            num_moves++;
+            singles &= singles - 1;
+        }
+
+        // Double moves
+        std::uint64_t copy = pieces[turn];
+        while (copy) {
+            const Square from = static_cast<Square>(lsbll(copy));
+            std::uint64_t destinations = double_moves(from) & empty;
+            while (destinations) {
+                assert(num_moves < MAX_MOVES);
+                const Square to = static_cast<Square>(lsbll(destinations));
+                moves[num_moves] = Move(from, to);
+                assert(moves[num_moves].type() == MoveType::Double);
+                num_moves++;
+                destinations &= destinations - 1;
+            }
+
+            copy &= copy - 1;
+        }
+
+        return num_moves;
+    }
+
     [[nodiscard]] int score() const {
         return popcountll(pieces[Side::Black]) -
                popcountll(pieces[Side::White]);

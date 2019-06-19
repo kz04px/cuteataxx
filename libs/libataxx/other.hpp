@@ -40,6 +40,23 @@ inline int popcountll(const std::uint64_t bb) {
     return __builtin_popcountll(bb);
 }
 
+std::uint64_t single_moves(const std::uint64_t bb) {
+    return Bitboards::All &
+           (((bb >> 1) & (Bitboards::NotFileG)) |  // Left 1
+            ((bb << 1) & (Bitboards::NotFileA)) |  // Right 1
+            (bb << 7) |                            // Up 1
+            (bb >> 7) |                            // Down 1
+            ((bb << 8) & (Bitboards::NotFileA)) |  // Up 1 right 1
+            ((bb << 6) & (Bitboards::NotFileG)) |  // Up 1 left 1
+            ((bb >> 8) & (Bitboards::NotFileG)) |  // Down 1 left 1
+            ((bb >> 6) & (Bitboards::NotFileA)));  // Down 1 right 1
+}
+
+std::uint64_t double_moves(int sq) {
+    assert(0 <= sq && sq <= 48);
+    return dist2[sq];
+}
+
 }  // namespace libataxx
 
 #endif

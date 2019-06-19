@@ -15,6 +15,8 @@ enum MoveType : bool
 
 struct Move {
    public:
+    Move() : to_{Square::None}, from_{Square::None} {
+    }
     explicit Move(const Square to) : to_{to}, from_{to} {
     }
     Move(const Square to, const Square from) : to_{to}, from_{from} {
@@ -92,8 +94,8 @@ struct Move {
     }
 
    private:
-    const Square to_;
-    const Square from_;
+    Square to_;
+    Square from_;
 };
 
 inline bool operator==(const Move &lhs, const Move &rhs) {
