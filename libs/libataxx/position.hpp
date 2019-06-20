@@ -148,6 +148,8 @@ class Position {
             assert(legal_move(moves[i]));
         }
 
+        assert(count_moves() == num_moves);
+
         return num_moves;
     }
 
@@ -348,7 +350,9 @@ class Position {
     }
 
     [[nodiscard]] std::uint64_t perft(const int depth) {
-        if (depth < 1) {
+        if (depth == 1) {
+            return count_moves();
+        } else if (depth <= 0) {
             return 1ULL;
         }
 
@@ -367,6 +371,29 @@ class Position {
 
     [[nodiscard]] const PV &history() const {
         return history_;
+    }
+
+    int count_moves() const {
+        const std::uint64_t filled =
+            pieces[Side::Black] | pieces[Side::White] | gaps;
+        const std::uint64_t empty = Bitboards::All ^ filled;
+        int num_moves = 0;
+
+        // Single moves
+        const std::uint64_t singles = single_moves(pieces[turn]) & empty;
+        num_moves += popcountll(singles);
+
+        // Double moves
+        std::uint64_t copy = pieces[turn];
+        while (copy) {
+            const Square from = static_cast<Square>(lsbll(copy));
+            const std::uint64_t destinations = double_moves(from) & empty;
+            num_moves += popcountll(destinations);
+            copy &= copy - 1;
+        }
+
+        assert(num_moves < max_moves);
+        return num_moves;
     }
 
     std::uint64_t hash() const {
