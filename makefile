@@ -1,7 +1,7 @@
 CC       = g++
-CFLAGS   = -std=c++17 -Wall -Wextra
-RFLAGS   = -O3 -flto -march=native -DNDEBUG
-DFLAGS   = -g -Wall -Wextra -Wshadow
+CFLAGS   = -std=c++17 -Wall -Wextra -Wshadow
+RFLAGS   = -O3 -march=native -flto -DNDEBUG
+DFLAGS   = -g
 INC      = -I libs/
 
 LINKER   = g++
