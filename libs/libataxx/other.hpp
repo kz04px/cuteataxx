@@ -52,8 +52,8 @@ std::uint64_t single_moves(const std::uint64_t bb) {
             ((bb >> 6) & (Bitboards::NotFileA)));  // Down 1 right 1
 }
 
-std::uint64_t double_moves(int sq) {
-    assert(0 <= sq && sq <= 48);
+std::uint64_t double_moves(const Square sq) {
+    assert(sq <= Square::g7);
     return dist2[sq];
 }
 

@@ -236,8 +236,8 @@ class Position {
     }
 
     [[nodiscard]] bool legal_move(const Move &move) const {
-        const int from = move.from();
-        const int to = move.to();
+        const Square from = move.from();
+        const Square to = move.to();
         const std::uint64_t filled =
             pieces[Side::Black] | pieces[Side::White] | gaps;
 
