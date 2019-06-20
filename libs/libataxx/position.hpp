@@ -369,6 +369,30 @@ class Position {
         return history_;
     }
 
+    std::uint64_t hash() const {
+        std::uint64_t key = 0ULL;
+
+        if (turn == Side::Black) {
+            key ^= zobrist::turn;
+        }
+
+        std::uint64_t copy = pieces[Side::Black];
+        while (copy) {
+            int sq = lsbll(copy);
+            key ^= zobrist::piece[Side::Black][sq];
+            copy &= copy - 1;
+        }
+
+        copy = pieces[Side::White];
+        while (copy) {
+            int sq = lsbll(copy);
+            key ^= zobrist::piece[Side::White][sq];
+            copy &= copy - 1;
+        }
+
+        return key;
+    }
+
    private:
     std::uint64_t pieces[2];
     std::uint64_t gaps : 49;
