@@ -48,7 +48,9 @@ struct Move {
         }*/
     }
     [[nodiscard]] static Move from_san(const std::string &san) {
-        if (san.length() == 2) {
+        if (san == "0000" || san == "null") {
+            return Move(Square::a1);
+        } else if (san.length() == 2) {
             const int x = san[0] - 'a';
             const int y = san[1] - '1';
             const int sq = 7 * y + x;
@@ -86,8 +88,6 @@ struct Move {
             else {
                 return Move(static_cast<Square>(sq1), static_cast<Square>(sq2));
             }
-        } else if (san == "0000" || san == "null") {
-            return Move(Square::a1);
         } else {
             throw std::invalid_argument("Invalid length (" + san + ")");
         }
