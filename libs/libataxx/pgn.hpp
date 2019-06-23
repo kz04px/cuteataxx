@@ -57,10 +57,11 @@ struct GameNode {
 };
 
 struct Game {
-    Game() : header{}, position{} {
+    Game() : header{{"Event", "?"}, {"Result", "*"}}, position{} {
     }
 
-    Game(const Position &pos) : header{}, position{pos} {
+    Game(const Position &pos)
+        : header{{"Event", "?"}, {"Result", "*"}}, position{pos} {
         GameNode *node = &root;
         for (const auto &move : pos.history()) {
             node = node->add_mainline(move);
@@ -126,20 +127,23 @@ std::basic_ostream<char> &operator<<(std::basic_ostream<char> &os,
 
 std::basic_ostream<char> &operator<<(std::basic_ostream<char> &os,
                                      const Game &game) {
-    // Header -- Event
-    auto asd = game.header.find("Event");
-    if (asd == game.header.end()) {
-        os << "[Event \"None\"]" << std::endl;
-    } else {
-        os << "[Event \"" << asd->second << "\"]" << std::endl;
-    }
+    static const std::string header_order[] = {"Event",
+                                               "Site",
+                                               "Date",
+                                               "Round",
+                                               "Black",
+                                               "White",
+                                               "Result",
+                                               "FEN",
+                                               "TimeControl"};
 
-    // Header -- The rest
-    for (const auto &[key, val] : game.header) {
-        if (key == "Event") {
-            continue;
+    // Header
+    for (const auto &word : header_order) {
+        const auto iter = game.header.find(word);
+        if (iter != game.header.end()) {
+            os << "[" << iter->first << " \"" << iter->second << "\"]"
+               << std::endl;
         }
-        os << "[" << key << " \"" << val << "\"]" << std::endl;
     }
     os << std::endl;
 
