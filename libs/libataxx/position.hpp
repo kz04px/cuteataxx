@@ -329,7 +329,14 @@ class Position {
         if (!gameover()) {
             return Result::None;
         }
-        return Result::Draw;
+        const int s = score();
+        if (s > 0) {
+            return Result::BlackWin;
+        } else if (s < 0) {
+            return Result::WhiteWin;
+        } else {
+            return Result::Draw;
+        }
     }
 
     [[nodiscard]] bool gameover() const {
