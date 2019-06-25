@@ -48,14 +48,12 @@ class Engine : public EngineBase {
     }
 
     void uai() {
-        if (uaiok) {
+        if (uaiok_received) {
             return;
         }
-        send("uai\n");
         std::unique_lock<std::mutex> lock(mtx_);
-        cv_uaiok_.wait(lock);
-        lock.unlock();
-        uaiok = true;
+        send("uai\n");
+        cv_uaiok_.wait(lock, [&] { return uaiok_received; });
     }
 
     void uainewgame() {
@@ -67,10 +65,10 @@ class Engine : public EngineBase {
     }
 
     void isready() {
-        send("isready\n");
         std::unique_lock<std::mutex> lock(mtx_);
-        cv_readyok_.wait(lock);
-        lock.unlock();
+        readyok_received = false;
+        send("isready\n");
+        cv_readyok_.wait(lock, [&] { return readyok_received; });
     }
 
     void position(const libataxx::Position &pos) {
@@ -116,8 +114,8 @@ class Engine : public EngineBase {
 
         start_searching();
         std::unique_lock<std::mutex> lock(mtx_);
-        cv_bestmove_.wait(lock);
-        lock.unlock();
+        bestmove_received = false;
+        cv_bestmove_.wait(lock, [&] { return bestmove_received; });
 
         stop_searching();
         return {bestmove(), pondermove()};
@@ -127,10 +125,11 @@ class Engine : public EngineBase {
         if (depth < 1) {
             return 0;
         }
-        send("perft " + std::to_string(depth) + "\n");
+
         std::unique_lock<std::mutex> lock(mtx_);
-        cv_nodes_.wait(lock);
-        lock.unlock();
+        nodes_received = false;
+        send("perft " + std::to_string(depth) + "\n");
+        cv_nodes_.wait(lock, [&] { return nodes_received; });
 
         return 1;
     }
@@ -158,10 +157,16 @@ class Engine : public EngineBase {
         std::string word;
         if (ss >> word) {
             if (word == "uaiok") {
+                std::lock_guard<std::mutex> lock(mtx_);
+                uaiok_received = true;
                 cv_uaiok_.notify_one();
             } else if (word == "readyok") {
+                std::lock_guard<std::mutex> lock(mtx_);
+                readyok_received = true;
                 cv_readyok_.notify_one();
             } else if (word == "bestmove") {
+                std::lock_guard<std::mutex> lock(mtx_);
+                bestmove_received = true;
                 ss >> word;
                 bestmove_ = Move::from_san(word);
                 // Catch ponder here
@@ -171,6 +176,8 @@ class Engine : public EngineBase {
                 }
                 cv_bestmove_.notify_one();
             } else if (word == "nodes") {
+                std::lock_guard<std::mutex> lock(mtx_);
+                nodes_received = true;
                 cv_nodes_.notify_one();
             } else if (word == "id") {
                 ss >> word;
@@ -204,7 +211,10 @@ class Engine : public EngineBase {
     }
 
    private:
-    bool uaiok{false};
+    bool uaiok_received{false};
+    bool readyok_received{false};
+    bool bestmove_received{false};
+    bool nodes_received{false};
     std::mutex mtx_;
     std::condition_variable cv_uaiok_;
     std::condition_variable cv_readyok_;
