@@ -1,6 +1,7 @@
 #include <iostream>
-#include <libataxx/position.hpp>
+#include <libataxx/test.hpp>
 #include <string>
+#include "match.hpp"
 #include "settings.hpp"
 
 int main(int argc, char **argv) {
@@ -18,8 +19,9 @@ int main(int argc, char **argv) {
         }
     }
 
-    auto pos = libataxx::Position();
-    pos.print();
+    libataxx::test();
+
+    match(3, 100);
 
     return 0;
 }
