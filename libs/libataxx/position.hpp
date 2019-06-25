@@ -36,7 +36,7 @@ class Position {
         pieces[Side::White] = sq_to_bb(Square::a1) | sq_to_bb(Square::g7);
         gaps = sq_to_bb(Square::c3) | sq_to_bb(Square::c5) |
                sq_to_bb(Square::e3) | sq_to_bb(Square::e5);
-        turn = Side::Black;
+        turn_ = Side::Black;
     }
 
     Position(const std::string &fen) {
@@ -52,7 +52,7 @@ class Position {
         pieces[Side::Black] = 0ULL;
         pieces[Side::White] = 0ULL;
         gaps = 0ULL;
-        turn = Side::Black;
+        turn_ = Side::Black;
 
         std::stringstream ss{fen};
         std::string word;
@@ -101,15 +101,15 @@ class Position {
         // Turn
         if (ss >> word) {
             if (word == "b" || word == "B" || word == "x" || word == "X") {
-                turn = Side::Black;
+                turn_ = Side::Black;
             } else {
-                turn = Side::White;
+                turn_ = Side::White;
             }
         }
     }
 
     int legal_moves(Move *moves) const {
-        const Side us = turn;
+        const Side us = turn_;
         const Side them = static_cast<Side>(!us);
         const std::uint64_t filled =
             pieces[Side::Black] | pieces[Side::White] | gaps;
@@ -117,7 +117,7 @@ class Position {
         int num_moves = 0;
 
         // Single moves
-        std::uint64_t singles = single_moves(pieces[turn]) & empty;
+        std::uint64_t singles = single_moves(pieces[turn_]) & empty;
         while (singles) {
             assert(num_moves < max_moves);
             const Square to = static_cast<Square>(lsbll(singles));
@@ -128,7 +128,7 @@ class Position {
         }
 
         // Double moves
-        std::uint64_t copy = pieces[turn];
+        std::uint64_t copy = pieces[turn_];
         while (copy) {
             const Square from = static_cast<Square>(lsbll(copy));
             std::uint64_t destinations = double_moves(from) & empty;
@@ -203,7 +203,7 @@ class Position {
         }
 
         // Turn
-        if (turn == Side::Black) {
+        if (turn_ == Side::Black) {
             fen += " x";
         } else {
             fen += " o";
@@ -233,7 +233,8 @@ class Position {
             }
             sq++;
         }
-        std::cout << "Turn: " << (turn == Side::Black ? "b" : "w") << std::endl;
+        std::cout << "Turn: " << (turn_ == Side::Black ? "b" : "w")
+                  << std::endl;
         std::cout << "FEN: " << fen() << std::endl;
     }
 
@@ -250,11 +251,11 @@ class Position {
 
         // Single moves
         if (move.type() == MoveType::Single) {
-            return single_moves(sq_to_bb(to)) & pieces[turn];
+            return single_moves(sq_to_bb(to)) & pieces[turn_];
         }
         // Double moves
         else {
-            return double_moves(to) & pieces[turn] & sq_to_bb(from);
+            return double_moves(to) & pieces[turn_] & sq_to_bb(from);
         }
     }
 
@@ -274,7 +275,7 @@ class Position {
             return;
         }
 
-        const Side us = turn;
+        const Side us = turn_;
         const Side them = static_cast<Side>(!us);
         const int to = move.to();
         const int from = move.from();
@@ -290,7 +291,7 @@ class Position {
         pieces[them] ^= captured;
         pieces[us] ^= captured;
 
-        turn = them;
+        turn_ = them;
 
         history_.push_back(move);
         irreversible_.push_back(Irreversible{.captured = captured});
@@ -303,8 +304,8 @@ class Position {
         const Move move = history_.back();
         const Irreversible irreversible = irreversible_.back();
 
-        const Side us = static_cast<Side>(!turn);
-        const Side them = turn;
+        const Side us = static_cast<Side>(!turn_);
+        const Side them = turn_;
         const int to = move.to();
         const int from = move.from();
         const std::uint64_t to_bb = sq_to_bb(to);
@@ -319,7 +320,7 @@ class Position {
         pieces[them] ^= captured;
         pieces[us] ^= captured;
 
-        turn = us;
+        turn_ = us;
 
         history_.pop_back();
         irreversible_.pop_back();
@@ -387,11 +388,11 @@ class Position {
         int num_moves = 0;
 
         // Single moves
-        const std::uint64_t singles = single_moves(pieces[turn]) & empty;
+        const std::uint64_t singles = single_moves(pieces[turn_]) & empty;
         num_moves += popcountll(singles);
 
         // Double moves
-        std::uint64_t copy = pieces[turn];
+        std::uint64_t copy = pieces[turn_];
         while (copy) {
             const Square from = static_cast<Square>(lsbll(copy));
             const std::uint64_t destinations = double_moves(from) & empty;
@@ -403,10 +404,14 @@ class Position {
         return num_moves;
     }
 
+    Side turn() const {
+        return turn_;
+    }
+
     std::uint64_t hash() const {
         std::uint64_t key = 0ULL;
 
-        if (turn == Side::Black) {
+        if (turn_ == Side::Black) {
             key ^= zobrist::turn;
         }
 
@@ -431,7 +436,7 @@ class Position {
     std::uint64_t pieces[2];
     std::uint64_t gaps : 49;
     int halfmoves_;
-    Side turn;
+    Side turn_;
     PV history_;
     std::vector<Irreversible> irreversible_;
 };
