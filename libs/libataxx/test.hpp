@@ -81,7 +81,12 @@ bool test_gameover() {
         {"-------/-------/-------/-------/-------/-------/-----xo", true},
         {"-------/-------/-------/-------/-------/-------/-----xx", true},
         {"-------/-------/-------/-------/-------/-------/-----oo", true},
-        {"xxxxxxx/-------/-------/7/-------/-------/ooooooo", true}};
+        {"xxxxxxx/-------/-------/7/-------/-------/ooooooo", true},
+        {"7/7/7/7/xxxxxxx/xxxxxxx/ooooooo x", false},
+        {"7/7/7/7/xxxxxxx/xxxxxxx/ooooooo o", false},
+        {"7/7/7/7/ooooooo/ooooooo/xxxxxxx x", false},
+        {"7/7/7/7/ooooooo/ooooooo/xxxxxxx o", false},
+    };
     for (const auto &[fen, expected] : tests) {
         Position pos(fen);
         if (pos.gameover() != expected) {
