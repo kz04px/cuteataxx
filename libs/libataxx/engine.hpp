@@ -36,7 +36,7 @@ class EngineBase {
     void start() {
         ba::async_read_until(out_,
                              buf_,
-                             "\0",
+                             '\n',
                              boost::bind(&EngineBase::handle_recv,
                                          this,
                                          ba::placeholders::error,
@@ -45,12 +45,10 @@ class EngineBase {
 
     void handle_recv(const boost::system::error_code &ec, std::size_t size) {
         if (!ec) {
-            buf_.commit(size);
-            std::istream istrm(&buf_);
-            std::string str;
-            while (getline(istrm, str) && !str.empty()) {
-                recv(str);
-            }
+            std::istream is(&buf_);
+            std::string line;
+            std::getline(is, line);
+            recv(line);
         }
 
         start();
