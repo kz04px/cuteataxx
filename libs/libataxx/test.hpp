@@ -160,6 +160,36 @@ bool test_parse_san() {
     return true;
 }
 
+bool test_result() {
+    const std::pair<std::string, Result> tests[] = {
+        {"startpos", Result::None},
+        {"7/7/7/7/7/7/7", Result::Draw},
+        {"x6/7/7/7/7/7/7", Result::BlackWin},
+        {"o6/7/7/7/7/7/7", Result::WhiteWin},
+        {"xo5/7/7/7/7/7/7", Result::None},
+        {"ox5/7/7/7/7/7/7", Result::None},
+        {"xxxxxxx/xxxxxxx/xxxxxxx/xxxxxxx/xxxxxxx/xxxxxxx/xxxxxxx",
+         Result::BlackWin},
+        {"ooooooo/ooooooo/ooooooo/ooooooo/ooooooo/ooooooo/ooooooo",
+         Result::WhiteWin},
+        {"xxxxxxx/xxxxxxx/xxxxxxx/xxxxooo/ooooooo/ooooooo/ooooooo",
+         Result::BlackWin},
+        {"xxxxxxx/xxxxxxx/xxxxxxx/xxxoooo/ooooooo/ooooooo/ooooooo",
+         Result::WhiteWin},
+        {"xxxxxxx/xxxxxxx/xxxxxxx/xxx-ooo/ooooooo/ooooooo/ooooooo",
+         Result::Draw},
+    };
+
+    for (const auto &[fen, result] : tests) {
+        Position pos(fen);
+        if (result != pos.result()) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void test() {
     std::cout << std::boolalpha;
     std::cout << test_fen() << " -- FEN parsing" << std::endl;
@@ -168,6 +198,7 @@ void test() {
     std::cout << test_gameover() << " -- Gameover" << std::endl;
     std::cout << test_legal_move() << " -- Legal move" << std::endl;
     std::cout << test_parse_san() << " -- Parse san" << std::endl;
+    std::cout << test_result() << " -- Result" << std::endl;
 }
 
 }  // namespace libataxx
