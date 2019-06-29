@@ -52,12 +52,12 @@ class Engine : public EngineBase {
             return;
         }
         std::unique_lock<std::mutex> lock(mtx_);
-        send("uai\n");
+        send("uai");
         cv_uaiok_.wait(lock, [&] { return uaiok_received; });
     }
 
     void uainewgame() {
-        send("uainewgame\n");
+        send("uainewgame");
     }
 
     void setoption(const std::string &name, const std::string &value) {
@@ -67,12 +67,12 @@ class Engine : public EngineBase {
     void isready() {
         std::unique_lock<std::mutex> lock(mtx_);
         readyok_received = false;
-        send("isready\n");
+        send("isready");
         cv_readyok_.wait(lock, [&] { return readyok_received; });
     }
 
     void position(const libataxx::Position &pos) {
-        send("position fen " + pos.fen() + "\n");
+        send("position fen " + pos.fen());
     }
 
     void register_info_handler(
@@ -81,44 +81,42 @@ class Engine : public EngineBase {
     }
 
     std::tuple<libataxx::Move, libataxx::Move> go(const SearchOptions &opts) {
+        bestmove_received = false;
         switch (opts.type) {
             case SearchType::Depth:
                 if (opts.depth < 1) {
                     throw std::invalid_argument("Depth must be >= 1");
                 }
-                send("go depth " + std::to_string(opts.depth) + "\n");
+                send("go depth " + std::to_string(opts.depth));
                 break;
             case SearchType::Movetime:
                 if (opts.movetime < 1) {
                     throw std::invalid_argument("Movetime must be >= 1");
                 }
-                send("go movetime " + std::to_string(opts.movetime) + "\n");
+                send("go movetime " + std::to_string(opts.movetime));
                 break;
             case SearchType::Nodes:
                 if (opts.nodes == 0ULL) {
                     throw std::invalid_argument("Nodes must be >= 1");
                 }
-                send("go nodes " + std::to_string(opts.nodes) + "\n");
+                send("go nodes " + std::to_string(opts.nodes));
                 break;
             case SearchType::Infinite:
-                send("go infinite\n");
+                send("go infinite");
                 break;
             case SearchType::Time:
                 send("go btime " + std::to_string(opts.btime) + " wtime " +
-                     std::to_string(opts.wtime) + "\n");
+                     std::to_string(opts.wtime));
                 break;
             default:
                 throw "asd";
                 break;
         }
 
-        start_searching();
         std::unique_lock<std::mutex> lock(mtx_);
-        bestmove_received = false;
         cv_bestmove_.wait(lock, [&] { return bestmove_received; });
 
-        stop_searching();
-        return {bestmove(), pondermove()};
+        return {bestmove_, pondermove_};
     }
 
     int perft(const int depth) {
@@ -128,16 +126,14 @@ class Engine : public EngineBase {
 
         std::unique_lock<std::mutex> lock(mtx_);
         nodes_received = false;
-        send("perft " + std::to_string(depth) + "\n");
+        send("perft " + std::to_string(depth));
         cv_nodes_.wait(lock, [&] { return nodes_received; });
 
         return 1;
     }
 
     void stop() {
-        if (searching()) {
-            send("stop\n");
-        }
+        send("stop");
     }
 
     Protocol protocol() const override {
@@ -145,7 +141,7 @@ class Engine : public EngineBase {
     }
 
     void quit() override {
-        send("quit\n");
+        send("quit");
     }
 
     void recv(const std::string &str) override {
@@ -165,15 +161,10 @@ class Engine : public EngineBase {
                 readyok_received = true;
                 cv_readyok_.notify_one();
             } else if (word == "bestmove") {
-                std::lock_guard<std::mutex> lock(mtx_);
-                bestmove_received = true;
                 ss >> word;
                 bestmove_ = Move::from_san(word);
-                // Catch ponder here
-                if (ss >> word && word == "ponder") {
-                    ss >> word;
-                    pondermove_ = Move::from_san(word);
-                }
+                std::lock_guard<std::mutex> lock(mtx_);
+                bestmove_received = true;
                 cv_bestmove_.notify_one();
             } else if (word == "nodes") {
                 std::lock_guard<std::mutex> lock(mtx_);
@@ -211,6 +202,8 @@ class Engine : public EngineBase {
     }
 
    private:
+    libataxx::Move bestmove_{libataxx::Square::None};
+    libataxx::Move pondermove_{libataxx::Square::None};
     bool uaiok_received{false};
     bool readyok_received{false};
     bool bestmove_received{false};

@@ -66,18 +66,6 @@ class EngineBase {
         author_ = author;
     }
 
-    void start_searching() {
-        searching_ = true;
-    }
-
-    void stop_searching() {
-        searching_ = false;
-    }
-
-    [[nodiscard]] bool searching() const {
-        return searching_;
-    }
-
     [[nodiscard]] const std::string &name() const {
         return name_;
     }
@@ -86,21 +74,13 @@ class EngineBase {
         return author_;
     }
 
-    [[nodiscard]] libataxx::Move bestmove() const {
-        return bestmove_;
-    }
-
-    [[nodiscard]] libataxx::Move pondermove() const {
-        return pondermove_;
-    }
-
     [[nodiscard]] bool debug() const {
         return debug_;
     }
 
     void send(const std::string &line) {
         if (debug()) {
-            std::cout << ">" << line;
+            std::cout << ">" << line << std::endl;
         }
         in_ << line << std::endl;
     }
@@ -118,15 +98,11 @@ class EngineBase {
         ios_thread_ = std::thread([&]() { ios_.run(); });
     }
 
-    libataxx::Move bestmove_{libataxx::Square::None};
-    libataxx::Move pondermove_{libataxx::Square::None};
-
    private:
     // Engine
     std::string name_{"Engine"};
     std::string author_{"Author"};
-    bool searching_{false};
-    bool debug_{false};
+    bool debug_{true};
     // Process
     std::thread ios_thread_;
     ba::io_service ios_;
