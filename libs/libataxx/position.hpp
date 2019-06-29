@@ -109,6 +109,10 @@ class Position {
     }
 
     int legal_moves(Move *moves) const {
+        if (gameover()) {
+            return 0;
+        }
+
         const Side us = turn_;
         const Side them = static_cast<Side>(!us);
         const std::uint64_t filled =
@@ -142,6 +146,11 @@ class Position {
             }
 
             copy &= copy - 1;
+        }
+
+        if (num_moves == 0) {
+            moves[0] = nullmove;
+            num_moves++;
         }
 
         for (int i = 0; i < num_moves; ++i) {
@@ -239,6 +248,10 @@ class Position {
     }
 
     [[nodiscard]] bool legal_move(const Move &move) const {
+        if (move == nullmove) {
+            return !can_move() && !gameover();
+        }
+
         const Square from = move.from();
         const Square to = move.to();
         const std::uint64_t filled =
@@ -275,6 +288,14 @@ class Position {
             return;
         }
 
+        if (move == nullmove) {
+            history_.push_back(move);
+            irreversible_.push_back(Irreversible{.captured = 0ULL});
+            assert(history_.size() == irreversible_.size());
+            turn_ = static_cast<Side>(!turn_);
+            return;
+        }
+
         const Side us = turn_;
         const Side them = static_cast<Side>(!us);
         const int to = move.to();
@@ -303,6 +324,13 @@ class Position {
         assert(history_.size() == irreversible_.size());
         const Move move = history_.back();
         const Irreversible irreversible = irreversible_.back();
+
+        if (move == nullmove) {
+            turn_ = static_cast<Side>(!turn_);
+            history_.pop_back();
+            irreversible_.pop_back();
+            return;
+        }
 
         const Side us = static_cast<Side>(!turn_);
         const Side them = turn_;
@@ -382,6 +410,10 @@ class Position {
     }
 
     int count_moves() const {
+        if (gameover()) {
+            return 0;
+        }
+
         const std::uint64_t filled =
             pieces[Side::Black] | pieces[Side::White] | gaps;
         const std::uint64_t empty = Bitboards::All ^ filled;
@@ -400,12 +432,24 @@ class Position {
             copy &= copy - 1;
         }
 
+        // Nullmove
+        if (num_moves == 0) {
+            num_moves++;
+        }
+
         assert(num_moves < max_moves);
         return num_moves;
     }
 
     Side turn() const {
         return turn_;
+    }
+
+    [[nodiscard]] bool can_move() const {
+        const std::uint64_t both = pieces[Side::Black] | pieces[Side::White];
+        const std::uint64_t empty = Bitboards::All ^ (both | gaps);
+        const std::uint64_t moves = single_moves(single_moves(pieces[turn_]));
+        return moves & empty;
     }
 
     std::uint64_t hash() const {

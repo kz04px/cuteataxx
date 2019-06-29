@@ -49,7 +49,7 @@ struct Move {
     }
     [[nodiscard]] static Move from_san(const std::string &san) {
         if (san == "0000" || san == "null") {
-            return Move(Square::a1);
+            return Move(Square::None);
         } else if (san.length() == 2) {
             const int x = san[0] - 'a';
             const int y = san[1] - '1';
@@ -98,6 +98,8 @@ struct Move {
     Square to_;
 };
 
+static const Move nullmove{Square::None};
+
 inline bool operator==(const Move &lhs, const Move &rhs) {
     return lhs.to() == rhs.to() && lhs.from() == rhs.from();
 }
@@ -109,12 +111,17 @@ inline bool operator!=(const Move &lhs, const Move &rhs) {
 inline std::ostream &operator<<(std::ostream &os, const Move &m) {
     const Square from = m.from();
     const Square to = m.to();
-    if (m.type() == MoveType::Double) {
+    if (m == nullmove) {
+        os << "0000";
+    } else if (m.type() == MoveType::Double) {
         os << static_cast<char>(sq_to_file(from) + 'a')
            << static_cast<char>(sq_to_rank(from) + '1');
+        os << static_cast<char>(sq_to_file(to) + 'a')
+           << static_cast<char>(sq_to_rank(to) + '1');
+    } else {
+        os << static_cast<char>(sq_to_file(to) + 'a')
+           << static_cast<char>(sq_to_rank(to) + '1');
     }
-    os << static_cast<char>(sq_to_file(to) + 'a')
-       << static_cast<char>(sq_to_rank(to) + '1');
     return os;
 }
 
