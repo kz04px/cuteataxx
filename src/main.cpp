@@ -21,7 +21,15 @@ int main(int argc, char **argv) {
 
     libataxx::test();
 
-    match(3, 100);
+    std::vector<Player> players;
+    players.push_back(Player{.path = "engines/tiktaxx"});
+    players.push_back(Player{.path = "engines/skeleton-debug"});
+
+    std::vector<std::string> openings;
+    openings.push_back("x5o/7/7/7/7/7/o5x x");
+    openings.push_back("x5o/7/2-1-2/7/2-1-2/7/o5x x");
+
+    match(1, 10, players, openings);
 
     return 0;
 }
