@@ -4,9 +4,8 @@
 #include <string>
 
 struct Player {
+    std::string name;
     std::string path;
-    int time = 10000;
-    int inc = 1000;
 };
 
 #endif
