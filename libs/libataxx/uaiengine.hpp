@@ -145,9 +145,6 @@ class Engine : public EngineBase {
     }
 
     void recv(const std::string &str) override {
-        if (debug()) {
-            std::cout << "<" << str << std::endl;
-        }
         std::stringstream ss{str};
 
         std::string word;

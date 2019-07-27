@@ -74,14 +74,7 @@ class EngineBase {
         return author_;
     }
 
-    [[nodiscard]] bool debug() const {
-        return debug_;
-    }
-
     void send(const std::string &line) {
-        if (debug()) {
-            std::cout << ">" << line << std::endl;
-        }
         in_ << line << std::endl;
     }
 
@@ -102,7 +95,6 @@ class EngineBase {
     // Engine
     std::string name_{"Engine"};
     std::string author_{"Author"};
-    bool debug_{true};
     // Process
     std::thread ios_thread_;
     ba::io_service ios_;
