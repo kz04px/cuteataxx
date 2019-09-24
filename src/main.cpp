@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     app.add_option_function<std::string>(
         "--tc",
         [&settings](const std::string &val) {
-            settings.search.type = libataxx::SearchType::Time;
+            settings.search.type = libataxx::engine::SearchSettings::Type::Time;
             // Fixme
             settings.search.btime = 1000;
             settings.search.wtime = 1000;
@@ -42,7 +42,8 @@ int main(int argc, char **argv) {
     app.add_option_function<std::uint64_t>(
            "--nodes",
            [&settings](const int &val) {
-               settings.search.type = libataxx::SearchType::Nodes;
+               settings.search.type =
+                   libataxx::engine::SearchSettings::Type::Nodes;
                settings.search.nodes = val;
            },
            "Search nodes")
@@ -51,7 +52,8 @@ int main(int argc, char **argv) {
     app.add_option_function<int>(
            "--depth",
            [&settings](const int &val) {
-               settings.search.type = libataxx::SearchType::Depth;
+               settings.search.type =
+                   libataxx::engine::SearchSettings::Type::Depth;
                settings.search.depth = val;
            },
            "Search depth")
@@ -59,7 +61,8 @@ int main(int argc, char **argv) {
     app.add_option_function<int>(
            "--movetime",
            [&settings](const int &val) {
-               settings.search.type = libataxx::SearchType::Movetime;
+               settings.search.type =
+                   libataxx::engine::SearchSettings::Type::Movetime;
                settings.search.movetime = val;
            },
            "Search movetime")
@@ -77,15 +80,13 @@ int main(int argc, char **argv) {
         return app.exit(e);
     }
 
-    assert(settings.search.type != libataxx::SearchType::Infinite);
-
     // Get players
     players.push_back(Player{.name = "Tiktaxx 1", .path = "./engines/tiktaxx"});
     players.push_back(Player{.name = "Tiktaxx 2", .path = "./engines/tiktaxx"});
 
     // Get openings
     if (settings.openings_path.empty()) {
-        openings.push_back("x5o/7/7/7/7/7/o5x x");
+        openings.push_back("x5o/7/7/7/7/7/o5x x 0");
     } else {
         std::ifstream file(settings.openings_path);
 

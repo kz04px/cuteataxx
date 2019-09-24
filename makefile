@@ -2,10 +2,11 @@ CC       = g++
 CFLAGS   = -std=c++17 -Wall -Wextra -Wshadow
 RFLAGS   = -O3 -march=native -flto -DNDEBUG
 DFLAGS   = -g
-INC      = -I libs/
+INC      = -I./libs/ -I./libs/libataxx/src/
 
 LINKER   = g++
-LFLAGS   = -pthread -lboost_system
+DLFLAGS  = -L./libs/libataxx/build/static/
+LFLAGS   = -pthread -lboost_system -lataxx
 
 TARGET   = cuteataxx
 SRCDIR   = src
@@ -16,7 +17,7 @@ SOURCES := $(shell find $(SRCDIR) -type f -name *.cpp)
 OBJECTS := $(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(SOURCES:.cpp=.o))
 
 $(BINDIR)/$(TARGET): $(BINDIR) $(OBJDIR) $(OBJECTS)
-	@$(LINKER) -o $@ $(OBJECTS) $(LFLAGS)
+	@$(LINKER) -o $@ $(OBJECTS) $(DLFLAGS) $(LFLAGS)
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
 	@mkdir -p $(@D)

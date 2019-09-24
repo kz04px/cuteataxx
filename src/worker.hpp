@@ -2,7 +2,6 @@
 #define WORKER_HPP
 
 #include <chrono>
-#include <libataxx/search.hpp>
 #include <libataxx/uaiengine.hpp>
 #include <mutex>
 #include <queue>
@@ -15,7 +14,7 @@ std::mutex file_mutex;
 
 struct Task {
     std::string fen;
-    libataxx::SearchOptions opts;
+    libataxx::engine::SearchSettings opts;
     Player black_player;
     Player white_player;
 };
@@ -37,10 +36,10 @@ void worker(std::queue<Task> &task_queue, std::ofstream &file) {
         libataxx::Result result = libataxx::Result::None;
         std::string reason;
 
-        auto engine1 = libataxx::uai::Engine(task.black_player.path);
+        auto engine1 = libataxx::engine::UAIEngine(task.black_player.path);
         engine1.uai();
 
-        auto engine2 = libataxx::uai::Engine(task.white_player.path);
+        auto engine2 = libataxx::engine::UAIEngine(task.white_player.path);
         engine2.uai();
 
         // Set position
@@ -54,13 +53,16 @@ void worker(std::queue<Task> &task_queue, std::ofstream &file) {
         engine2.isready();
 
         // Set time control
-        libataxx::SearchOptions tc = task.opts;
+        libataxx::engine::SearchSettings tc = task.opts;
+
+        // Create PV
+        std::vector<libataxx::Move> pv;
 
         bool abort = false;
 
         // Play game
         while (!pos.gameover()) {
-            libataxx::uai::Engine *engine =
+            libataxx::engine::UAIEngine *engine =
                 pos.turn() == libataxx::Side::Black ? &engine1 : &engine2;
 
             assert(engine);
@@ -71,7 +73,7 @@ void worker(std::queue<Task> &task_queue, std::ofstream &file) {
             // Get move
             engine->isready();
             const auto t0 = clockz::now();
-            const auto [bestmove, pondermove] = engine->go(tc);
+            const libataxx::Move bestmove = engine->go(tc);
             const auto t1 = clockz::now();
             const auto diff = std::chrono::duration_cast<ms>(t1 - t0);
 
@@ -84,7 +86,7 @@ void worker(std::queue<Task> &task_queue, std::ofstream &file) {
 
             // Check time left
             switch (task.opts.type) {
-                case libataxx::SearchType::Time:
+                case libataxx::engine::SearchSettings::Type::Time:
                     if (pos.turn() == libataxx::Side::Black) {
                         if (tc.btime < 0) {
                             reason = "Timeout";
@@ -99,7 +101,7 @@ void worker(std::queue<Task> &task_queue, std::ofstream &file) {
                         }
                     }
                     break;
-                case libataxx::SearchType::Movetime:
+                case libataxx::engine::SearchSettings::Type::Movetime:
                     if (diff.count() > task.opts.movetime) {
                         break;
                     }
@@ -110,7 +112,7 @@ void worker(std::queue<Task> &task_queue, std::ofstream &file) {
 
             // Check move
             if (!pos.legal_move(bestmove)) {
-                reason = "Illegal move " + bestmove.san();
+                reason = "Illegal move " + std::string(bestmove);
                 abort = true;
                 break;
             }
@@ -127,6 +129,9 @@ void worker(std::queue<Task> &task_queue, std::ofstream &file) {
 
             // Make move
             pos.makemove(bestmove);
+
+            // Add bestmove to PV
+            pv.push_back(bestmove);
         }
 
         if (!abort) {
@@ -134,43 +139,50 @@ void worker(std::queue<Task> &task_queue, std::ofstream &file) {
         }
 
         // Create pgn
-        auto pgn = libataxx::pgn::Game::from_position(pos);
-        pgn.header["Black"] = task.black_player.name;
-        pgn.header["White"] = task.white_player.name;
-        pgn.header["FEN"] = task.fen;
+        auto pgn = libataxx::pgn::PGN{};
+        pgn.header().add("Black", task.black_player.name);
+        pgn.header().add("White", task.white_player.name);
+        pgn.header().add("FEN", task.fen);
         switch (task.opts.type) {
-            case libataxx::SearchType::Time:
-                pgn.header["Timecontrol"] =
-                    std::to_string(task.opts.btime) + "+" +
-                    std::to_string(task.opts.binc) + "s";
+            case libataxx::engine::SearchSettings::Type::Time:
+                pgn.header().add("Timecontrol",
+                                 std::to_string(task.opts.btime) + "+" +
+                                     std::to_string(task.opts.binc) + "s");
                 break;
-            case libataxx::SearchType::Movetime:
-                pgn.header["Movetime"] = task.opts.movetime;
+            case libataxx::engine::SearchSettings::Type::Movetime:
+                pgn.header().add("Movetime",
+                                 std::to_string(task.opts.movetime));
                 break;
-            case libataxx::SearchType::Depth:
-                pgn.header["Depth"] = task.opts.depth;
+            case libataxx::engine::SearchSettings::Type::Depth:
+                pgn.header().add("Depth", std::to_string(task.opts.depth));
                 break;
-            case libataxx::SearchType::Nodes:
-                pgn.header["Nodes"] = task.opts.nodes;
+            case libataxx::engine::SearchSettings::Type::Nodes:
+                pgn.header().add("Nodes", std::to_string(task.opts.nodes));
                 break;
             default:
                 break;
         }
         if (result == libataxx::Result::BlackWin) {
-            pgn.header["Result"] = "1-0";
+            pgn.header().add("Result", "1-0");
         } else if (result == libataxx::Result::WhiteWin) {
-            pgn.header["Result"] = "0-1";
+            pgn.header().add("Result", "0-1");
         } else if (result == libataxx::Result::Draw) {
-            pgn.header["Result"] = "1/2-1/2";
+            pgn.header().add("Result", "1/2-1/2");
         } else {
-            pgn.header["Result"] = "*";
+            pgn.header().add("Result", "*");
         }
         if (!reason.empty()) {
-            pgn.header["Reason"] = reason;
+            pgn.header().add("Reason", reason);
+        }
+
+        // Add moves to pgn
+        libataxx::pgn::Node *node = pgn.root();
+        for (const auto &move : pv) {
+            node = node->add_mainline(move);
         }
 
         // Print to terminal
-        std::cout << pgn.header["Result"] << std::endl;
+        std::cout << pgn.header().get("Result").value() << std::endl;
         std::cout << std::endl;
 
         // Save pgn

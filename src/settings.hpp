@@ -1,7 +1,7 @@
 #ifndef SETTINGS_HPP
 #define SETTINGS_HPP
 
-#include <libataxx/search.hpp>
+#include <libataxx/engine.hpp>
 #include <string>
 
 struct Settings {
@@ -15,7 +15,7 @@ struct Settings {
     bool pgnout = false;
     std::string openings_path;
     std::string pgn_path;
-    libataxx::SearchOptions search;
+    libataxx::engine::SearchSettings search;
 };
 
 #endif
