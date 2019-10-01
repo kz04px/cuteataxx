@@ -35,20 +35,18 @@ void Match::play() noexcept {
         auto engine1 = engine::UAIEngine(settings1.path);
         auto engine2 = engine::UAIEngine(settings2.path);
 
-        /*
         // Did the engines start?
         if (!engine1.running() || !engine2.running()) {
             if (!engine1.running()) {
-                engines_.at(game.engine1_path).crashes++;
+                scores_.at(game.name1).crashes++;
             }
 
             if (!engine2.running()) {
-                engines_.at(game.engine2_path).crashes++;
+                scores_.at(game.name2).crashes++;
             }
 
             continue;
         }
-        */
 
         engine1.uai();
         engine1.isready();
