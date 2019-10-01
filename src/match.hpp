@@ -1,65 +1,94 @@
 #ifndef MATCH_HPP
 #define MATCH_HPP
 
-#include <cassert>
 #include <fstream>
-#include <future>
 #include <iostream>
-#include <libataxx/pgn.hpp>
-#include <libataxx/uaiengine.hpp>
+#include <mutex>
+#include <queue>
+#include <string>
+#include <thread>
+#include <unordered_map>
 #include <vector>
-#include "player.hpp"
-#include "settings.hpp"
-#include "worker.hpp"
+#include "engine.hpp"
 
-using namespace libataxx;
-
-void match(const Settings &settings,
-           std::vector<Player> &players,
-           std::vector<std::string> &openings) {
-    std::queue<Task> task_queue;
-
-    // Fill task queue
-    for (int i = 0; i < settings.games; ++i) {
-        // Get opening fen
-        const int idx = i % openings.size();
-
-        // Create task
-        const auto task = Task{
-            .fen = openings.at(idx),
-            .opts = settings.search,
-            .black_player = players[0],
-            .white_player = players[1],
-        };
-        task_queue.push(task);
+struct MatchSettings {
+   public:
+    MatchSettings()
+        : ratinginterval{10},
+          concurrency{1},
+          num_games{100},
+          debug{false},
+          recover{false},
+          verbose{false},
+          repeat{true},
+          engines{},
+          openings{} {
     }
 
-    std::ofstream file(settings.pgn_path);
-
-    if (!file.is_open()) {
-        std::cerr << "Could not open pgn file" << std::endl;
-        return;
+    void add_opening(const std::string &fen) {
+        openings.push_back(fen);
     }
 
-    const auto t0 = std::chrono::high_resolution_clock::now();
-
-    // Create threads
-    std::vector<std::future<void>> futures;
-    for (int i = 0; i < settings.concurrency; ++i) {
-        futures.push_back(std::async(
-            std::launch::async, worker, std::ref(task_queue), std::ref(file)));
+    void add_engine(const std::string &name, const std::string &path) {
+        engines.emplace(name, EngineSettings{path});
     }
 
-    // Wait
-    for (int i = 0; i < settings.concurrency; ++i) {
-        futures[i].wait();
+    int ratinginterval;
+    int concurrency;
+    int num_games;
+    bool debug;
+    bool recover;
+    bool verbose;
+    bool repeat;
+    std::unordered_map<std::string, EngineSettings> engines;
+    std::vector<std::string> openings;
+};
+
+struct Game {
+    Game() {
     }
 
-    const auto t1 = std::chrono::high_resolution_clock::now();
-    const auto diff = std::chrono::duration_cast<std::chrono::seconds>(t1 - t0);
+    Game(const std::string &fen_,
+         const std::string &name1_,
+         const std::string &name2_)
+        : fen{fen_}, name1{name1_}, name2{name2_} {
+    }
 
-    std::cout << "Runtime: " << diff.count() << "s" << std::endl;
-    std::cout << "Games: " << settings.games << std::endl;
-}
+    std::string fen;
+    std::string name1;
+    std::string name2;
+};
+
+class Match {
+   public:
+    explicit Match(const MatchSettings &settings)
+        : settings_{settings}, games_completed_{0} {
+    }
+
+    void add_game(const Game &game) noexcept {
+        games_.push(game);
+    }
+
+    void stats() const noexcept {
+        std::cout << "Openings loaded: " << settings_.openings.size()
+                  << std::endl;
+        std::cout << "Engines loaded: " << settings_.engines.size()
+                  << std::endl;
+    }
+
+    void run();
+
+   private:
+    void play() noexcept;
+
+   private:
+    const MatchSettings settings_;
+    std::unordered_map<std::string, EngineScore> scores_;
+    std::queue<Game> games_;
+    std::mutex mtx_output_;
+    std::mutex mtx_games_;
+    std::fstream pgn_file_;
+    int games_completed_;
+};
 
 #endif
