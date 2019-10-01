@@ -53,11 +53,9 @@ void Match::play() noexcept {
         engine2.uai();
         engine2.isready();
 
-        /*
         // Set engine options
-        engine1.setoption("hash", 128);
-        engine2.setoption("hash", 128);
-        */
+        engine1.set_option("hash", settings_.hash_size);
+        engine2.set_option("hash", settings_.hash_size);
 
         // Create PGN
         pgn::PGN pgn;

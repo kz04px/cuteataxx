@@ -17,6 +17,7 @@ struct MatchSettings {
         : ratinginterval{10},
           concurrency{1},
           num_games{100},
+          hash_size{16},
           debug{false},
           recover{false},
           verbose{false},
@@ -36,6 +37,7 @@ struct MatchSettings {
     int ratinginterval;
     int concurrency;
     int num_games;
+    int hash_size;
     bool debug;
     bool recover;
     bool verbose;

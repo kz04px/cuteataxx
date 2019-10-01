@@ -24,6 +24,8 @@ int main(int argc, char **argv) {
     app.add_option(
            "--ratinginterval", settings.ratinginterval, "Rating interval")
         ->check(CLI::Range(1, 10000));
+    app.add_option("--hash", settings.hash_size, "Hash table size in megabytes")
+        ->check(CLI::Range(1, std::numeric_limits<int>::max()));
 
     // Add engines
     auto engine_option = app.add_option(
