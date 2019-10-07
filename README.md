@@ -4,7 +4,7 @@ Cuteataxx runs computer engine matches for the board game [Ataxx](https://en.wik
 ## Usage
 Match settings are passed to cuteataxx through command line arguments.
 ```
-./cuteataxx --games=100 --movetime=100 --pgn=games.pgn --concurrency=2
+./cuteataxx --engine [name] [path] --engine [name] [path] --games=100 --concurrency=2
 ```
 
 ## Building
@@ -15,6 +15,9 @@ make
 cd ../../
 make release
 ```
+
+## License
+Cuteataxx is available under the MIT license.
 
 ## Credits
  - CLI11 is a command line parser and can be found [here](https://github.com/CLIUtils/CLI11). The header only version of this library is included in the libs folder.
