@@ -8,9 +8,11 @@ Match settings are passed to cuteataxx through command line arguments.
 ```
 
 ## Building
-```
-git clone https://github.com/kz04px/cuteataxx
-cd ./cuteataxx
+```bash
+git clone --recurse-submodules https://github.com/kz04px/cuteataxx
+cd ./cuteataxx/libs/libataxx
+make
+cd ../../
 make release
 ```
 
