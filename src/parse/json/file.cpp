@@ -45,6 +45,11 @@ std::pair<match::Settings, match::Engines> file(const std::string &path) {
         settings.ratinginterval = j.at("ratinginterval");
     }
 
+    // Add concurrency
+    if (j.find("concurrency") != j.end()) {
+        settings.concurrency = j.at("concurrency");
+    }
+
     // Add colour1
     if (j.find("colour1") != j.end()) {
         settings.colour1 = j.at("colour1");

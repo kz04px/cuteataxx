@@ -23,6 +23,7 @@ int main(int argc, char **argv) {
         const auto &[settings, engines] = parse::json::file(argv[1]);
         std::cout << "games " << settings.num_games << std::endl;
         std::cout << "engines " << engines.size() << std::endl;
+        std::cout << "concurrency " << settings.concurrency << std::endl;
 
         switch (settings.tc.type) {
             case libataxx::engine::SearchSettings::Type::Depth:
