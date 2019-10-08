@@ -1,82 +1,77 @@
-#include <CLI11.hpp>
-#include <cassert>
 #include <iostream>
-#include <limits>
-#include <string>
-#include "match.hpp"
+#include <libataxx/engine.hpp>
+#include <stdexcept>
+#include "match/match.hpp"
+#include "match/openings.hpp"
+#include "match/settings.hpp"
+#include "parse/json/file.hpp"
+#include "parse/openings.hpp"
+
+using namespace match;
 
 int main(int argc, char **argv) {
-    CLI::App app{"Cuteataxx"};
+    if (argc < 2) {
+        std::cerr << "Must provide path to settings file" << std::endl;
+        return 1;
+    }
 
-    MatchSettings settings;
-    std::string openings_path;
-    std::string pgn_path;
-
-    // Specify command line options
-    app.add_option("--openings", openings_path, "Path to openings file")
-        ->check(CLI::ExistingFile);
-    app.add_option("--pgn", pgn_path, "Path to pgn output");
-    app.add_option("--games", settings.num_games, "Number of games to play")
-        ->check(CLI::Range(1, 100000))
-        ->required();
-    app.add_option("--concurrency", settings.concurrency, "Threads to use")
-        ->check(CLI::Range(1, 128));
-    app.add_option(
-           "--ratinginterval", settings.ratinginterval, "Rating interval")
-        ->check(CLI::Range(1, 10000));
-    app.add_option("--hash", settings.hash_size, "Hash table size in megabytes")
-        ->check(CLI::Range(1, std::numeric_limits<int>::max()));
-
-    // Add engines
-    auto engine_option = app.add_option(
-        "--engine",
-        [&settings](CLI::results_t vals) {
-            for (std::size_t i = 0; i < vals.size(); i += 2) {
-                settings.add_engine(vals.at(i), vals.at(i + 1));
-            }
-            return true;
-        },
-        "Engine name & path");
-    engine_option->type_name("name path");
-    engine_option->type_size(-2);
-
-    // Specify command line flags
-    app.add_flag("--debug ", settings.debug, "Enable debug mode");
-    app.add_flag("--recover ", settings.recover, "Enable recover mode");
-    app.add_flag("--verbose ", settings.verbose, "Enable verbose mode");
-
-    // Parse command line arguments
     try {
-        app.parse(argc, argv);
-    } catch (const CLI::ParseError &e) {
-        return app.exit(e);
-    }
+        Match match;
 
-    // Add openings
-    if (openings_path.empty()) {
-        settings.add_opening("x5o/7/7/7/7/7/o5x x 0");
-    } else {
-        std::ifstream file(openings_path);
+        // Load settings
+        std::cout << "Loading settings from " << argv[1] << std::endl;
+        const auto &[settings, engines] = parse::json::file(argv[1]);
+        std::cout << "games " << settings.num_games << std::endl;
+        std::cout << "engines " << engines.size() << std::endl;
 
-        if (!file.is_open()) {
-            std::cerr << "Could not open " << openings_path << std::endl;
-            return 1;
+        switch (settings.tc.type) {
+            case libataxx::engine::SearchSettings::Type::Depth:
+                std::cout << "depth " << settings.tc.depth << std::endl;
+                break;
+            case libataxx::engine::SearchSettings::Type::Nodes:
+                std::cout << "nodes " << settings.tc.nodes << std::endl;
+                break;
+            case libataxx::engine::SearchSettings::Type::Movetime:
+                std::cout << "movetime " << settings.tc.movetime << "ms"
+                          << std::endl;
+                break;
+            case libataxx::engine::SearchSettings::Type::Time:
+                std::cout << settings.tc.btime << "+" << settings.tc.binc
+                          << "ms" << std::endl;
+                break;
+            default:
+                throw std::invalid_argument("Coulldn't find movetime");
         }
 
-        std::string line;
-        while (getline(file, line)) {
-            settings.add_opening(line);
+        std::cout << std::endl;
+
+        // Load openings
+        std::cout << "Loading openings from " << settings.openings_path
+                  << std::endl;
+        const auto openings = parse::openings(settings.openings_path);
+        std::cout << "found " << openings.size() << std::endl;
+        std::cout << std::endl;
+
+        // Sanity checks
+        if (settings.concurrency > 128) {
+            throw "Too many threads fam";
+        } else if (engines.size() > 128) {
+            throw "Too many engines fam";
         }
+
+        // Run match
+        std::cout << "Starting games" << std::endl;
+        std::cout << std::endl;
+        match.run(settings, openings, engines);
+    } catch (std::invalid_argument &e) {
+        std::cerr << e.what() << std::endl;
+    } catch (const char *e) {
+        std::cerr << e << std::endl;
+    } catch (std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "Uh oh" << std::endl;
     }
-
-    // Create match with the settings
-    Match match{settings};
-
-    // Print stats
-    match.stats();
-
-    // Play match
-    match.run();
 
     return 0;
 }

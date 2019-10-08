@@ -20,4 +20,4 @@ make release
 Cuteataxx is available under the MIT license.
 
 ## Credits
- - CLI11 is a command line parser and can be found [here](https://github.com/CLIUtils/CLI11). The header only version of this library is included in the libs folder.
+ - [JSON for Modern C++](https://github.com/nlohmann/json)

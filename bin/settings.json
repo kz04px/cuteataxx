@@ -1,0 +1,39 @@
+{
+    "games": 40,
+    "concurrency": 3,
+    "ratinginterval": 10,
+    "repeat": true,
+    "verbose": false,
+    "debug": false,
+    "recover": false,
+    "adjudicate": false,
+    "colour1": "White",
+    "colour2": "Black",
+    "openings": "openings/ply2.txt",
+    "timecontrol": {
+        "time": 1000,
+        "inc": 10
+    },
+    "options": {
+        "debug": false,
+        "threads": 1,
+        "hash": 128,
+        "ownbook": false
+    },
+    "pgn": {
+        "enabled": true,
+        "verbose": true,
+        "path": "games.pgn",
+        "event": "?"
+    },
+    "engines": [
+        {
+            "name": "Engine1",
+            "path": "./engines/engine1"
+        },
+        {
+            "name": "Engine2",
+            "path": "./engines/engine2"
+        }
+    ]
+}
