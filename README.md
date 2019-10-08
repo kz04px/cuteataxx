@@ -2,9 +2,9 @@
 Cuteataxx runs computer engine matches for the board game [Ataxx](https://en.wikipedia.org/wiki/Ataxx). Still a work in progress.
 
 ## Usage
-Match settings are passed to cuteataxx through command line arguments.
+Match settings are read from a .json file passed to cuteataxx through command line arguments
 ```
-./cuteataxx --engine [name] [path] --engine [name] [path] --games=100 --concurrency=2
+./cuteataxx settings.json
 ```
 
 ## Building
