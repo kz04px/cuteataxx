@@ -84,6 +84,18 @@ std::pair<match::Settings, match::Engines> file(const std::string &path) {
     // Add engines
     auto engines = parse::json::engines(j);
 
+    // Add global engine options
+    if (j.find("options") != j.end()) {
+        for (auto &[name, details] : engines) {
+            for (const auto &[key, val] : j.at("options").items()) {
+                // Use the global option only if not specified for the engine
+                if (details.options.find(key) == details.options.end()) {
+                    details.options[key] = val;
+                }
+            }
+        }
+    }
+
     return {settings, engines};
 }
 

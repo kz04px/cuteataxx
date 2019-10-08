@@ -15,10 +15,10 @@
         "inc": 10
     },
     "options": {
-        "debug": false,
-        "threads": 1,
-        "hash": 128,
-        "ownbook": false
+        "debug": "false",
+        "threads": "1",
+        "hash": "128",
+        "ownbook": "false"
     },
     "pgn": {
         "enabled": true,
@@ -29,7 +29,10 @@
     "engines": [
         {
             "name": "Engine1",
-            "path": "./engines/engine1"
+            "path": "./engines/engine1",
+            "options": {
+                "ownbook": "true"
+            }
         },
         {
             "name": "Engine2",

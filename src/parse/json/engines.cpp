@@ -22,6 +22,13 @@ match::Engines engines(const nlohmann::json &j) {
             details.name = engine.at("name");
         }
 
+        // Engine options
+        if (engine.find("options") != engine.end()) {
+            for (const auto &[key, val] : engine.at("options").items()) {
+                details.options[key] = val;
+            }
+        }
+
         engines[details.name] = details;
     }
     return engines;
