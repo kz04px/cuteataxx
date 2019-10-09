@@ -112,6 +112,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
         // Illegal move played
         if (!pos.legal_move(move)) {
+            node->add_comment("illegal move");
             illegal_move = true;
             break;
         }
