@@ -156,6 +156,15 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             }
         }
 
+        // Add the time left
+        if (settings.pgn_verbose && settings.tc.type == SearchType::Time) {
+            if (pos.turn() == Side::Black) {
+                node->add_comment("time left " + std::to_string(btime) + "ms");
+            } else {
+                node->add_comment("time left " + std::to_string(wtime) + "ms");
+            }
+        }
+
         pos.makemove(move);
     }
 
