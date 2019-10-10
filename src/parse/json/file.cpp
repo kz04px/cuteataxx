@@ -50,6 +50,11 @@ std::pair<match::Settings, match::Engines> file(const std::string &path) {
         settings.concurrency = j.at("concurrency");
     }
 
+    // Add timeout buffer
+    if (j.find("timeoutbuffer") != j.end()) {
+        settings.timeout_buffer = j.at("timeoutbuffer");
+    }
+
     // Add colour1
     if (j.find("colour1") != j.end()) {
         settings.colour1 = j.at("colour1");

@@ -24,6 +24,8 @@ int main(int argc, char **argv) {
         std::cout << "games " << settings.num_games << std::endl;
         std::cout << "engines " << engines.size() << std::endl;
         std::cout << "concurrency " << settings.concurrency << std::endl;
+        std::cout << "timeout buffer " << settings.timeout_buffer << "ms"
+                  << std::endl;
 
         switch (settings.tc.type) {
             case libataxx::engine::SearchSettings::Type::Depth:

@@ -134,7 +134,8 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
             // Out of time?
             if (settings.tc.type == SearchType::Movetime) {
-                if (diff.count() > settings.tc.movetime + 10) {
+                if (diff.count() >
+                    settings.tc.movetime + settings.timeout_buffer) {
                     out_of_time = true;
                     if (pos.turn() == libataxx::Side::Black) {
                         result = libataxx::Result::WhiteWin;
