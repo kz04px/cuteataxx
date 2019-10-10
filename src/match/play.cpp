@@ -18,38 +18,11 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     // Get engine & position settings
     auto pos = Position{game.fen};
 
-    // Start engines
-    auto engine1 = engine::UAIEngine(game.engine1.path);
-    auto engine2 = engine::UAIEngine(game.engine2.path);
-
-    // Did the engines start?
-    if (!engine1.running()) {
-        throw "asd 1";
-    }
-    if (!engine2.running()) {
-        throw "asd 2";
-    }
-
-    engine1.uai();
-    engine2.uai();
-
-    // Set engine options
-    for (const auto &[key, val] : game.engine1.options) {
-        engine1.set_option(key, val);
-    }
-    for (const auto &[key, val] : game.engine2.options) {
-        engine2.set_option(key, val);
-    }
-
-    engine1.isready();
-    engine2.isready();
-
     // Create PGN
     pgn::PGN pgn;
     pgn.header().add(settings.colour1, game.engine1.name);
     pgn.header().add(settings.colour2, game.engine2.name);
     pgn.header().add("FEN", game.fen);
-
     auto *node = pgn.root();
 
     int btime = settings.tc.btime;
@@ -59,77 +32,89 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     bool engine_crash = false;
     auto result = libataxx::Result::None;
 
-    // Play
-    while (!pos.gameover()) {
-        auto *engine = pos.turn() == Side::Black ? &engine1 : &engine2;
+    try {
+        // Start engines
+        auto engine1 = engine::UAIEngine(game.engine1.path);
+        auto engine2 = engine::UAIEngine(game.engine2.path);
 
-        engine->position(pos);
+        // Did the engines start?
+        if (!engine1.running()) {
+            throw "asd 1";
+        }
+        if (!engine2.running()) {
+            throw "asd 2";
+        }
 
-        engine->isready();
+        engine1.uai();
+        engine2.uai();
 
-        auto search = settings.tc;
+        // Set engine options
+        for (const auto &[key, val] : game.engine1.options) {
+            engine1.set_option(key, val);
+        }
+        for (const auto &[key, val] : game.engine2.options) {
+            engine2.set_option(key, val);
+        }
 
-        if (search.type == SearchType::Time) {
-            if (btime <= 0 || wtime <= 0) {
-                throw "meh";
+        engine1.isready();
+        engine2.isready();
+
+        // Play
+        while (!pos.gameover()) {
+            auto *engine = pos.turn() == Side::Black ? &engine1 : &engine2;
+
+            engine->position(pos);
+
+            engine->isready();
+
+            auto search = settings.tc;
+
+            if (search.type == SearchType::Time) {
+                if (btime <= 0 || wtime <= 0) {
+                    throw "meh";
+                }
             }
-        }
 
-        // Update tc
-        search.btime = btime;
-        search.wtime = wtime;
+            // Update tc
+            search.btime = btime;
+            search.wtime = wtime;
 
-        // Start move timer
-        const auto t0 = high_resolution_clock::now();
+            // Start move timer
+            const auto t0 = high_resolution_clock::now();
 
-        // Get move
-        libataxx::Move move;
-        try {
-            move = engine->go(search);
-        } catch (...) {
-            engine_crash = true;
-            if (pos.turn() == libataxx::Side::Black) {
-                result = libataxx::Result::WhiteWin;
-            } else {
-                result = libataxx::Result::BlackWin;
+            // Get move
+            libataxx::Move move;
+            try {
+                move = engine->go(search);
+            } catch (...) {
+                move = libataxx::Move::nullmove();
+                engine_crash = true;
             }
-            break;
-        }
 
-        // Stop move timer
-        const auto t1 = high_resolution_clock::now();
+            // Stop move timer
+            const auto t1 = high_resolution_clock::now();
 
-        // Get move time
-        const auto diff = duration_cast<milliseconds>(t1 - t0);
+            // Get move time
+            const auto diff = duration_cast<milliseconds>(t1 - t0);
 
-        // Add move to .pgn
-        node = node->add_mainline(move);
+            // Add move to .pgn
+            node = node->add_mainline(move);
 
-        // Comment with engine data
-        if (settings.pgn_verbose) {
-            node->add_comment("movetime " + std::to_string(diff.count()));
-        }
-
-        // Illegal move played
-        if (!pos.legal_move(move)) {
-            node->add_comment("illegal move");
-            illegal_move = true;
-            break;
-        }
-
-        // Update clock
-        if (settings.tc.type == SearchType::Time) {
-            if (pos.turn() == Side::Black) {
-                btime -= diff.count();
-            } else {
-                wtime -= diff.count();
+            // Comment with engine data
+            if (settings.pgn_verbose) {
+                node->add_comment("movetime " + std::to_string(diff.count()));
             }
-        }
 
-        // Out of time?
-        if (settings.tc.type == SearchType::Movetime) {
-            if (diff.count() > settings.tc.movetime + 10) {
-                out_of_time = true;
+            // Illegal move played
+            if (!pos.legal_move(move)) {
+                node->add_comment("illegal move");
+                illegal_move = true;
+                break;
+            }
+
+            // Engine crashed
+            if (engine_crash) {
+                node->add_comment("engine crashed");
                 if (pos.turn() == libataxx::Side::Black) {
                     result = libataxx::Result::WhiteWin;
                 } else {
@@ -137,35 +122,71 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
                 }
                 break;
             }
-        } else if (btime <= 0) {
-            out_of_time = true;
+
+            // Update clock
+            if (settings.tc.type == SearchType::Time) {
+                if (pos.turn() == Side::Black) {
+                    btime -= diff.count();
+                } else {
+                    wtime -= diff.count();
+                }
+            }
+
+            // Out of time?
+            if (settings.tc.type == SearchType::Movetime) {
+                if (diff.count() > settings.tc.movetime + 10) {
+                    out_of_time = true;
+                    if (pos.turn() == libataxx::Side::Black) {
+                        result = libataxx::Result::WhiteWin;
+                    } else {
+                        result = libataxx::Result::BlackWin;
+                    }
+                    break;
+                }
+            } else if (btime <= 0) {
+                out_of_time = true;
+                result = libataxx::Result::WhiteWin;
+                break;
+            } else if (wtime <= 0) {
+                out_of_time = true;
+                result = libataxx::Result::BlackWin;
+                break;
+            }
+
+            // Increments
+            if (settings.tc.type == SearchType::Time) {
+                if (pos.turn() == Side::Black) {
+                    btime += settings.tc.binc;
+                } else {
+                    wtime += settings.tc.winc;
+                }
+            }
+
+            // Add the time left
+            if (settings.pgn_verbose && settings.tc.type == SearchType::Time) {
+                if (pos.turn() == Side::Black) {
+                    node->add_comment("time left " + std::to_string(btime) +
+                                      "ms");
+                } else {
+                    node->add_comment("time left " + std::to_string(wtime) +
+                                      "ms");
+                }
+            }
+
+            pos.makemove(move);
+        }
+
+        // Stop engines
+        engine1.quit();
+        engine2.quit();
+    } catch (...) {
+        engine_crash = true;
+        node->add_comment("engine crashed");
+        if (pos.turn() == libataxx::Side::Black) {
             result = libataxx::Result::WhiteWin;
-            break;
-        } else if (wtime <= 0) {
-            out_of_time = true;
+        } else {
             result = libataxx::Result::BlackWin;
-            break;
         }
-
-        // Increments
-        if (settings.tc.type == SearchType::Time) {
-            if (pos.turn() == Side::Black) {
-                btime += settings.tc.binc;
-            } else {
-                wtime += settings.tc.winc;
-            }
-        }
-
-        // Add the time left
-        if (settings.pgn_verbose && settings.tc.type == SearchType::Time) {
-            if (pos.turn() == Side::Black) {
-                node->add_comment("time left " + std::to_string(btime) + "ms");
-            } else {
-                node->add_comment("time left " + std::to_string(wtime) + "ms");
-            }
-        }
-
-        pos.makemove(move);
     }
 
     // Game finished normally
@@ -198,10 +219,6 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     else if (engine_crash) {
         pgn.header().add("Adjudicated", "Engine crashed");
     }
-
-    // Stop engines
-    engine1.quit();
-    engine2.quit();
 
     return pgn;
 }
