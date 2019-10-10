@@ -65,6 +65,11 @@ std::pair<match::Settings, match::Engines> file(const std::string &path) {
         settings.colour2 = j.at("colour2");
     }
 
+    // Add debug
+    if (j.find("debug") != j.end()) {
+        settings.debug = j.at("debug");
+    }
+
     // Add repeat
     if (j.find("repeat") != j.end()) {
         settings.repeat = j.at("repeat");
