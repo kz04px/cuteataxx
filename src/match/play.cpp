@@ -20,6 +20,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
     // Create PGN
     pgn::PGN pgn;
+    pgn.header().add("Event", settings.pgn_event);
     pgn.header().add(settings.colour1, game.engine1.name);
     pgn.header().add(settings.colour2, game.engine2.name);
     pgn.header().add("FEN", game.fen);
