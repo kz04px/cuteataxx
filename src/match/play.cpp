@@ -134,25 +134,30 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             }
 
             // Out of time?
-            if (settings.tc.type == SearchType::Movetime) {
-                if (diff.count() >
-                    settings.tc.movetime + settings.timeout_buffer) {
-                    out_of_time = true;
-                    if (pos.turn() == libataxx::Side::Black) {
+            switch (settings.tc.type) {
+                case SearchType::Movetime:
+                    if (diff.count() >
+                        settings.tc.movetime + settings.timeout_buffer) {
+                        out_of_time = true;
+                        if (pos.turn() == libataxx::Side::Black) {
+                            result = libataxx::Result::WhiteWin;
+                        } else {
+                            result = libataxx::Result::BlackWin;
+                        }
+                        break;
+                    }
+                    break;
+                case SearchType::Time:
+                    if (btime <= 0) {
+                        out_of_time = true;
                         result = libataxx::Result::WhiteWin;
-                    } else {
+                    } else if (wtime <= 0) {
+                        out_of_time = true;
                         result = libataxx::Result::BlackWin;
                     }
                     break;
-                }
-            } else if (btime <= 0) {
-                out_of_time = true;
-                result = libataxx::Result::WhiteWin;
-                break;
-            } else if (wtime <= 0) {
-                out_of_time = true;
-                result = libataxx::Result::BlackWin;
-                break;
+                default:
+                    break;
             }
 
             // Increments
@@ -193,20 +198,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
     // Game finished normally
     if (result == libataxx::Result::None) {
-        switch (pos.result()) {
-            case libataxx::Result::BlackWin:
-                pgn.header().add("Result", "1-0");
-                break;
-            case libataxx::Result::WhiteWin:
-                pgn.header().add("Result", "0-1");
-                break;
-            case libataxx::Result::Draw:
-                pgn.header().add("Result", "1/2-1/2");
-                break;
-            default:
-                pgn.header().add("Result", "*");
-                break;
-        }
+        result = pos.result();
     }
 
     // Illegal move
@@ -220,6 +212,22 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     // Engine crashed
     else if (engine_crash) {
         pgn.header().add("Adjudicated", "Engine crashed");
+    }
+
+    // Add result to .pgn
+    switch (result) {
+        case libataxx::Result::BlackWin:
+            pgn.header().add("Result", "1-0");
+            break;
+        case libataxx::Result::WhiteWin:
+            pgn.header().add("Result", "0-1");
+            break;
+        case libataxx::Result::Draw:
+            pgn.header().add("Result", "1/2-1/2");
+            break;
+        default:
+            pgn.header().add("Result", "*");
+            break;
     }
 
     return pgn;
