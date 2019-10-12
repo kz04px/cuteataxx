@@ -3,6 +3,7 @@
     "concurrency": 3,
     "ratinginterval": 10,
     "timeoutbuffer": 25,
+    "maxfullmoves": 300,
     "repeat": true,
     "verbose": false,
     "debug": false,

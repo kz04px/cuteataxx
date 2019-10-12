@@ -61,7 +61,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
         engine2.isready();
 
         // Play
-        while (!pos.gameover()) {
+        while (!pos.gameover() && pos.fullmoves() < settings.maxfullmoves) {
             auto *engine = pos.turn() == Side::Black ? &engine1 : &engine2;
 
             engine->position(pos);
@@ -194,6 +194,12 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
         } else {
             result = libataxx::Result::BlackWin;
         }
+    }
+
+    // Max fullmove counter was hit
+    if (pos.fullmoves() >= settings.maxfullmoves) {
+        result = libataxx::Result::Draw;
+        pgn.header().add("Adjudicated", "Max game length reached");
     }
 
     // Game finished normally

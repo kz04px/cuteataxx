@@ -55,6 +55,11 @@ std::pair<match::Settings, match::Engines> file(const std::string &path) {
         settings.timeout_buffer = j.at("timeoutbuffer");
     }
 
+    // Add max fullmoves
+    if (j.find("maxfullmoves") != j.end()) {
+        settings.maxfullmoves = j.at("maxfullmoves");
+    }
+
     // Add colour1
     if (j.find("colour1") != j.end()) {
         settings.colour1 = j.at("colour1");

@@ -2,6 +2,7 @@
 #define MATCH_SETTINGS_HPP
 
 #include <libataxx/engine.hpp>
+#include <limits>
 #include <map>
 #include <string>
 #include <vector>
@@ -14,6 +15,7 @@ struct Settings {
     int num_games = 100;
     int hash_size = 16;
     int timeout_buffer = 10;
+    unsigned int maxfullmoves = std::numeric_limits<unsigned int>::max();
     bool debug = false;
     bool recover = false;
     bool verbose = false;
