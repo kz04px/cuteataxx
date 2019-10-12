@@ -41,8 +41,6 @@ void Match::worker(const Settings &settings,
             continue;
         }
 
-        pgn.header().add("Event", settings.pgn_event);
-
         // Results & printing
         {
             std::lock_guard<std::mutex> lock(mtx_output_);
