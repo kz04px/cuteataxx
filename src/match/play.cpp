@@ -196,17 +196,6 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
         }
     }
 
-    // Max fullmove counter was hit
-    if (pos.fullmoves() >= settings.maxfullmoves) {
-        result = libataxx::Result::Draw;
-        pgn.header().add("Adjudicated", "Max game length reached");
-    }
-
-    // Game finished normally
-    if (result == libataxx::Result::None) {
-        result = pos.result();
-    }
-
     // Illegal move
     if (illegal_move) {
         pgn.header().add("Adjudicated", "Illegal move");
@@ -218,6 +207,15 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     // Engine crashed
     else if (engine_crash) {
         pgn.header().add("Adjudicated", "Engine crashed");
+    }
+    // Game finished normally
+    else if (pos.gameover()) {
+        result = pos.result();
+    }
+    // Max fullmove counter was hit
+    else if (pos.fullmoves() >= settings.maxfullmoves) {
+        result = libataxx::Result::Draw;
+        pgn.header().add("Adjudicated", "Max game length reached");
     }
 
     // Add result to .pgn
