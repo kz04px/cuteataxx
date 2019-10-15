@@ -134,30 +134,27 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             }
 
             // Out of time?
-            switch (settings.tc.type) {
-                case SearchType::Movetime:
-                    if (diff.count() >
-                        settings.tc.movetime + settings.timeout_buffer) {
-                        out_of_time = true;
-                        if (pos.turn() == libataxx::Side::Black) {
-                            result = libataxx::Result::WhiteWin;
-                        } else {
-                            result = libataxx::Result::BlackWin;
-                        }
-                        break;
-                    }
-                    break;
-                case SearchType::Time:
-                    if (btime <= 0) {
-                        out_of_time = true;
+            if (settings.tc.type == SearchType::Movetime) {
+                if (diff.count() >
+                    settings.tc.movetime + settings.timeout_buffer) {
+                    out_of_time = true;
+                    if (pos.turn() == libataxx::Side::Black) {
                         result = libataxx::Result::WhiteWin;
-                    } else if (wtime <= 0) {
-                        out_of_time = true;
+                    } else {
                         result = libataxx::Result::BlackWin;
                     }
                     break;
-                default:
+                }
+            } else if (settings.tc.type == SearchType::Time) {
+                if (btime <= 0) {
+                    out_of_time = true;
+                    result = libataxx::Result::WhiteWin;
                     break;
+                } else if (wtime <= 0) {
+                    out_of_time = true;
+                    result = libataxx::Result::BlackWin;
+                    break;
+                }
             }
 
             // Increments
