@@ -3,6 +3,15 @@
 #include "match.hpp"
 #include "settings.hpp"
 
+void print_score(const match::Details &engine1,
+                 const match::Details &engine2,
+                 const match::Results &results) {
+    std::cout << "Score of ";
+    std::cout << engine1.name << " vs " << engine2.name;
+    std::cout << ": " << results.scores.at(engine1.name);
+    std::cout << " " << results.scores.at(engine1.name).played;
+}
+
 namespace match {
 
 void Match::worker(const Settings &settings,
@@ -78,12 +87,11 @@ void Match::worker(const Settings &settings,
             if (results.scores.size() == 2) {
                 if (results.games_played < settings.ratinginterval ||
                     results.games_played % settings.ratinginterval == 0) {
-                    std::cout << "Score of ";
-                    std::cout << game.engine1.name << " vs "
-                              << game.engine2.name;
-                    std::cout << ": " << results.scores[game.engine1.name];
-                    std::cout << " "
-                              << results.scores[game.engine1.name].played;
+                    if (game.engine1.id < game.engine2.id) {
+                        print_score(game.engine1, game.engine2, results);
+                    } else {
+                        print_score(game.engine2, game.engine1, results);
+                    }
                     std::cout << std::endl;
 
                     if (results.games_played >= settings.ratinginterval) {

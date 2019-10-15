@@ -7,6 +7,7 @@
 namespace match {
 
 struct Details {
+    int id;
     std::string name;
     std::string path;
     std::map<std::string, std::string> options;

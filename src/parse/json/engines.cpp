@@ -5,6 +5,7 @@ namespace parse {
 namespace json {
 
 match::Engines engines(const nlohmann::json &j) {
+    int count = 0;
     match::Engines engines;
     for (const auto &engine : j.at("engines")) {
         match::Details details;
@@ -12,6 +13,9 @@ match::Engines engines(const nlohmann::json &j) {
         if (engine.find("path") == engine.end()) {
             continue;
         }
+
+        // Engine ID
+        details.id = count;
 
         details.path = engine.at("path");
 
@@ -30,6 +34,7 @@ match::Engines engines(const nlohmann::json &j) {
         }
 
         engines[details.name] = details;
+        count++;
     }
     return engines;
 }
