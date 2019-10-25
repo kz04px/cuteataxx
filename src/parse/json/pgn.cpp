@@ -20,6 +20,10 @@ void pgn(const nlohmann::json &j, match::Settings &ms) {
         ms.pgn_verbose = pgn.at("verbose");
     }
 
+    if (pgn.find("override") != pgn.end()) {
+        ms.pgn_override = pgn.at("override");
+    }
+
     if (pgn.find("path") != pgn.end()) {
         ms.pgn_path = pgn.at("path");
     }

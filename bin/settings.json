@@ -25,6 +25,7 @@
     "pgn": {
         "enabled": true,
         "verbose": true,
+        "override": false,
         "path": "games.pgn",
         "event": "?"
     },

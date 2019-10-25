@@ -27,6 +27,7 @@ struct Settings {
     // pgn
     bool pgn_enabled = true;
     bool pgn_verbose = false;
+    bool pgn_override = false;
     std::string pgn_path = "games.pgn";
     std::string pgn_event = "*";
 };

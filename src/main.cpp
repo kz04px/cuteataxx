@@ -62,6 +62,11 @@ int main(int argc, char **argv) {
             throw "Too many engines fam";
         }
 
+        // Clear pgn
+        if (settings.pgn_override) {
+            std::ofstream file(settings.pgn_path, std::ofstream::trunc);
+        }
+
         // Run match
         std::cout << "Starting games" << std::endl;
         std::cout << std::endl;
