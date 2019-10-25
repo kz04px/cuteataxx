@@ -1,15 +1,24 @@
 #include <fstream>
+#include <iomanip>
 #include <iostream>
+#include "../elo.hpp"
 #include "match.hpp"
 #include "settings.hpp"
 
 void print_score(const match::Details &engine1,
                  const match::Details &engine2,
                  const match::Results &results) {
+    const auto e = Elo{results.scores.at(engine1.name).wins,
+                       results.scores.at(engine1.name).losses,
+                       results.scores.at(engine1.name).draws};
+
     std::cout << "Score of ";
     std::cout << engine1.name << " vs " << engine2.name;
     std::cout << ": " << results.scores.at(engine1.name);
     std::cout << " " << results.scores.at(engine1.name).played;
+    std::cout << std::endl;
+    std::cout << std::fixed << std::setprecision(2) << e.elo() << " +/- "
+              << e.err();
 }
 
 namespace match {
