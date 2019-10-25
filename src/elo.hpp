@@ -15,7 +15,7 @@ class Elo {
     }
 
     [[nodiscard]] constexpr float elo() const noexcept {
-        const auto total = wins_ + losses_ + draws_;
+        const int total = wins_ + losses_ + draws_;
 
         if (total == 0) {
             return std::nanf("");
@@ -23,7 +23,7 @@ class Elo {
 
         const float m_mu = (wins_ + static_cast<float>(draws_) / 2.0) / total;
 
-        const auto x = diff(m_mu);
+        const float x = diff(m_mu);
         if (x == -0.0) {
             return 0.0;
         }
@@ -31,7 +31,7 @@ class Elo {
     }
 
     [[nodiscard]] constexpr float err() const noexcept {
-        const auto total = wins_ + losses_ + draws_;
+        const int total = wins_ + losses_ + draws_;
 
         if (total == 0) {
             return std::nanf("");
@@ -63,7 +63,7 @@ class Elo {
     }
 
     [[nodiscard]] constexpr float drawRatio() const noexcept {
-        const auto total = wins_ + losses_ + draws_;
+        const int total = wins_ + losses_ + draws_;
 
         if (total == 0) {
             return std::nanf("");
@@ -76,10 +76,10 @@ class Elo {
     [[nodiscard]] constexpr float erfInv(const float x) const noexcept {
         assert(x < 1.0);
         assert(x > -1.0);
-        const auto a = 8.0 * (M_PI - 3.0) / (3.0 * M_PI * (4.0 - M_PI));
-        const auto y = std::log10(1.0 - x * x);
-        const auto z = 2.0 / (M_PI * a) + y / 2.0;
-        const auto ret = std::sqrt(std::sqrt(z * z - y / a) - z);
+        const float a = 8.0 * (M_PI - 3.0) / (3.0 * M_PI * (4.0 - M_PI));
+        const float y = std::log(1.0 - x * x);
+        const float z = 2.0 / (M_PI * a) + y / 2.0;
+        const float ret = std::sqrt(std::sqrt(z * z - y / a) - z);
 
         if (x >= 0.0) {
             return ret;
