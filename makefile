@@ -14,12 +14,13 @@ OBJDIR   = obj
 BINDIR   = bin
 
 SOURCES := $(shell find $(SRCDIR) -type f -name *.cpp)
+HEADERS := $(shell find $(SRCDIR) -type f -name *.hpp)
 OBJECTS := $(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(SOURCES:.cpp=.o))
 
 $(BINDIR)/$(TARGET): $(BINDIR) $(OBJDIR) $(OBJECTS)
 	@$(LINKER) -o $@ $(OBJECTS) $(DLFLAGS) $(LFLAGS)
 
-$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp $(HEADERS)
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
