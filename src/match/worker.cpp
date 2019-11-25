@@ -7,7 +7,8 @@
 
 void print_score(const match::Details &engine1,
                  const match::Details &engine2,
-                 const match::Results &results) {
+                 const match::Results &results,
+                 const bool show_elo = true) {
     const auto e = Elo{results.scores.at(engine1.name).wins,
                        results.scores.at(engine1.name).losses,
                        results.scores.at(engine1.name).draws};
@@ -17,8 +18,10 @@ void print_score(const match::Details &engine1,
     std::cout << ": " << results.scores.at(engine1.name);
     std::cout << " " << results.scores.at(engine1.name).played;
     std::cout << std::endl;
-    std::cout << std::fixed << std::setprecision(2) << e.elo() << " +/- "
-              << e.err();
+    if (show_elo) {
+        std::cout << std::fixed << std::setprecision(2) << e.elo() << " +/- "
+                  << e.err();
+    }
 }
 
 namespace match {
@@ -96,12 +99,15 @@ void Match::worker(const Settings &settings,
             if (results.scores.size() == 2) {
                 if (results.games_played < settings.ratinginterval ||
                     results.games_played % settings.ratinginterval == 0) {
+                    const bool show_elo =
+                        results.games_played >= settings.ratinginterval;
                     if (game.engine1.id < game.engine2.id) {
-                        print_score(game.engine1, game.engine2, results);
+                        print_score(
+                            game.engine1, game.engine2, results, show_elo);
                     } else {
-                        print_score(game.engine2, game.engine1, results);
+                        print_score(
+                            game.engine2, game.engine1, results, show_elo);
                     }
-                    std::cout << std::endl;
 
                     if (results.games_played >= settings.ratinginterval) {
                         std::cout << std::endl;
