@@ -26,6 +26,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     pgn.header().add("FEN", game.fen);
     auto *node = pgn.root();
 
+    int ply_count = 0;
     int btime = settings.tc.btime;
     int wtime = settings.tc.wtime;
     bool out_of_time = false;
@@ -100,6 +101,8 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
             // Add move to .pgn
             node = node->add_mainline(move);
+
+            ply_count++;
 
             // Comment with engine data
             if (settings.pgn_verbose) {
@@ -230,6 +233,9 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             pgn.header().add("Result", "*");
             break;
     }
+
+    // Add PlyCount
+    pgn.header().add("PlyCount", std::to_string(ply_count));
 
     return pgn;
 }
