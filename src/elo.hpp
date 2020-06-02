@@ -62,7 +62,7 @@ class Elo {
                                            std::sqrt(2.0 * (wins_ + losses_))));
     }
 
-    [[nodiscard]] constexpr float drawRatio() const noexcept {
+    [[nodiscard]] constexpr float draw_ratio() const noexcept {
         const int total = wins_ + losses_ + draws_;
 
         if (total == 0) {
