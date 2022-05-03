@@ -7,8 +7,7 @@
 
 class Elo {
    public:
-    constexpr Elo(const int wins, const int losses, const int draws)
-        : wins_{wins}, losses_{losses}, draws_{draws} {
+    constexpr Elo(const int wins, const int losses, const int draws) : wins_{wins}, losses_{losses}, draws_{draws} {
         if (wins < 0 || losses < 0 || draws < 0) {
             throw "asd";
         }
@@ -58,8 +57,7 @@ class Elo {
         if (wins_ + losses_ == 0) {
             return std::nanf("");
         }
-        return 100 * (0.5 + 0.5 * std::erf((wins_ - losses_) /
-                                           std::sqrt(2.0 * (wins_ + losses_))));
+        return 100 * (0.5 + 0.5 * std::erf((wins_ - losses_) / std::sqrt(2.0 * (wins_ + losses_))));
     }
 
     [[nodiscard]] constexpr float draw_ratio() const noexcept {

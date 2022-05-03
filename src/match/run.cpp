@@ -10,9 +10,7 @@ using namespace std::chrono;
 
 namespace match {
 
-void Match::run(const Settings &settings,
-                const Openings &openings,
-                const Engines &engines) {
+void Match::run(const Settings &settings, const Openings &openings, const Engines &engines) {
     if (openings.size() < 1) {
         throw std::invalid_argument("Must be at least 1 opening position");
     }
@@ -59,8 +57,7 @@ void Match::run(const Settings &settings,
 
     // Start game threads
     for (int i = 0; i < settings.concurrency; ++i) {
-        threads[i] = std::thread(
-            &Match::worker, this, settings, std::ref(games), std::ref(results));
+        threads[i] = std::thread(&Match::worker, this, settings, std::ref(games), std::ref(results));
     }
 
     // Wait for game threads to finish

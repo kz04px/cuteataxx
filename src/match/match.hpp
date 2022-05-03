@@ -15,16 +15,12 @@ class Settings;
 
 class Match {
    public:
-    void run(const Settings &settings,
-             const Openings &openings,
-             const Engines &engines);
+    void run(const Settings &settings, const Openings &openings, const Engines &engines);
 
    private:
     static libataxx::pgn::PGN play(const Settings &settings, const Game &game);
 
-    void worker(const Settings &settings,
-                std::stack<Game> &games,
-                Results &results);
+    void worker(const Settings &settings, std::stack<Game> &games, Results &results);
 
    private:
     std::mutex mtx_output_;

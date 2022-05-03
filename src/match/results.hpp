@@ -23,8 +23,7 @@ struct Results {
 inline std::ostream &operator<<(std::ostream &os, const Score &score) {
     const float points = score.wins + static_cast<float>(score.draws) / 2;
     os << score.wins << " - " << score.losses << " - " << score.draws;
-    os << std::fixed << std::setprecision(3) << "  [" << points / score.played
-       << "]";
+    os << std::fixed << std::setprecision(3) << "  [" << points / score.played << "]";
     return os;
 }
 

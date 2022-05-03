@@ -24,8 +24,7 @@ int main(int argc, char **argv) {
         std::cout << "games " << settings.num_games << std::endl;
         std::cout << "engines " << engines.size() << std::endl;
         std::cout << "concurrency " << settings.concurrency << std::endl;
-        std::cout << "timeout buffer " << settings.timeout_buffer << "ms"
-                  << std::endl;
+        std::cout << "timeout buffer " << settings.timeout_buffer << "ms" << std::endl;
 
         switch (settings.tc.type) {
             case libataxx::engine::SearchSettings::Type::Depth:
@@ -35,12 +34,10 @@ int main(int argc, char **argv) {
                 std::cout << "nodes " << settings.tc.nodes << std::endl;
                 break;
             case libataxx::engine::SearchSettings::Type::Movetime:
-                std::cout << "movetime " << settings.tc.movetime << "ms"
-                          << std::endl;
+                std::cout << "movetime " << settings.tc.movetime << "ms" << std::endl;
                 break;
             case libataxx::engine::SearchSettings::Type::Time:
-                std::cout << settings.tc.btime << "+" << settings.tc.binc
-                          << "ms" << std::endl;
+                std::cout << settings.tc.btime << "+" << settings.tc.binc << "ms" << std::endl;
                 break;
             default:
                 throw std::invalid_argument("Coulldn't find movetime");
@@ -49,8 +46,7 @@ int main(int argc, char **argv) {
         std::cout << std::endl;
 
         // Load openings
-        std::cout << "Loading openings from " << settings.openings_path
-                  << std::endl;
+        std::cout << "Loading openings from " << settings.openings_path << std::endl;
         const auto openings = parse::openings(settings.openings_path);
         std::cout << "found " << openings.size() << std::endl;
         std::cout << std::endl;

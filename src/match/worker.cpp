@@ -19,16 +19,13 @@ void print_score(const match::Details &engine1,
     std::cout << " " << results.scores.at(engine1.name).played;
     std::cout << std::endl;
     if (show_elo) {
-        std::cout << std::fixed << std::setprecision(2) << e.elo() << " +/- "
-                  << e.err();
+        std::cout << std::fixed << std::setprecision(2) << e.elo() << " +/- " << e.err();
     }
 }
 
 namespace match {
 
-void Match::worker(const Settings &settings,
-                   std::stack<Game> &games,
-                   Results &results) {
+void Match::worker(const Settings &settings, std::stack<Game> &games, Results &results) {
     while (true) {
         Game game;
 
@@ -41,8 +38,7 @@ void Match::worker(const Settings &settings,
             game = games.top();
             games.pop();
             if (settings.verbose) {
-                std::cout << "Starting game " << game.engine1.name << " vs "
-                          << game.engine2.name << std::endl;
+                std::cout << "Starting game " << game.engine1.name << " vs " << game.engine2.name << std::endl;
             }
         }
 
@@ -84,14 +80,12 @@ void Match::worker(const Settings &settings,
 
             // Write to .pgn
             if (settings.pgn_enabled && !settings.pgn_path.empty()) {
-                std::ofstream file(settings.pgn_path,
-                                   std::fstream::out | std::fstream::app);
+                std::ofstream file(settings.pgn_path, std::fstream::out | std::fstream::app);
 
                 if (file.is_open()) {
                     file << pgn;
                 } else {
-                    std::cerr << "Could not open " << settings.pgn_path
-                              << std::endl;
+                    std::cerr << "Could not open " << settings.pgn_path << std::endl;
                 }
             }
 
@@ -99,14 +93,11 @@ void Match::worker(const Settings &settings,
             if (results.scores.size() == 2) {
                 if (results.games_played < settings.ratinginterval ||
                     results.games_played % settings.ratinginterval == 0) {
-                    const bool show_elo =
-                        results.games_played >= settings.ratinginterval;
+                    const bool show_elo = results.games_played >= settings.ratinginterval;
                     if (game.engine1.id < game.engine2.id) {
-                        print_score(
-                            game.engine1, game.engine2, results, show_elo);
+                        print_score(game.engine1, game.engine2, results, show_elo);
                     } else {
-                        print_score(
-                            game.engine2, game.engine1, results, show_elo);
+                        print_score(game.engine2, game.engine1, results, show_elo);
                     }
 
                     if (results.games_played >= settings.ratinginterval) {
