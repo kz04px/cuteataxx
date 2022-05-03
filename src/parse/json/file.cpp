@@ -7,9 +7,7 @@
 #include "pgn.hpp"
 #include "timecontrol.hpp"
 
-namespace parse {
-
-namespace json {
+namespace parse::json {
 
 std::pair<match::Settings, match::Engines> file(const std::string &path) {
     match::Settings settings;
@@ -114,6 +112,4 @@ std::pair<match::Settings, match::Engines> file(const std::string &path) {
     return {settings, engines};
 }
 
-}  // namespace json
-
-}  // namespace parse
+}  // namespace parse::json

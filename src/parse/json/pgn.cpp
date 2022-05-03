@@ -1,9 +1,7 @@
 #include "pgn.hpp"
 #include <iostream>
 
-namespace parse {
-
-namespace json {
+namespace parse::json {
 
 void pgn(const nlohmann::json &j, match::Settings &ms) {
     if (j.find("pgn") == j.end()) {
@@ -33,6 +31,4 @@ void pgn(const nlohmann::json &j, match::Settings &ms) {
     }
 }
 
-}  // namespace json
-
-}  // namespace parse
+}  // namespace parse::json

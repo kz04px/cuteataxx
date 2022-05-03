@@ -5,14 +5,10 @@
 #include "../../match/engines.hpp"
 #include "../../match/settings.hpp"
 
-namespace parse {
-
-namespace json {
+namespace parse::json {
 
 match::Engines engines(const nlohmann::json &j);
 
-}  // namespace json
-
-}  // namespace parse
+}  // namespace parse::json
 
 #endif

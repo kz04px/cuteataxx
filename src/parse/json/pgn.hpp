@@ -4,14 +4,10 @@
 #include <nlohmann/json.hpp>
 #include "../../match/settings.hpp"
 
-namespace parse {
-
-namespace json {
+namespace parse::json {
 
 void pgn(const nlohmann::json &j, match::Settings &ms);
 
-}  // namespace json
-
-}  // namespace parse
+}  // namespace parse::json
 
 #endif

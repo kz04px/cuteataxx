@@ -117,6 +117,6 @@ void Match::worker(const Settings &settings, std::stack<Game> &games, Results &r
             }
         }
     }
-}  // namespace match
+}
 
 }  // namespace match

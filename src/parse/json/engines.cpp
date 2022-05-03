@@ -1,8 +1,6 @@
 #include "engines.hpp"
 
-namespace parse {
-
-namespace json {
+namespace parse::json {
 
 match::Engines engines(const nlohmann::json &j) {
     int count = 0;
@@ -39,6 +37,4 @@ match::Engines engines(const nlohmann::json &j) {
     return engines;
 }
 
-}  // namespace json
-
-}  // namespace parse
+}  // namespace parse::json

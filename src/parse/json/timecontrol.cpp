@@ -1,9 +1,7 @@
 #include "timecontrol.hpp"
 #include <iostream>
 
-namespace parse {
-
-namespace json {
+namespace parse::json {
 
 void timecontrol(const nlohmann::json &j, match::Settings &ms) {
     // Default
@@ -45,6 +43,4 @@ void timecontrol(const nlohmann::json &j, match::Settings &ms) {
     }
 }
 
-}  // namespace json
-
-}  // namespace parse
+}  // namespace parse::json
