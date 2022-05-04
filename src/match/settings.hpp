@@ -1,11 +1,11 @@
 #ifndef MATCH_SETTINGS_HPP
 #define MATCH_SETTINGS_HPP
 
-#include <libataxx/engine.hpp>
 #include <limits>
 #include <map>
 #include <string>
 #include <vector>
+#include "../uaiengine.hpp"
 
 namespace match {
 
@@ -20,7 +20,7 @@ struct Settings {
     bool recover = false;
     bool verbose = false;
     bool repeat = true;
-    libataxx::engine::SearchSettings tc;
+    SearchSettings tc;
     std::string colour1 = "white";
     std::string colour2 = "black";
     std::string openings_path = "";

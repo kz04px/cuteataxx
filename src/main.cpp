@@ -1,11 +1,11 @@
 #include <iostream>
-#include <libataxx/engine.hpp>
 #include <stdexcept>
 #include "match/match.hpp"
 #include "match/openings.hpp"
 #include "match/settings.hpp"
 #include "parse/json/file.hpp"
 #include "parse/openings.hpp"
+#include "uaiengine.hpp"
 
 using namespace match;
 
@@ -27,16 +27,16 @@ int main(int argc, char **argv) {
         std::cout << "timeout buffer " << settings.timeout_buffer << "ms" << std::endl;
 
         switch (settings.tc.type) {
-            case libataxx::engine::SearchSettings::Type::Depth:
-                std::cout << "depth " << settings.tc.depth << std::endl;
+            case SearchSettings::Type::Depth:
+                std::cout << "depth " << settings.tc.ply << std::endl;
                 break;
-            case libataxx::engine::SearchSettings::Type::Nodes:
+            case SearchSettings::Type::Nodes:
                 std::cout << "nodes " << settings.tc.nodes << std::endl;
                 break;
-            case libataxx::engine::SearchSettings::Type::Movetime:
+            case SearchSettings::Type::Movetime:
                 std::cout << "movetime " << settings.tc.movetime << "ms" << std::endl;
                 break;
-            case libataxx::engine::SearchSettings::Type::Time:
+            case SearchSettings::Type::Time:
                 std::cout << settings.tc.btime << "+" << settings.tc.binc << "ms" << std::endl;
                 break;
             default:

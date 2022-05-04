@@ -1,16 +1,14 @@
 #include <chrono>
 #include <iostream>
 #include <libataxx/pgn.hpp>
-#include <libataxx/uaiengine.hpp>
 #include <mutex>
+#include "../uaiengine.hpp"
 #include "game.hpp"
 #include "match.hpp"
 #include "settings.hpp"
 
 using namespace std::chrono;
 using namespace libataxx;
-using namespace libataxx::engine;
-using SearchType = libataxx::engine::SearchSettings::Type;
 
 namespace match {
 
@@ -24,7 +22,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     pgn.header().add(settings.colour1, game.engine1.name);
     pgn.header().add(settings.colour2, game.engine2.name);
     pgn.header().add("FEN", game.fen);
-    auto *node = pgn.root();
+    auto node = pgn.root();
 
     int ply_count = 0;
     int btime = settings.tc.btime;
@@ -36,14 +34,14 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
     try {
         // Start engines
-        auto engine1 = engine::UAIEngine(game.engine1.path);
-        auto engine2 = engine::UAIEngine(game.engine2.path);
+        auto engine1 = UAIEngine(game.engine1.path);
+        auto engine2 = UAIEngine(game.engine2.path);
 
         // Did the engines start?
-        if (!engine1.running()) {
+        if (!engine1.is_running()) {
             throw "asd 1";
         }
-        if (!engine2.running()) {
+        if (!engine2.is_running()) {
             throw "asd 2";
         }
 
@@ -71,7 +69,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
             auto search = settings.tc;
 
-            if (search.type == SearchType::Time) {
+            if (search.type == SearchSettings::Type::Time) {
                 if (btime <= 0 || wtime <= 0) {
                     throw "meh";
                 }
@@ -128,7 +126,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             }
 
             // Update clock
-            if (settings.tc.type == SearchType::Time) {
+            if (settings.tc.type == SearchSettings::Type::Time) {
                 if (pos.turn() == Side::Black) {
                     btime -= diff.count();
                 } else {
@@ -137,9 +135,8 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             }
 
             // Out of time?
-            if (settings.tc.type == SearchType::Movetime) {
-                if (diff.count() >
-                    settings.tc.movetime + settings.timeout_buffer) {
+            if (settings.tc.type == SearchSettings::Type::Movetime) {
+                if (diff.count() > settings.tc.movetime + settings.timeout_buffer) {
                     out_of_time = true;
                     if (pos.turn() == libataxx::Side::Black) {
                         result = libataxx::Result::WhiteWin;
@@ -148,7 +145,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
                     }
                     break;
                 }
-            } else if (settings.tc.type == SearchType::Time) {
+            } else if (settings.tc.type == SearchSettings::Type::Time) {
                 if (btime <= 0) {
                     out_of_time = true;
                     result = libataxx::Result::WhiteWin;
@@ -161,7 +158,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             }
 
             // Increments
-            if (settings.tc.type == SearchType::Time) {
+            if (settings.tc.type == SearchSettings::Type::Time) {
                 if (pos.turn() == Side::Black) {
                     btime += settings.tc.binc;
                 } else {
@@ -170,13 +167,11 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             }
 
             // Add the time left
-            if (settings.pgn_verbose && settings.tc.type == SearchType::Time) {
+            if (settings.pgn_verbose && settings.tc.type == SearchSettings::Type::Time) {
                 if (pos.turn() == Side::Black) {
-                    node->add_comment("time left " + std::to_string(btime) +
-                                      "ms");
+                    node->add_comment("time left " + std::to_string(btime) + "ms");
                 } else {
-                    node->add_comment("time left " + std::to_string(wtime) +
-                                      "ms");
+                    node->add_comment("time left " + std::to_string(wtime) + "ms");
                 }
             }
 
