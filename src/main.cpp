@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
                 std::cout << settings.tc.btime << "+" << settings.tc.binc << "ms" << std::endl;
                 break;
             default:
-                throw std::invalid_argument("Coulldn't find movetime");
+                throw std::invalid_argument("Couldn't find movetime");
         }
 
         std::cout << std::endl;
