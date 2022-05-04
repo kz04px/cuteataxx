@@ -1,6 +1,7 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <vector>
 #include "game.hpp"
 #include "match.hpp"
 #include "results.hpp"
@@ -50,20 +51,20 @@ void Match::run(const Settings &settings, const Openings &openings, const Engine
     }
 
     // Create threads
-    std::thread threads[settings.concurrency];
+    std::vector<std::thread> threads;
 
     // Start timer
     const auto t0 = high_resolution_clock::now();
 
     // Start game threads
     for (int i = 0; i < settings.concurrency; ++i) {
-        threads[i] = std::thread(&Match::worker, this, settings, std::ref(games), std::ref(results));
+        threads.emplace_back(&Match::worker, this, settings, std::ref(games), std::ref(results));
     }
 
     // Wait for game threads to finish
-    for (int i = 0; i < settings.concurrency; ++i) {
-        if (threads[i].joinable()) {
-            threads[i].join();
+    for (auto &thread : threads) {
+        if (thread.joinable()) {
+            thread.join();
         }
     }
 
