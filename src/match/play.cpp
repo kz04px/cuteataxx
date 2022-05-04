@@ -1,5 +1,4 @@
 #include <chrono>
-#include <iostream>
 #include <libataxx/pgn.hpp>
 #include <mutex>
 #include "../uaiengine.hpp"
@@ -32,36 +31,37 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     bool engine_crash = false;
     auto result = libataxx::Result::None;
 
-    try {
-        // Start engines
-        auto engine1 = UAIEngine(game.engine1.path);
-        auto engine2 = UAIEngine(game.engine2.path);
-
-        // Did the engines start?
-        if (!engine1.is_running()) {
-            throw "asd 1";
-        }
-        if (!engine2.is_running()) {
-            throw "asd 2";
-        }
-
-        engine1.uai();
-        engine2.uai();
-
-        // Set engine options
+    auto engine1 = m_engine_cache.get(game.engine1.id);
+    if (!engine1) {
+        engine1 = std::make_shared<UAIEngine>(game.engine1.path);
+        (*engine1)->uai();
         for (const auto &[key, val] : game.engine1.options) {
-            engine1.set_option(key, val);
+            (*engine1)->set_option(key, val);
         }
-        for (const auto &[key, val] : game.engine2.options) {
-            engine2.set_option(key, val);
-        }
+    }
 
-        engine1.isready();
-        engine2.isready();
+    auto engine2 = m_engine_cache.get(game.engine2.id);
+    if (!engine2) {
+        engine2 = std::make_shared<UAIEngine>(game.engine2.path);
+        (*engine2)->uai();
+        for (const auto &[key, val] : game.engine2.options) {
+            (*engine2)->set_option(key, val);
+        }
+    }
+
+    try {
+        assert(engine1);
+        assert(engine2);
+
+        assert(*engine1);
+        assert(*engine2);
+
+        (*engine1)->isready();
+        (*engine2)->isready();
 
         // Play
         while (!pos.gameover() && pos.fullmoves() < settings.maxfullmoves) {
-            auto *engine = pos.turn() == Side::Black ? &engine1 : &engine2;
+            auto engine = pos.turn() == Side::Black ? *engine1 : *engine2;
 
             engine->position(pos);
 
@@ -178,9 +178,6 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             pos.makemove(move);
         }
 
-        // Stop engines
-        engine1.quit();
-        engine2.quit();
     } catch (...) {
         engine_crash = true;
         node->add_comment("engine crashed");
@@ -190,6 +187,9 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             result = libataxx::Result::BlackWin;
         }
     }
+
+    m_engine_cache.push(game.engine1.id, *engine1);
+    m_engine_cache.push(game.engine2.id, *engine2);
 
     // Illegal move
     if (illegal_move) {

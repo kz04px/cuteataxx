@@ -26,28 +26,25 @@ void Match::run(const Settings &settings, const Openings &openings, const Engine
 
     // Create games
     std::stack<Game> games;
-    int idx_opening = 0;
-    for (int i = 0; i < settings.num_games; i += 2) {
-        for (const auto &[name1, engine1] : engines) {
-            for (const auto &[name2, engine2] : engines) {
-                // Engines can't play themselves
-                if (name1 == name2) {
-                    continue;
-                }
+    for (std::size_t i = 0; i < engines.size(); ++i) {
+        for (std::size_t j = i + 1; j < engines.size(); ++j) {
+            int idx_opening = 0;
 
-                games.push(Game{openings[idx_opening], engine1, engine2});
+            for (int n = 0; n < settings.num_games; n += 2) {
+                games.push(Game{openings[idx_opening], engines[i], engines[j]});
+                games.push(Game{openings[idx_opening], engines[j], engines[i]});
+
+                // Next opening
+                idx_opening++;
+                idx_opening = idx_opening % openings.size();
             }
         }
-
-        // Next opening
-        idx_opening++;
-        idx_opening = idx_opening % openings.size();
     }
 
     // Create results & initialise
     Results results;
-    for (const auto &[key, val] : engines) {
-        results.scores[key];
+    for (const auto &engine : engines) {
+        results.scores[engine.name];
     }
 
     // Create threads

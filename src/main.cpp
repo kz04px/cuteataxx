@@ -16,8 +16,6 @@ int main(int argc, char **argv) {
     }
 
     try {
-        Match match;
-
         // Load settings
         std::cout << "Loading settings from " << argv[1] << std::endl;
         const auto &[settings, engines] = parse::json::file(argv[1]);
@@ -66,6 +64,7 @@ int main(int argc, char **argv) {
         // Run match
         std::cout << "Starting games" << std::endl;
         std::cout << std::endl;
+        Match match(2 * settings.concurrency);
         match.run(settings, openings, engines);
     } catch (std::invalid_argument &e) {
         std::cerr << e.what() << std::endl;

@@ -31,7 +31,7 @@ match::Engines engines(const nlohmann::json &j) {
             }
         }
 
-        engines[details.name] = details;
+        engines.emplace_back(details);
         count++;
     }
     return engines;

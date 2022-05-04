@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 namespace match {
 
@@ -13,7 +14,7 @@ struct Details {
     std::map<std::string, std::string> options;
 };
 
-using Engines = std::map<std::string, Details>;
+using Engines = std::vector<Details>;
 
 }  // namespace match
 
