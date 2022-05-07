@@ -9,8 +9,6 @@
 #include "openings.hpp"
 #include "results.hpp"
 
-namespace match {
-
 class Settings;
 
 class Match {
@@ -28,7 +26,5 @@ class Match {
     std::mutex mtx_output_;
     std::mutex mtx_games_;
 };
-
-}  // namespace match
 
 #endif

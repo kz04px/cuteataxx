@@ -5,10 +5,7 @@
 #include "match.hpp"
 #include "settings.hpp"
 
-void print_score(const match::Details &engine1,
-                 const match::Details &engine2,
-                 const match::Results &results,
-                 const bool show_elo = true) {
+void print_score(const Details &engine1, const Details &engine2, const Results &results, const bool show_elo = true) {
     const auto w = results.scores.at(engine1.name).wins;
     const auto l = results.scores.at(engine1.name).losses;
     const auto d = results.scores.at(engine1.name).draws;
@@ -22,8 +19,6 @@ void print_score(const match::Details &engine1,
         std::cout << std::fixed << std::setprecision(2) << get_elo(w, l, d) << " +/- " << get_err(w, l, d);
     }
 }
-
-namespace match {
 
 void Match::worker(const Settings &settings, std::stack<Game> &games, Results &results) {
     while (true) {
@@ -118,5 +113,3 @@ void Match::worker(const Settings &settings, std::stack<Game> &games, Results &r
         }
     }
 }
-
-}  // namespace match

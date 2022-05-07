@@ -4,10 +4,6 @@
 #include <string>
 #include <vector>
 
-namespace match {
-
 using Openings = std::vector<std::string>;
-
-}  // namespace match
 
 #endif

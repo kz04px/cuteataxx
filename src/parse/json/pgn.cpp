@@ -3,7 +3,7 @@
 
 namespace parse::json {
 
-void pgn(const nlohmann::json &j, match::Settings &ms) {
+void pgn(const nlohmann::json &j, Settings &ms) {
     if (j.find("pgn") == j.end()) {
         return;
     }

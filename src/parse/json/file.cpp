@@ -9,8 +9,8 @@
 
 namespace parse::json {
 
-std::pair<match::Settings, match::Engines> file(const std::string &path) {
-    match::Settings settings;
+std::pair<Settings, Engines> file(const std::string &path) {
+    Settings settings;
     nlohmann::json j;
 
     // Get settings file

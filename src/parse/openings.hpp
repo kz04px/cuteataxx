@@ -6,7 +6,7 @@
 
 namespace parse {
 
-match::Openings openings(const std::string &path);
+Openings openings(const std::string &path);
 
 }  // namespace parse
 

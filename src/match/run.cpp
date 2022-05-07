@@ -7,10 +7,6 @@
 #include "results.hpp"
 #include "settings.hpp"
 
-using namespace std::chrono;
-
-namespace match {
-
 void Match::run(const Settings &settings, const Openings &openings, const Engines &engines) {
     if (openings.size() < 1) {
         throw std::invalid_argument("Must be at least 1 opening position");
@@ -51,7 +47,7 @@ void Match::run(const Settings &settings, const Openings &openings, const Engine
     std::vector<std::thread> threads;
 
     // Start timer
-    const auto t0 = high_resolution_clock::now();
+    const auto t0 = std::chrono::high_resolution_clock::now();
 
     // Start game threads
     for (int i = 0; i < settings.concurrency; ++i) {
@@ -66,10 +62,10 @@ void Match::run(const Settings &settings, const Openings &openings, const Engine
     }
 
     // End timer
-    const auto t1 = high_resolution_clock::now();
+    const auto t1 = std::chrono::high_resolution_clock::now();
 
     // Elapsed time
-    const auto diff = duration_cast<seconds>(t1 - t0);
+    const auto diff = std::chrono::duration_cast<std::chrono::seconds>(t1 - t0);
 
     // Print stats
     std::cout << "Time taken: " << diff.count() << std::endl;
@@ -85,5 +81,3 @@ void Match::run(const Settings &settings, const Openings &openings, const Engine
         std::cout << std::endl;
     }
 }
-
-}  // namespace match

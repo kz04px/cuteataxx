@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-namespace match {
-
 struct Details {
     int id;
     std::string name;
@@ -15,7 +13,5 @@ struct Details {
 };
 
 using Engines = std::vector<Details>;
-
-}  // namespace match
 
 #endif

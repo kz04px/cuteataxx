@@ -4,9 +4,9 @@
 
 namespace parse {
 
-match::Openings openings(const std::string &path) {
+Openings openings(const std::string &path) {
     std::ifstream f(path);
-    match::Openings openings;
+    Openings openings;
 
     if (!f.is_open()) {
         openings.push_back("x5o/7/7/7/7/7/o5x x 0");

@@ -7,8 +7,6 @@
 #include <vector>
 #include "../uaiengine.hpp"
 
-namespace match {
-
 struct Settings {
     int ratinginterval = 10;
     int concurrency = 1;
@@ -31,7 +29,5 @@ struct Settings {
     std::string pgn_path = "games.pgn";
     std::string pgn_event = "*";
 };
-
-}  // namespace match
 
 #endif

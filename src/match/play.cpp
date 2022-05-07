@@ -9,11 +9,6 @@
 #include "match.hpp"
 #include "settings.hpp"
 
-using namespace std::chrono;
-using namespace libataxx;
-
-namespace match {
-
 thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
 
 libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
@@ -21,10 +16,10 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     assert(game.engine1.id != game.engine2.id);
 
     // Get engine & position settings
-    auto pos = Position{game.fen};
+    auto pos = libataxx::Position{game.fen};
 
     // Create PGN
-    pgn::PGN pgn;
+    libataxx::pgn::PGN pgn;
     pgn.header().add("Event", settings.pgn_event);
     pgn.header().add(settings.colour1, game.engine1.name);
     pgn.header().add(settings.colour2, game.engine2.name);
@@ -71,7 +66,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
         // Play
         while (!pos.gameover() && pos.fullmoves() < settings.maxfullmoves) {
-            auto engine = pos.turn() == Side::Black ? *engine1 : *engine2;
+            auto engine = pos.turn() == libataxx::Side::Black ? *engine1 : *engine2;
 
             engine->position(pos);
 
@@ -90,7 +85,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             search.wtime = wtime;
 
             // Start move timer
-            const auto t0 = high_resolution_clock::now();
+            const auto t0 = std::chrono::high_resolution_clock::now();
 
             // Get move
             libataxx::Move move;
@@ -102,10 +97,10 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
             }
 
             // Stop move timer
-            const auto t1 = high_resolution_clock::now();
+            const auto t1 = std::chrono::high_resolution_clock::now();
 
             // Get move time
-            const auto diff = duration_cast<milliseconds>(t1 - t0);
+            const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
 
             // Add move to .pgn
             node = node->add_mainline(move);
@@ -137,7 +132,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
             // Update clock
             if (settings.tc.type == SearchSettings::Type::Time) {
-                if (pos.turn() == Side::Black) {
+                if (pos.turn() == libataxx::Side::Black) {
                     btime -= diff.count();
                 } else {
                     wtime -= diff.count();
@@ -169,7 +164,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
             // Increments
             if (settings.tc.type == SearchSettings::Type::Time) {
-                if (pos.turn() == Side::Black) {
+                if (pos.turn() == libataxx::Side::Black) {
                     btime += settings.tc.binc;
                 } else {
                     wtime += settings.tc.winc;
@@ -178,7 +173,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
             // Add the time left
             if (settings.pgn_verbose && settings.tc.type == SearchSettings::Type::Time) {
-                if (pos.turn() == Side::Black) {
+                if (pos.turn() == libataxx::Side::Black) {
                     node->add_comment("time left " + std::to_string(btime) + "ms");
                 } else {
                     node->add_comment("time left " + std::to_string(wtime) + "ms");
@@ -247,5 +242,3 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
     return pgn;
 }
-
-}  // namespace match

@@ -5,8 +5,6 @@
 #include <map>
 #include <string>
 
-namespace match {
-
 struct Score {
     int wins = 0;
     int draws = 0;
@@ -26,7 +24,5 @@ inline std::ostream &operator<<(std::ostream &os, const Score &score) {
     os << std::fixed << std::setprecision(3) << "  [" << points / score.played << "]";
     return os;
 }
-
-}  // namespace match
 
 #endif

@@ -7,7 +7,7 @@
 
 namespace parse::json {
 
-std::pair<match::Settings, match::Engines> file(const std::string &path);
+std::pair<Settings, Engines> file(const std::string &path);
 
 }  // namespace parse::json
 

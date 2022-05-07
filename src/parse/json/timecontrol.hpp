@@ -6,7 +6,7 @@
 
 namespace parse::json {
 
-void timecontrol(const nlohmann::json &j, match::Settings &ms);
+void timecontrol(const nlohmann::json &j, Settings &ms);
 
 }  // namespace parse::json
 

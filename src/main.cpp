@@ -7,8 +7,6 @@
 #include "parse/openings.hpp"
 #include "uaiengine.hpp"
 
-using namespace match;
-
 int main(int argc, char **argv) {
     if (argc < 2) {
         std::cerr << "Must provide path to settings file" << std::endl;

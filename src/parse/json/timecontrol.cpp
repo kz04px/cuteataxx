@@ -3,7 +3,7 @@
 
 namespace parse::json {
 
-void timecontrol(const nlohmann::json &j, match::Settings &ms) {
+void timecontrol(const nlohmann::json &j, Settings &ms) {
     // Default
     ms.tc.type = SearchSettings::Type::Movetime;
     ms.tc.movetime = 10;
