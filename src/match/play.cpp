@@ -1,3 +1,4 @@
+#include <cassert>
 #include <chrono>
 #include <libataxx/pgn.hpp>
 #include <memory>
@@ -16,6 +17,9 @@ namespace match {
 thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
 
 libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
+    assert(!game.fen.empty());
+    assert(game.engine1.id != game.engine2.id);
+
     // Get engine & position settings
     auto pos = Position{game.fen};
 
@@ -59,6 +63,8 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
 
         assert(*engine1);
         assert(*engine2);
+
+        assert(*engine1 != *engine2);
 
         (*engine1)->isready();
         (*engine2)->isready();
