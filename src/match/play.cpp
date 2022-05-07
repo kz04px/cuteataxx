@@ -1,6 +1,8 @@
 #include <chrono>
 #include <libataxx/pgn.hpp>
+#include <memory>
 #include <mutex>
+#include "../cache.hpp"
 #include "../uaiengine.hpp"
 #include "game.hpp"
 #include "match.hpp"
@@ -10,6 +12,8 @@ using namespace std::chrono;
 using namespace libataxx;
 
 namespace match {
+
+thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
 
 libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     // Get engine & position settings
@@ -31,7 +35,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     bool engine_crash = false;
     auto result = libataxx::Result::None;
 
-    auto engine1 = m_engine_cache.get(game.engine1.id);
+    auto engine1 = engine_cache.get(game.engine1.id);
     if (!engine1) {
         engine1 = std::make_shared<UAIEngine>(game.engine1.path);
         (*engine1)->uai();
@@ -40,7 +44,7 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
         }
     }
 
-    auto engine2 = m_engine_cache.get(game.engine2.id);
+    auto engine2 = engine_cache.get(game.engine2.id);
     if (!engine2) {
         engine2 = std::make_shared<UAIEngine>(game.engine2.path);
         (*engine2)->uai();
@@ -188,8 +192,8 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
         }
     }
 
-    m_engine_cache.push(game.engine1.id, *engine1);
-    m_engine_cache.push(game.engine2.id, *engine2);
+    engine_cache.push(game.engine1.id, *engine1);
+    engine_cache.push(game.engine2.id, *engine2);
 
     (*engine1).reset();
     (*engine2).reset();

@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
         // Run match
         std::cout << "Starting games" << std::endl;
         std::cout << std::endl;
-        Match match(2 * settings.concurrency);
+        Match match;
         match.run(settings, openings, engines);
     } catch (std::invalid_argument &e) {
         std::cerr << e.what() << std::endl;

@@ -2,11 +2,8 @@
 #define MATCH_HPP
 
 #include <libataxx/pgn.hpp>
-#include <memory>
 #include <mutex>
 #include <stack>
-#include "../cache.hpp"
-#include "../uaiengine.hpp"
 #include "engines.hpp"
 #include "game.hpp"
 #include "openings.hpp"
@@ -18,8 +15,7 @@ class Settings;
 
 class Match {
    public:
-    Match(const std::size_t cache_size) : m_engine_cache(cache_size) {
-    }
+    [[nodiscard]] Match() = default;
 
     void run(const Settings &settings, const Openings &openings, const Engines &engines);
 
@@ -31,7 +27,6 @@ class Match {
    private:
     std::mutex mtx_output_;
     std::mutex mtx_games_;
-    Cache<int, std::shared_ptr<UAIEngine>> m_engine_cache;
 };
 
 }  // namespace match
