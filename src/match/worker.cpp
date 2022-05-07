@@ -110,16 +110,14 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
                         print_score(game.engine2, game.engine1, results, show_elo);
                     }
                 }
-            } else {
-                if (results.games_played % settings.ratinginterval == 0) {
-                    for (const auto &[name, score] : results.scores) {
-                        std::cout << name << ": ";
-                        std::cout << score;
-                        std::cout << " " << score.played;
-                        std::cout << "\n";
-                    }
+            } else if (results.games_played % settings.ratinginterval == 0) {
+                for (const auto &[name, score] : results.scores) {
+                    std::cout << name << ": ";
+                    std::cout << score;
+                    std::cout << " " << score.played;
                     std::cout << "\n";
                 }
+                std::cout << "\n";
             }
         }
     }
