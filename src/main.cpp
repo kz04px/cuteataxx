@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdexcept>
-#include "match/match.hpp"
-#include "match/openings.hpp"
+#include "match/run.hpp"
 #include "match/settings.hpp"
 #include "parse/json/file.hpp"
 #include "parse/openings.hpp"
@@ -16,9 +15,9 @@ int main(int argc, char **argv) {
     try {
         // Load settings
         std::cout << "Loading settings from " << argv[1] << "\n";
-        const auto &[settings, engines] = parse::json::file(argv[1]);
+        const auto settings = parse::json::file(argv[1]);
         std::cout << "games " << settings.num_games << "\n";
-        std::cout << "engines " << engines.size() << "\n";
+        std::cout << "engines " << settings.engines.size() << "\n";
         std::cout << "concurrency " << settings.concurrency << "\n";
         std::cout << "timeout buffer " << settings.timeout_buffer << "ms\n";
 
@@ -50,7 +49,7 @@ int main(int argc, char **argv) {
         // Sanity checks
         if (settings.concurrency > 128) {
             throw "Too many threads fam";
-        } else if (engines.size() > 128) {
+        } else if (settings.engines.size() > 128) {
             throw "Too many engines fam";
         }
 
@@ -61,8 +60,7 @@ int main(int argc, char **argv) {
 
         // Run match
         std::cout << "Starting games\n\n";
-        Match match;
-        match.run(settings, openings, engines);
+        run(settings, openings);
     } catch (std::invalid_argument &e) {
         std::cerr << e.what() << "\n";
     } catch (const char *e) {

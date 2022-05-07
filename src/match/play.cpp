@@ -1,3 +1,4 @@
+#include "play.hpp"
 #include <cassert>
 #include <chrono>
 #include <libataxx/pgn.hpp>
@@ -5,13 +6,11 @@
 #include <mutex>
 #include "../cache.hpp"
 #include "../uaiengine.hpp"
-#include "game.hpp"
-#include "match.hpp"
 #include "settings.hpp"
 
 thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
 
-libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
+libataxx::pgn::PGN play(const Settings &settings, const GameSettings &game) {
     assert(!game.fen.empty());
     assert(game.engine1.id != game.engine2.id);
 

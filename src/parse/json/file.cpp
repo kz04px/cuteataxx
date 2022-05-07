@@ -9,7 +9,7 @@
 
 namespace parse::json {
 
-std::pair<Settings, Engines> file(const std::string &path) {
+Settings file(const std::string &path) {
     Settings settings;
     nlohmann::json j;
 
@@ -95,11 +95,11 @@ std::pair<Settings, Engines> file(const std::string &path) {
     parse::json::pgn(j, settings);
 
     // Add engines
-    auto engines = parse::json::engines(j);
+    settings.engines = parse::json::engines(j);
 
     // Add global engine options
     if (j.find("options") != j.end()) {
-        for (auto &engine : engines) {
+        for (auto &engine : settings.engines) {
             for (const auto &[key, val] : j.at("options").items()) {
                 // Use the global option only if not specified for the engine
                 if (engine.options.find(key) == engine.options.end()) {
@@ -109,7 +109,7 @@ std::pair<Settings, Engines> file(const std::string &path) {
         }
     }
 
-    return {settings, engines};
+    return settings;
 }
 
 }  // namespace parse::json

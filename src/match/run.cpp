@@ -1,19 +1,20 @@
+#include "run.hpp"
 #include <chrono>
 #include <iomanip>
 #include <iostream>
+#include <stack>
 #include <thread>
 #include <vector>
-#include "game.hpp"
-#include "match.hpp"
 #include "results.hpp"
 #include "settings.hpp"
+#include "worker.hpp"
 
-void Match::run(const Settings &settings, const Openings &openings, const Engines &engines) {
+void run(const Settings &settings, const std::vector<std::string> &openings) {
     if (openings.size() < 1) {
         throw std::invalid_argument("Must be at least 1 opening position");
     }
 
-    if (engines.size() < 2) {
+    if (settings.engines.size() < 2) {
         throw std::invalid_argument("Must be at least 2 engines");
     }
 
@@ -22,14 +23,14 @@ void Match::run(const Settings &settings, const Openings &openings, const Engine
     }
 
     // Create games
-    std::stack<Game> games;
-    for (std::size_t i = 0; i < engines.size(); ++i) {
-        for (std::size_t j = i + 1; j < engines.size(); ++j) {
+    std::stack<GameSettings> games;
+    for (std::size_t i = 0; i < settings.engines.size(); ++i) {
+        for (std::size_t j = i + 1; j < settings.engines.size(); ++j) {
             int idx_opening = 0;
 
             for (int n = 0; n < settings.num_games; n += 2) {
-                games.push(Game{openings[idx_opening], engines[i], engines[j]});
-                games.push(Game{openings[idx_opening], engines[j], engines[i]});
+                games.push(GameSettings{openings[idx_opening], settings.engines[i], settings.engines[j]});
+                games.push(GameSettings{openings[idx_opening], settings.engines[j], settings.engines[i]});
 
                 // Next opening
                 idx_opening++;
@@ -40,7 +41,7 @@ void Match::run(const Settings &settings, const Openings &openings, const Engine
 
     // Create results & initialise
     Results results;
-    for (const auto &engine : engines) {
+    for (const auto &engine : settings.engines) {
         results.scores[engine.name];
     }
 
@@ -52,7 +53,7 @@ void Match::run(const Settings &settings, const Openings &openings, const Engine
 
     // Start game threads
     for (int i = 0; i < settings.concurrency; ++i) {
-        threads.emplace_back(&Match::worker, this, settings, std::ref(games), std::ref(results));
+        threads.emplace_back(worker, settings, std::ref(games), std::ref(results));
     }
 
     // Wait for game threads to finish

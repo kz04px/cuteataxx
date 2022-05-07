@@ -2,11 +2,11 @@
 
 namespace parse::json {
 
-Engines engines(const nlohmann::json &j) {
+std::vector<EngineSettings> engines(const nlohmann::json &j) {
     int count = 0;
-    Engines engines;
+    std::vector<EngineSettings> engines;
     for (const auto &engine : j.at("engines")) {
-        Details details;
+        EngineSettings details;
         // Necessary -- path
         if (engine.find("path") == engine.end()) {
             continue;

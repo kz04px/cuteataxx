@@ -2,11 +2,11 @@
 #define PARSE_JSON_OPENINGS_HPP
 
 #include <string>
-#include "../match/openings.hpp"
+#include <vector>
 
 namespace parse {
 
-Openings openings(const std::string &path);
+std::vector<std::string> openings(const std::string &path);
 
 }  // namespace parse
 

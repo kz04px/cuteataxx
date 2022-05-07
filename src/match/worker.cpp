@@ -1,12 +1,21 @@
+#include "worker.hpp"
 #include <elo.hpp>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include "match.hpp"
+#include <libataxx/pgn.hpp>
+#include <mutex>
+#include "play.hpp"
 #include "results.hpp"
 #include "settings.hpp"
 
-void print_score(const Details &engine1, const Details &engine2, const Results &results, const bool show_elo = true) {
+std::mutex mtx_output;
+std::mutex mtx_games;
+
+void print_score(const EngineSettings &engine1,
+                 const EngineSettings &engine2,
+                 const Results &results,
+                 const bool show_elo = true) {
     const auto w = results.scores.at(engine1.name).wins;
     const auto l = results.scores.at(engine1.name).losses;
     const auto d = results.scores.at(engine1.name).draws;
@@ -21,13 +30,13 @@ void print_score(const Details &engine1, const Details &engine2, const Results &
     }
 }
 
-void Match::worker(const Settings &settings, std::stack<Game> &games, Results &results) {
+void worker(const Settings &settings, std::stack<GameSettings> &games, Results &results) {
     while (true) {
-        Game game;
+        GameSettings game;
 
         // Get something to do
         {
-            std::lock_guard<std::mutex> lock(mtx_games_);
+            std::lock_guard<std::mutex> lock(mtx_games);
             if (games.empty()) {
                 return;
             }
@@ -56,7 +65,7 @@ void Match::worker(const Settings &settings, std::stack<Game> &games, Results &r
 
         // Results & printing
         {
-            std::lock_guard<std::mutex> lock(mtx_output_);
+            std::lock_guard<std::mutex> lock(mtx_output);
 
             results.games_played++;
 
