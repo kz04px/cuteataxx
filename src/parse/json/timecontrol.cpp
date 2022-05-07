@@ -9,7 +9,7 @@ void timecontrol(const nlohmann::json &j, Settings &ms) {
     ms.tc.movetime = 10;
 
     if (j.find("timecontrol") == j.end()) {
-        std::cerr << "No timecontrol setting found, using default" << std::endl;
+        std::cerr << "No timecontrol setting found, using default\n";
         return;
     }
 
@@ -39,7 +39,7 @@ void timecontrol(const nlohmann::json &j, Settings &ms) {
         ms.tc.type = SearchSettings::Type::Depth;
         ms.tc.ply = tc.at("depth");
     } else {
-        std::cerr << "No timecontrol setting found, using default" << std::endl;
+        std::cerr << "No timecontrol setting found, using default\n";
     }
 }
 

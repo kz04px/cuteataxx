@@ -15,7 +15,7 @@ void print_score(const Details &engine1, const Details &engine2, const Results &
     std::cout << engine1.name << " vs " << engine2.name;
     std::cout << ": " << results.scores.at(engine1.name);
     std::cout << " " << results.scores.at(engine1.name).played;
-    std::cout << std::endl;
+    std::cout << "\n";
     if (show_elo) {
         std::cout << std::fixed << std::setprecision(2) << get_elo(w, l, d) << " +/- " << get_err(w, l, d);
     }
@@ -34,7 +34,7 @@ void Match::worker(const Settings &settings, std::stack<Game> &games, Results &r
             game = games.top();
             games.pop();
             if (settings.verbose) {
-                std::cout << "Starting game " << game.engine1.name << " vs " << game.engine2.name << std::endl;
+                std::cout << "Starting game " << game.engine1.name << " vs " << game.engine2.name << "\n";
             }
         }
 
@@ -44,13 +44,13 @@ void Match::worker(const Settings &settings, std::stack<Game> &games, Results &r
         try {
             pgn = play(settings, game);
         } catch (std::invalid_argument &e) {
-            std::cerr << e.what() << std::endl;
+            std::cerr << e.what() << "\n";
         } catch (const char *e) {
-            std::cerr << e << std::endl;
+            std::cerr << e << "\n";
         } catch (std::exception &e) {
-            std::cerr << e.what() << std::endl;
+            std::cerr << e.what() << "\n";
         } catch (...) {
-            std::cerr << "Error woops" << std::endl;
+            std::cerr << "Error woops\n";
             continue;
         }
 
@@ -81,7 +81,7 @@ void Match::worker(const Settings &settings, std::stack<Game> &games, Results &r
                 if (file.is_open()) {
                     file << pgn;
                 } else {
-                    std::cerr << "Could not open " << settings.pgn_path << std::endl;
+                    std::cerr << "Could not open " << settings.pgn_path << "\n";
                 }
             }
 
@@ -90,14 +90,15 @@ void Match::worker(const Settings &settings, std::stack<Game> &games, Results &r
                 if (results.games_played < settings.ratinginterval ||
                     results.games_played % settings.ratinginterval == 0) {
                     const bool show_elo = results.games_played >= settings.ratinginterval;
+
+                    if (results.games_played > settings.ratinginterval) {
+                        std::cout << "\n\n";
+                    }
+
                     if (game.engine1.id < game.engine2.id) {
                         print_score(game.engine1, game.engine2, results, show_elo);
                     } else {
                         print_score(game.engine2, game.engine1, results, show_elo);
-                    }
-
-                    if (results.games_played >= settings.ratinginterval) {
-                        std::cout << std::endl;
                     }
                 }
             } else {
@@ -106,9 +107,9 @@ void Match::worker(const Settings &settings, std::stack<Game> &games, Results &r
                         std::cout << name << ": ";
                         std::cout << score;
                         std::cout << " " << score.played;
-                        std::cout << std::endl;
+                        std::cout << "\n";
                     }
-                    std::cout << std::endl;
+                    std::cout << "\n";
                 }
             }
         }

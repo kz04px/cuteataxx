@@ -1,4 +1,5 @@
 #include <chrono>
+#include <iomanip>
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -66,18 +67,23 @@ void Match::run(const Settings &settings, const Openings &openings, const Engine
 
     // Elapsed time
     const auto diff = std::chrono::duration_cast<std::chrono::seconds>(t1 - t0);
+    const auto hh_mm_ss = std::chrono::hh_mm_ss(diff);
 
     // Print stats
-    std::cout << "Time taken: " << diff.count() << std::endl;
-    std::cout << "Total games: " << settings.num_games << std::endl;
-    std::cout << "Threads: " << settings.concurrency << std::endl;
-    std::cout << std::endl;
+    std::cout << "\n\n";
+    std::cout << "Time taken: ";
+    std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.hours().count() << "h ";
+    std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.minutes().count() << "m ";
+    std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.seconds().count() << "s\n";
+    std::cout << "Total games: " << settings.num_games << "\n";
+    std::cout << "Threads: " << settings.concurrency << "\n";
+    std::cout << "\n";
 
     // Print engine scores
     for (const auto &[name, score] : results.scores) {
         std::cout << "Score of " << name << ": ";
         std::cout << score;
         std::cout << " " << score.played;
-        std::cout << std::endl;
+        std::cout << "\n";
     }
 }
