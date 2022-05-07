@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <iostream>
 #include "match.hpp"
+#include "results.hpp"
 #include "settings.hpp"
 
 void print_score(const Details &engine1, const Details &engine2, const Results &results, const bool show_elo = true) {

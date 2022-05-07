@@ -4,12 +4,11 @@
 #include <libataxx/pgn.hpp>
 #include <mutex>
 #include <stack>
-#include "engines.hpp"
 #include "game.hpp"
 #include "openings.hpp"
-#include "results.hpp"
 
 class Settings;
+class Results;
 
 class Match {
    public:
