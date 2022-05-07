@@ -94,6 +94,16 @@ class UAIEngine {
         : m_child(path, boost::process::std_out > m_out, boost::process::std_in < m_in) {
     }
 
+    ~UAIEngine() {
+        if (is_running()) {
+            send("stop");
+            send("quit");
+            m_in.close();
+            m_out.close();
+            m_child.wait();
+        }
+    }
+
     [[nodiscard]] auto is_running() -> bool {
         return m_child.running();
     }

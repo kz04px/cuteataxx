@@ -191,6 +191,9 @@ libataxx::pgn::PGN Match::play(const Settings &settings, const Game &game) {
     m_engine_cache.push(game.engine1.id, *engine1);
     m_engine_cache.push(game.engine2.id, *engine2);
 
+    (*engine1).reset();
+    (*engine2).reset();
+
     // Illegal move
     if (illegal_move) {
         pgn.header().add("Adjudicated", "Illegal move");
