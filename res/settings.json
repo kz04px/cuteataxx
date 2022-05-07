@@ -4,14 +4,17 @@
     "ratinginterval": 10,
     "timeoutbuffer": 25,
     "maxfullmoves": 300,
-    "repeat": true,
     "verbose": false,
     "debug": false,
     "recover": false,
     "adjudicate": false,
     "colour1": "White",
     "colour2": "Black",
-    "openings": "openings/ply2.txt",
+    "openings": {
+        "path": "openings/ply2.txt",
+        "repeat": true,
+        "shuffle": false
+    },
     "timecontrol": {
         "time": 1000,
         "inc": 10

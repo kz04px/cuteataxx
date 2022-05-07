@@ -54,12 +54,18 @@ Settings settings(const std::string &path) {
             settings.colour2 = b.get<std::string>();
         } else if (a == "debug") {
             settings.debug = b.get<bool>();
-        } else if (a == "repeat") {
-            settings.repeat = b.get<bool>();
         } else if (a == "verbose") {
             settings.verbose = b.get<bool>();
         } else if (a == "openings") {
-            settings.openings_path = b.get<std::string>();
+            for (const auto &[key, val] : b.items()) {
+                if (key == "path") {
+                    settings.openings_path = val.get<std::string>();
+                } else if (key == "repeat") {
+                    settings.repeat = val.get<bool>();
+                } else if (key == "shuffle") {
+                    settings.shuffle = val.get<bool>();
+                }
+            }
         } else if (a == "timecontrol") {
             for (const auto &[key, val] : b.items()) {
                 if (key == "movetime") {

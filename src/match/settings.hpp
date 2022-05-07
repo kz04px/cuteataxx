@@ -75,6 +75,7 @@ struct Settings {
     bool recover = false;
     bool verbose = false;
     bool repeat = true;
+    bool shuffle = false;
     SearchSettings tc;
     std::string openings_path = "";
     std::vector<EngineSettings> engines;
