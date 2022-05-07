@@ -10,18 +10,6 @@
 #include "worker.hpp"
 
 void run(const Settings &settings, const std::vector<std::string> &openings) {
-    if (openings.size() < 1) {
-        throw std::invalid_argument("Must be at least 1 opening position");
-    }
-
-    if (settings.engines.size() < 2) {
-        throw std::invalid_argument("Must be at least 2 engines");
-    }
-
-    if (settings.concurrency < 1) {
-        throw std::invalid_argument("Must be at least 1 thread");
-    }
-
     // Create games
     std::stack<GameSettings> games;
     for (std::size_t i = 0; i < settings.engines.size(); ++i) {

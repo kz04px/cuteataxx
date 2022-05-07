@@ -25,10 +25,12 @@ int main(int argc, char **argv) {
         std::cout << "\n";
 
         // Sanity checks
-        if (settings.concurrency > 128) {
-            throw "Too many threads fam";
-        } else if (settings.engines.size() > 128) {
-            throw "Too many engines fam";
+        if (openings.size() < 1) {
+            throw std::invalid_argument("Must be at least 1 opening position");
+        } else if (settings.engines.size() < 2) {
+            throw std::invalid_argument("Must be at least 2 engines");
+        } else if (settings.concurrency < 1) {
+            throw std::invalid_argument("Must be at least 1 thread");
         }
 
         // Clear pgn
