@@ -4,7 +4,7 @@
 
 namespace parse {
 
-std::vector<std::string> openings(const std::string &path) {
+[[nodiscard]] std::vector<std::string> openings(const std::string &path) {
     std::ifstream f(path);
     std::vector<std::string> openings;
 

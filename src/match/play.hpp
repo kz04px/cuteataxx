@@ -6,6 +6,6 @@
 class Settings;
 class GameSettings;
 
-libataxx::pgn::PGN play(const Settings &settings, const GameSettings &game);
+[[nodiscard]] libataxx::pgn::PGN play(const Settings &settings, const GameSettings &game);
 
 #endif

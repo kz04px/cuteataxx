@@ -10,7 +10,7 @@
 
 thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
 
-libataxx::pgn::PGN play(const Settings &settings, const GameSettings &game) {
+[[nodiscard]] libataxx::pgn::PGN play(const Settings &settings, const GameSettings &game) {
     assert(!game.fen.empty());
     assert(game.engine1.id != game.engine2.id);
 

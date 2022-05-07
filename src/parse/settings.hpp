@@ -6,7 +6,7 @@
 
 namespace parse {
 
-Settings settings(const std::string &path);
+[[nodiscard]] Settings settings(const std::string &path);
 
 }  // namespace parse
 
