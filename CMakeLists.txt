@@ -28,10 +28,7 @@ add_executable(
     src/match/run.cpp
     src/match/worker.cpp
     src/parse/openings.cpp
-    src/parse/json/engines.cpp
-    src/parse/json/file.cpp
-    src/parse/json/pgn.cpp
-    src/parse/json/timecontrol.cpp
+    src/parse/settings.cpp
 )
 
 target_link_libraries(

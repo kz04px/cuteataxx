@@ -2,8 +2,8 @@
 #include <stdexcept>
 #include "match/run.hpp"
 #include "match/settings.hpp"
-#include "parse/json/file.hpp"
 #include "parse/openings.hpp"
+#include "parse/settings.hpp"
 #include "uaiengine.hpp"
 
 int main(int argc, char **argv) {
@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     try {
         // Load settings
         std::cout << "Loading settings from " << argv[1] << "\n";
-        const auto settings = parse::json::file(argv[1]);
+        const auto settings = parse::settings(argv[1]);
         std::cout << "games " << settings.num_games << "\n";
         std::cout << "engines " << settings.engines.size() << "\n";
         std::cout << "concurrency " << settings.concurrency << "\n";

@@ -1,5 +1,5 @@
-#ifndef PARSE_JSON_OPENINGS_HPP
-#define PARSE_JSON_OPENINGS_HPP
+#ifndef PARSE_OPENINGS_HPP
+#define PARSE_OPENINGS_HPP
 
 #include <string>
 #include <vector>
