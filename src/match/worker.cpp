@@ -26,7 +26,7 @@ void print_score(const EngineSettings &engine1,
     std::cout << " " << results.scores.at(engine1.name).played;
     std::cout << "\n";
     if (show_elo) {
-        std::cout << std::fixed << std::setprecision(2) << get_elo(w, l, d) << " +/- " << get_err(w, l, d);
+        std::cout << std::fixed << std::setprecision(2) << get_elo(w, l, d) << " +/- " << get_err(w, l, d) << "\n";
     }
 }
 
@@ -101,7 +101,7 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
                     const bool show_elo = results.games_played >= settings.ratinginterval;
 
                     if (results.games_played > settings.ratinginterval) {
-                        std::cout << "\n\n";
+                        std::cout << "\n";
                     }
 
                     if (game.engine1.id < game.engine2.id) {

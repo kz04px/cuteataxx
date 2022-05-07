@@ -3,6 +3,7 @@
 
 #include <limits>
 #include <map>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -94,5 +95,25 @@ struct GameSettings {
     EngineSettings engine1;
     EngineSettings engine2;
 };
+
+inline std::ostream &operator<<(std::ostream &os, const SearchSettings &ss) {
+    switch (ss.type) {
+        case SearchSettings::Type::Depth:
+            os << "depth " << ss.ply;
+            break;
+        case SearchSettings::Type::Nodes:
+            os << "nodes " << ss.nodes;
+            break;
+        case SearchSettings::Type::Movetime:
+            os << "movetime " << ss.movetime << "ms";
+            break;
+        case SearchSettings::Type::Time:
+            os << ss.btime << "+" << ss.binc << "ms";
+            break;
+        default:
+            break;
+    }
+    return os;
+}
 
 #endif
