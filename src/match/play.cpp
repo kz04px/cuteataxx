@@ -236,8 +236,11 @@ thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
             break;
     }
 
-    // Add PlyCount
+    // Add some game statistics
+    const auto material_difference = pos.black().count() - pos.white().count();
     pgn.header().add("PlyCount", std::to_string(ply_count));
+    pgn.header().add("Final FEN", pos.get_fen());
+    pgn.header().add("Material", (material_difference >= 0 ? "+" : "") + std::to_string(material_difference));
 
     return pgn;
 }
