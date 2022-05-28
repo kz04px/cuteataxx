@@ -10,6 +10,25 @@
 
 thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
 
+enum class ResultReason : int
+{
+    Normal = 0,
+    OutOfTime,
+    MaterialImbalance,
+    EasyFill,
+    Gamelength,
+    IllegalMove,
+    EngineCrash,
+    None,
+};
+
+[[nodiscard]] constexpr auto make_win_for(const libataxx::Side s) noexcept {
+    return s == libataxx::Side::Black ? libataxx::Result::BlackWin : libataxx::Result::WhiteWin;
+}
+
+static_assert(make_win_for(libataxx::Side::Black) == libataxx::Result::BlackWin);
+static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin);
+
 [[nodiscard]] libataxx::pgn::PGN play(const Settings &settings, const GameSettings &game) {
     assert(!game.fen.empty());
     assert(game.engine1.id != game.engine2.id);
@@ -28,10 +47,8 @@ thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
     int ply_count = 0;
     int btime = settings.tc.btime;
     int wtime = settings.tc.wtime;
-    bool out_of_time = false;
-    bool illegal_move = false;
-    bool engine_crash = false;
     auto result = libataxx::Result::None;
+    auto result_reason = ResultReason::None;
 
     auto engine1 = engine_cache.get(game.engine1.id);
     if (!engine1) {
@@ -64,7 +81,42 @@ thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
         (*engine2)->isready();
 
         // Play
-        while (!pos.gameover() && pos.fullmoves() < settings.maxfullmoves) {
+        while (!pos.gameover()) {
+            // Try to adjudicate based on material imbalance
+            if (settings.adjudicate_material) {
+                const auto material_imbalance = pos.us().count() - pos.them().count();
+                if (material_imbalance >= *settings.adjudicate_material) {
+                    result = make_win_for(pos.turn());
+                    result_reason = ResultReason::MaterialImbalance;
+                    break;
+                }
+            }
+
+            // Try to adjudicate based on "easy fill"
+            // This is when one side has to pass and the other can fill the rest of the board trivially to win
+            if (settings.adjudicate_easyfill && pos.must_pass()) {
+                const auto them_stuck = (pos.us().singles() | pos.us().doubles()) & pos.them();
+                const auto them_unstuck = pos.them() ^ them_stuck;
+                assert(pos.them() == them_stuck | them_unstuck);
+                const auto their_reach =
+                    pos.reachable((them_stuck.singles() | them_unstuck.doubles()) & pos.empty(), pos.empty());
+                const auto all_them = pos.them() | their_reach;
+                const auto is_easyfill = (all_them | pos.empty()) == all_them;
+                const auto is_winning = all_them.count() > pos.us().count();
+                if (is_easyfill && is_winning) {
+                    result = make_win_for(!pos.turn());
+                    result_reason = ResultReason::EasyFill;
+                    break;
+                }
+            }
+
+            // Try to adjudicate based on game length
+            if (settings.adjudicate_gamelength && pos.fullmoves() >= *settings.adjudicate_gamelength) {
+                result = libataxx::Result::Draw;
+                result_reason = ResultReason::Gamelength;
+                break;
+            }
+
             auto engine = pos.turn() == libataxx::Side::Black ? *engine1 : *engine2;
 
             engine->position(pos);
@@ -92,7 +144,7 @@ thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
                 move = engine->go(search);
             } catch (...) {
                 move = libataxx::Move::nullmove();
-                engine_crash = true;
+                result_reason = ResultReason::IllegalMove;
             }
 
             // Stop move timer
@@ -114,18 +166,6 @@ thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
             // Illegal move played
             if (!pos.legal_move(move)) {
                 node->add_comment("illegal move");
-                illegal_move = true;
-                break;
-            }
-
-            // Engine crashed
-            if (engine_crash) {
-                node->add_comment("engine crashed");
-                if (pos.turn() == libataxx::Side::Black) {
-                    result = libataxx::Result::WhiteWin;
-                } else {
-                    result = libataxx::Result::BlackWin;
-                }
                 break;
             }
 
@@ -141,21 +181,17 @@ thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
             // Out of time?
             if (settings.tc.type == SearchSettings::Type::Movetime) {
                 if (diff.count() > settings.tc.movetime + settings.timeout_buffer) {
-                    out_of_time = true;
-                    if (pos.turn() == libataxx::Side::Black) {
-                        result = libataxx::Result::WhiteWin;
-                    } else {
-                        result = libataxx::Result::BlackWin;
-                    }
+                    result_reason = ResultReason::OutOfTime;
+                    result = make_win_for(!pos.turn());
                     break;
                 }
             } else if (settings.tc.type == SearchSettings::Type::Time) {
                 if (btime <= 0) {
-                    out_of_time = true;
+                    result_reason = ResultReason::OutOfTime;
                     result = libataxx::Result::WhiteWin;
                     break;
                 } else if (wtime <= 0) {
-                    out_of_time = true;
+                    result_reason = ResultReason::OutOfTime;
                     result = libataxx::Result::BlackWin;
                     break;
                 }
@@ -181,15 +217,9 @@ thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
 
             pos.makemove(move);
         }
-
     } catch (...) {
-        engine_crash = true;
-        node->add_comment("engine crashed");
-        if (pos.turn() == libataxx::Side::Black) {
-            result = libataxx::Result::WhiteWin;
-        } else {
-            result = libataxx::Result::BlackWin;
-        }
+        result_reason = ResultReason::EngineCrash;
+        result = make_win_for(!pos.turn());
     }
 
     engine_cache.push(game.engine1.id, *engine1);
@@ -198,26 +228,9 @@ thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
     (*engine1).reset();
     (*engine2).reset();
 
-    // Illegal move
-    if (illegal_move) {
-        pgn.header().add("Adjudicated", "Illegal move");
-    }
-    // Out of time
-    else if (out_of_time) {
-        pgn.header().add("Adjudicated", "Out of time");
-    }
-    // Engine crashed
-    else if (engine_crash) {
-        pgn.header().add("Adjudicated", "Engine crashed");
-    }
     // Game finished normally
-    else if (pos.gameover()) {
+    if (result == libataxx::Result::None) {
         result = pos.result();
-    }
-    // Max fullmove counter was hit
-    else if (pos.fullmoves() >= settings.maxfullmoves) {
-        result = libataxx::Result::Draw;
-        pgn.header().add("Adjudicated", "Max game length reached");
     }
 
     // Add result to .pgn
@@ -233,6 +246,28 @@ thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
             break;
         default:
             pgn.header().add("Result", "*");
+            break;
+    }
+
+    switch (result_reason) {
+        case ResultReason::Normal:
+            break;
+        case ResultReason::OutOfTime:
+            pgn.header().add("Adjudicated", "Out of time");
+            break;
+        case ResultReason::MaterialImbalance:
+            pgn.header().add("Adjudicated", "Material imbalance");
+            break;
+        case ResultReason::EasyFill:
+            pgn.header().add("Adjudicated", "Easy fill");
+            break;
+        case ResultReason::Gamelength:
+            pgn.header().add("Adjudicated", "Max game length reached");
+            break;
+        case ResultReason::IllegalMove:
+            pgn.header().add("Adjudicated", "Illegal move");
+            break;
+        default:
             break;
     }
 

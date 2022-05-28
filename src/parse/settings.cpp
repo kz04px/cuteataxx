@@ -46,8 +46,6 @@ namespace parse {
             settings.concurrency = b.get<int>();
         } else if (a == "timeoutbuffer") {
             settings.timeout_buffer = b.get<int>();
-        } else if (a == "maxfullmoves") {
-            settings.maxfullmoves = b.get<int>();
         } else if (a == "colour1") {
             settings.colour1 = b.get<std::string>();
         } else if (a == "colour2") {
@@ -56,6 +54,16 @@ namespace parse {
             settings.debug = b.get<bool>();
         } else if (a == "verbose") {
             settings.verbose = b.get<bool>();
+        } else if (a == "adjudicate") {
+            for (const auto &[key, val] : b.items()) {
+                if (key == "material") {
+                    settings.adjudicate_material = val.get<int>();
+                } else if (key == "easyfill") {
+                    settings.adjudicate_easyfill = val.get<bool>();
+                } else if (key == "gamelength") {
+                    settings.adjudicate_gamelength = val.get<int>();
+                }
+            }
         } else if (a == "openings") {
             for (const auto &[key, val] : b.items()) {
                 if (key == "path") {

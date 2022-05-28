@@ -1,8 +1,8 @@
 #ifndef MATCH_SETTINGS_HPP
 #define MATCH_SETTINGS_HPP
 
-#include <limits>
 #include <map>
+#include <optional>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -71,15 +71,19 @@ struct Settings {
     int num_games = 100;
     int hash_size = 16;
     int timeout_buffer = 10;
-    unsigned int maxfullmoves = std::numeric_limits<unsigned int>::max();
     bool debug = false;
     bool recover = false;
     bool verbose = false;
     bool repeat = true;
     bool shuffle = false;
+    bool adjudicate = false;
     SearchSettings tc;
-    std::string openings_path = "";
+    std::string openings_path;
     std::vector<EngineSettings> engines;
+    // Adjudication
+    std::optional<int> adjudicate_gamelength;
+    std::optional<int> adjudicate_material;
+    std::optional<bool> adjudicate_easyfill;
     // pgn
     std::string pgn_path = "games.pgn";
     std::string pgn_event = "*";
