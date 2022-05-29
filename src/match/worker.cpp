@@ -75,12 +75,15 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
             if (pgn.header().get("Result") == "1-0") {
                 results.scores[game.engine1.name].wins++;
                 results.scores[game.engine2.name].losses++;
+                results.black_wins++;
             } else if (pgn.header().get("Result") == "0-1") {
                 results.scores[game.engine1.name].losses++;
                 results.scores[game.engine2.name].wins++;
+                results.white_wins++;
             } else if (pgn.header().get("Result") == "1/2-1/2") {
                 results.scores[game.engine1.name].draws++;
                 results.scores[game.engine2.name].draws++;
+                results.draws++;
             }
 
             // Write to .pgn

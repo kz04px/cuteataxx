@@ -70,11 +70,9 @@ void run(const Settings &settings, const std::vector<std::string> &openings) {
     std::cout << "Threads: " << settings.concurrency << "\n";
     std::cout << "\n";
 
-    // Print engine scores
-    for (const auto &[name, score] : results.scores) {
-        std::cout << "Score of " << name << ": ";
-        std::cout << score;
-        std::cout << " " << score.played;
-        std::cout << "\n";
-    }
+    // Print match statistics
+    std::cout << "Result  Games\n";
+    std::cout << "1-0     " << results.black_wins << "\n";
+    std::cout << "0-1     " << results.white_wins << "\n";
+    std::cout << "1/2-1/2 " << results.draws << "\n";
 }
