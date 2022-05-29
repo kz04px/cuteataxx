@@ -42,9 +42,11 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
             }
             game = games.top();
             games.pop();
-            if (settings.verbose) {
-                std::cout << "Starting game " << game.engine1.name << " vs " << game.engine2.name << "\n";
-            }
+        }
+
+        if (settings.verbose) {
+            std::lock_guard<std::mutex> lock(mtx_output);
+            std::cout << "Starting game " << game.engine1.name << " vs " << game.engine2.name << "\n";
         }
 
         libataxx::pgn::PGN pgn;
@@ -66,6 +68,10 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
         // Results & printing
         {
             std::lock_guard<std::mutex> lock(mtx_output);
+
+            if (settings.verbose) {
+                std::cout << "Finishing game " << game.engine1.name << " vs " << game.engine2.name << "\n";
+            }
 
             results.games_played++;
 
@@ -100,7 +106,8 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
             // Print results
             if (results.scores.size() == 2) {
                 if (results.games_played < settings.ratinginterval ||
-                    results.games_played % settings.ratinginterval == 0 || results.games_played == results.games_total) {
+                    results.games_played % settings.ratinginterval == 0 ||
+                    results.games_played == results.games_total) {
                     const bool show_elo = results.games_played >= settings.ratinginterval;
 
                     if (results.games_played > settings.ratinginterval) {
@@ -113,7 +120,8 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
                         print_score(game.engine2, game.engine1, results, show_elo);
                     }
                 }
-            } else if (results.games_played % settings.ratinginterval == 0 || results.games_played == results.games_total) {
+            } else if (results.games_played % settings.ratinginterval == 0 ||
+                       results.games_played == results.games_total) {
                 for (const auto &[name, score] : results.scores) {
                     std::cout << name << ": ";
                     std::cout << score;
