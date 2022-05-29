@@ -50,7 +50,14 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
     auto result = libataxx::Result::None;
     auto result_reason = ResultReason::None;
 
+    // If the engines we need aren't in the cache, we get nothing
     auto engine1 = engine_cache.get(game.engine1.id);
+    auto engine2 = engine_cache.get(game.engine2.id);
+
+    // Free resources by removing any engine processes left in the cache
+    engine_cache.clear();
+
+    // Create new engine processes if necessary, knowing we have the resources available
     if (!engine1) {
         engine1 = std::make_shared<UAIEngine>(game.engine1.path);
         (*engine1)->uai();
@@ -59,7 +66,6 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
         }
     }
 
-    auto engine2 = engine_cache.get(game.engine2.id);
     if (!engine2) {
         engine2 = std::make_shared<UAIEngine>(game.engine2.path);
         (*engine2)->uai();

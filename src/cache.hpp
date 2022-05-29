@@ -42,6 +42,10 @@ class Cache {
         m_store.emplace_back(key, value);
     }
 
+    auto clear() noexcept -> void {
+        m_store.clear();
+    }
+
    private:
     std::mutex m_mutex;
     std::size_t m_capacity = 0;
