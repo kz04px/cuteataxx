@@ -27,13 +27,13 @@ void run(const Settings &settings, const std::vector<std::string> &openings) {
         }
     }
 
-    const auto num_games = games.size();
-
     // Create results & initialise
     Results results;
     for (const auto &engine : settings.engines) {
         results.scores[engine.name];
     }
+
+    results.games_total = games.size();
 
     // Create threads
     std::vector<std::thread> threads;
@@ -66,7 +66,7 @@ void run(const Settings &settings, const std::vector<std::string> &openings) {
     std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.hours().count() << "h ";
     std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.minutes().count() << "m ";
     std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.seconds().count() << "s\n";
-    std::cout << "Total games: " << num_games << "\n";
+    std::cout << "Total games: " << results.games_total << "\n";
     std::cout << "Threads: " << settings.concurrency << "\n";
     std::cout << "\n";
 
