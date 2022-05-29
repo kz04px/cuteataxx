@@ -68,6 +68,12 @@ void run(const Settings &settings, const std::vector<std::string> &openings) {
     std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.seconds().count() << "s\n";
     std::cout << "Total games: " << results.games_total << "\n";
     std::cout << "Threads: " << settings.concurrency << "\n";
+    if (diff.count() > 0) {
+        const auto games_per_sec = static_cast<float>(results.games_total) / diff.count();
+        std::cout << std::setprecision(2);
+        std::cout << "games/sec: " << games_per_sec << "\n";
+        std::cout << "games/min: " << games_per_sec * 60.0f << "\n";
+    }
     std::cout << "\n";
 
     // Print match statistics
