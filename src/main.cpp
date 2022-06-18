@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -15,6 +16,19 @@ int main(int argc, char **argv) {
 
     try {
         const auto settings = parse::settings(argv[1]);
+
+        // Check the paths given
+        if (!std::filesystem::exists(settings.openings_path)) {
+            std::cerr << "Openings path not found " << settings.openings_path << "\n";
+            return 1;
+        }
+        for (const auto &engine : settings.engines) {
+            if (!std::filesystem::exists(engine.path)) {
+                std::cerr << "Engine path not found " << engine.path << "\n";
+                return 1;
+            }
+        }
+
         const auto openings = parse::openings(settings.openings_path);
 
         std::cout << "Settings:\n";
