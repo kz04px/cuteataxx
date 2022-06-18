@@ -6,8 +6,8 @@
     "verbose": false,
     "debug": false,
     "recover": false,
-    "colour1": "White",
-    "colour2": "Black",
+    "colour1": "Black",
+    "colour2": "White",
     "adjudicate": {
         "gamelength": 300,
         "material": 30,
