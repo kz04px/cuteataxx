@@ -7,6 +7,7 @@
 #include "../cache.hpp"
 #include "../engine.hpp"
 #include "../uaiengine.hpp"
+#include "../uciengine.hpp"
 #include "settings.hpp"
 
 thread_local Cache<int, std::shared_ptr<Engine>> engine_cache(2);
@@ -64,6 +65,9 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
             case EngineProtocol::UAI:
                 engine1 = std::make_shared<UAIEngine>(game.engine1.path);
                 break;
+            case EngineProtocol::UCI:
+                engine1 = std::make_shared<UCIEngine>(game.engine1.path);
+                break;
             default:
                 return {};
         }
@@ -77,6 +81,9 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
         switch (game.engine2.proto) {
             case EngineProtocol::UAI:
                 engine2 = std::make_shared<UAIEngine>(game.engine2.path);
+                break;
+            case EngineProtocol::UCI:
+                engine2 = std::make_shared<UCIEngine>(game.engine2.path);
                 break;
             default:
                 return {};
