@@ -5,9 +5,9 @@
 #include <memory>
 #include <mutex>
 #include "../cache.hpp"
-#include "../engine.hpp"
-#include "../uaiengine.hpp"
-#include "../uciengine.hpp"
+#include "../engine/engine.hpp"
+#include "../engine/uaiengine.hpp"
+#include "../engine/uciengine.hpp"
 #include "settings.hpp"
 
 thread_local Cache<int, std::shared_ptr<Engine>> engine_cache(2);
