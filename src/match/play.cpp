@@ -123,7 +123,7 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
             if (settings.adjudicate_easyfill && pos.must_pass()) {
                 const auto them_stuck = (pos.us().singles() | pos.us().doubles()) & pos.them();
                 const auto them_unstuck = pos.them() ^ them_stuck;
-                assert(pos.them() == them_stuck | them_unstuck);
+                assert(pos.them() == (them_stuck | them_unstuck));
                 const auto their_reach =
                     pos.reachable((them_stuck.singles() | them_unstuck.doubles()) & pos.empty(), pos.empty());
                 const auto all_them = pos.them() | their_reach;
