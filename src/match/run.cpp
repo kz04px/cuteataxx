@@ -64,7 +64,7 @@ void run(const Settings &settings, const std::vector<std::string> &openings) {
     const auto hh_mm_ss = std::chrono::hh_mm_ss(diff);
 
     // Print stats
-    std::cout << "\n\n";
+    std::cout << "\n";
     std::cout << "Time taken: ";
     std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.hours().count() << "h ";
     std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.minutes().count() << "m ";

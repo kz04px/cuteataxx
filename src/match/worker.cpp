@@ -105,19 +105,21 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
 
             // Print results
             if (results.scores.size() == 2) {
-                if (results.games_played < settings.ratinginterval ||
-                    results.games_played % settings.ratinginterval == 0 ||
-                    results.games_played == results.games_total) {
-                    const bool show_elo = results.games_played >= settings.ratinginterval;
+                const auto print_result = results.games_played < settings.ratinginterval ||
+                                          results.games_played % settings.ratinginterval == 0 ||
+                                          results.games_played == results.games_total;
+                const auto show_elo =
+                    results.games_played >= settings.ratinginterval || settings.num_games == results.games_played;
 
-                    if (results.games_played > settings.ratinginterval) {
-                        std::cout << "\n";
-                    }
-
+                if (print_result) {
                     if (game.engine1.id < game.engine2.id) {
                         print_score(game.engine1, game.engine2, results, show_elo);
                     } else {
                         print_score(game.engine2, game.engine1, results, show_elo);
+                    }
+
+                    if (show_elo) {
+                        std::cout << "\n";
                     }
                 }
             } else if (results.games_played % settings.ratinginterval == 0 ||
