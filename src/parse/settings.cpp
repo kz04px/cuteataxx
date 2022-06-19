@@ -7,7 +7,7 @@ namespace parse {
 
 [[nodiscard]] Settings settings(const std::string &path) {
     Settings settings;
-    nlohmann::json json;
+    nlohmann::ordered_json json;
 
     // Get settings file
     {
@@ -35,7 +35,7 @@ namespace parse {
     settings.tc.type = SearchSettings::Type::Movetime;
     settings.tc.movetime = 10;
 
-    std::map<std::string, std::string> engine_options;
+    std::vector<std::pair<std::string, std::string>> engine_options;
 
     for (const auto &[a, b] : json.items()) {
         if (a == "games") {
@@ -111,7 +111,7 @@ namespace parse {
             }
         } else if (a == "options") {
             for (const auto &[key, val] : b.items()) {
-                engine_options[key] = val;
+                engine_options.emplace_back(key, val);
             }
         }
     }
@@ -129,7 +129,17 @@ namespace parse {
                 details.name = b.get<std::string>();
             } else if (a == "options") {
                 for (const auto &[key, val] : b.items()) {
-                    details.options[key] = val.get<std::string>();
+                    const auto iter =
+                        std::find_if(details.options.begin(), details.options.end(), [key](const auto &obj) -> bool {
+                            return obj.first == key;
+                        });
+
+                    // override
+                    if (iter != details.options.end()) {
+                        details.options.erase(iter);
+                    }
+
+                    details.options.emplace_back(key, val.get<std::string>());
                 }
             }
         }

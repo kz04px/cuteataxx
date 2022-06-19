@@ -1,7 +1,6 @@
 #ifndef MATCH_SETTINGS_HPP
 #define MATCH_SETTINGS_HPP
 
-#include <map>
 #include <optional>
 #include <ostream>
 #include <string>
@@ -62,7 +61,7 @@ struct EngineSettings {
     int id;
     std::string name;
     std::string path;
-    std::map<std::string, std::string> options;
+    std::vector<std::pair<std::string, std::string>> options;
 };
 
 struct Settings {
