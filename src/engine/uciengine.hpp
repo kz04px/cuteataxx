@@ -1,7 +1,6 @@
 #ifndef UCI_ENGINE_PROCESS_HPP
 #define UCI_ENGINE_PROCESS_HPP
 
-#include <libataxx/move.hpp>
 #include <libataxx/position.hpp>
 #include <string>
 #include <string_view>
@@ -84,7 +83,7 @@ class UCIEngine : public Engine {
         send("setoption name " + name + " value " + value);
     }
 
-    [[nodiscard]] virtual auto go(const SearchSettings &settings) -> libataxx::Move override {
+    [[nodiscard]] virtual auto go(const SearchSettings &settings) -> std::string override {
         switch (settings.type) {
             case SearchSettings::Type::Time: {
                 auto str = std::string();
@@ -127,16 +126,16 @@ class UCIEngine : public Engine {
 
         // Passing moves are encoded as [sq][sq] instead of 0000
         if (movestr[0] == movestr[2] && movestr[1] == movestr[3]) {
-            return libataxx::Move::nullmove();
+            return "0000";
         }
 
         // Turn long form dropping moves into short form
         // Example: X@g2 ---> g2
         if (movestr[1] == '@') {
-            movestr = movestr.substr(2, 2);
+            return movestr.substr(2, 2);
         }
 
-        return libataxx::Move::from_uai(movestr);
+        return movestr;
     }
 
    private:

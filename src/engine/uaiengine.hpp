@@ -1,7 +1,6 @@
 #ifndef UAI_ENGINE_PROCESS_HPP
 #define UAI_ENGINE_PROCESS_HPP
 
-#include <libataxx/move.hpp>
 #include <libataxx/position.hpp>
 #include <string>
 #include <string_view>
@@ -54,7 +53,7 @@ class UAIEngine : public Engine {
         send("setoption name " + name + " value " + value);
     }
 
-    [[nodiscard]] virtual auto go(const SearchSettings &settings) -> libataxx::Move override {
+    [[nodiscard]] virtual auto go(const SearchSettings &settings) -> std::string override {
         switch (settings.type) {
             case SearchSettings::Type::Time: {
                 auto str = std::string();
@@ -95,7 +94,7 @@ class UAIEngine : public Engine {
             return got_bestmove;
         });
 
-        return libataxx::Move::from_uai(movestr);
+        return movestr;
     }
 
    private:

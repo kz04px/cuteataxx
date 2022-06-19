@@ -93,6 +93,7 @@ auto info_recv(const std::string &msg) noexcept -> void {
     int wtime = settings.tc.wtime;
     auto result = libataxx::Result::None;
     auto result_reason = ResultReason::None;
+    auto movestr = std::string();
 
     // If the engines we need aren't in the cache, we get nothing
     auto engine1 = engine_cache.get(game.engine1.id);
@@ -189,13 +190,7 @@ auto info_recv(const std::string &msg) noexcept -> void {
             const auto t0 = std::chrono::high_resolution_clock::now();
 
             // Get move
-            libataxx::Move move;
-            try {
-                move = engine->go(search);
-            } catch (...) {
-                move = libataxx::Move::nullmove();
-                result_reason = ResultReason::IllegalMove;
-            }
+            movestr = engine->go(search);
 
             // Stop move timer
             const auto t1 = std::chrono::high_resolution_clock::now();
@@ -203,20 +198,32 @@ auto info_recv(const std::string &msg) noexcept -> void {
             // Get move time
             const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
 
-            // Add move to .pgn
-            node = node->add_mainline(move);
+            libataxx::Move move;
+
+            try {
+                // Parse move string
+                move = libataxx::Move::from_uai(movestr);
+
+                // Illegal move
+                if (!pos.legal_move(move)) {
+                    throw;
+                }
+            } catch (...) {
+                result_reason = ResultReason::IllegalMove;
+                result = make_win_for(!pos.turn());
+                std::cout << "Illegal move \"" << movestr << "\" played by "
+                          << (pos.turn() == libataxx::Side::Black ? game.engine1.name : game.engine2.name) << "\n\n";
+                break;
+            }
 
             ply_count++;
+
+            // Add move to .pgn
+            node = node->add_mainline(move);
 
             // Comment with engine data
             if (settings.pgn_verbose) {
                 node->add_comment("movetime " + std::to_string(diff.count()));
-            }
-
-            // Illegal move played
-            if (!pos.legal_move(move)) {
-                node->add_comment("illegal move");
-                break;
             }
 
             // Update clock
@@ -315,7 +322,7 @@ auto info_recv(const std::string &msg) noexcept -> void {
             pgn.header().add("Adjudicated", "Max game length reached");
             break;
         case ResultReason::IllegalMove:
-            pgn.header().add("Adjudicated", "Illegal move");
+            pgn.header().add("Adjudicated", "Illegal move " + movestr);
             break;
         default:
             break;

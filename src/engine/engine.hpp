@@ -3,7 +3,6 @@
 
 #include <boost/process.hpp>
 #include <functional>
-#include <libataxx/move.hpp>
 #include <libataxx/position.hpp>
 #include <string>
 #include <string_view>
@@ -13,7 +12,7 @@ class Engine {
    public:
     virtual auto init() -> void = 0;
 
-    [[nodiscard]] virtual auto go(const SearchSettings &settings) -> libataxx::Move = 0;
+    [[nodiscard]] virtual auto go(const SearchSettings &settings) -> std::string = 0;
 
     virtual auto position(const libataxx::Position &pos) -> void = 0;
 
