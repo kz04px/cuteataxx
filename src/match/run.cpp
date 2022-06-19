@@ -18,7 +18,10 @@ void run(const Settings &settings, const std::vector<std::string> &openings) {
 
             for (int n = 0; n < settings.num_games; n += 2) {
                 games.push(GameSettings{openings[idx_opening], settings.engines[i], settings.engines[j]});
-                games.push(GameSettings{openings[idx_opening], settings.engines[j], settings.engines[i]});
+
+                if (n + 1 < settings.num_games) {
+                    games.push(GameSettings{openings[idx_opening], settings.engines[j], settings.engines[i]});
+                }
 
                 // Next opening
                 idx_opening++;
