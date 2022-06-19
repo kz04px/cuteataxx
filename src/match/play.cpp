@@ -1,9 +1,11 @@
 #include "play.hpp"
 #include <cassert>
 #include <chrono>
+#include <iostream>
 #include <libataxx/pgn.hpp>
 #include <memory>
 #include <mutex>
+#include <thread>
 #include "../cache.hpp"
 #include "../engine/engine.hpp"
 #include "../engine/uaiengine.hpp"
@@ -30,6 +32,46 @@ enum class ResultReason : int
 
 static_assert(make_win_for(libataxx::Side::Black) == libataxx::Result::BlackWin);
 static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin);
+
+auto info_send(const std::string &msg) noexcept -> void {
+    std::cout << std::this_thread::get_id() << "> " << msg << "\n";
+}
+
+auto info_recv(const std::string &msg) noexcept -> void {
+    std::cout << std::this_thread::get_id() << "< " << msg << "\n";
+}
+
+[[nodiscard]] auto make_engine(const EngineSettings &settings, const bool debug = false) -> std::shared_ptr<Engine> {
+    std::shared_ptr<Engine> engine;
+
+    switch (settings.proto) {
+        case EngineProtocol::UAI:
+            if (debug) {
+                engine = std::make_shared<UAIEngine>(settings.path, info_send, info_recv);
+            } else {
+                engine = std::make_shared<UAIEngine>(settings.path);
+            }
+            break;
+        case EngineProtocol::UCI:
+            if (debug) {
+                engine = std::make_shared<UCIEngine>(settings.path, info_send, info_recv);
+            } else {
+                engine = std::make_shared<UCIEngine>(settings.path);
+            }
+            break;
+        default:
+            throw std::invalid_argument("Unknown engine protocol");
+    }
+
+    engine->init();
+    for (const auto &[key, val] : settings.options) {
+        engine->set_option(key, val);
+    }
+
+    engine->isready();
+
+    return engine;
+}
 
 [[nodiscard]] libataxx::pgn::PGN play(const Settings &settings, const GameSettings &game) {
     assert(!game.fen.empty());
@@ -61,37 +103,11 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
 
     // Create new engine processes if necessary, knowing we have the resources available
     if (!engine1) {
-        switch (game.engine1.proto) {
-            case EngineProtocol::UAI:
-                engine1 = std::make_shared<UAIEngine>(game.engine1.path);
-                break;
-            case EngineProtocol::UCI:
-                engine1 = std::make_shared<UCIEngine>(game.engine1.path);
-                break;
-            default:
-                return {};
-        }
-        (*engine1)->init();
-        for (const auto &[key, val] : game.engine1.options) {
-            (*engine1)->set_option(key, val);
-        }
+        engine1 = make_engine(game.engine1, settings.debug);
     }
 
     if (!engine2) {
-        switch (game.engine2.proto) {
-            case EngineProtocol::UAI:
-                engine2 = std::make_shared<UAIEngine>(game.engine2.path);
-                break;
-            case EngineProtocol::UCI:
-                engine2 = std::make_shared<UCIEngine>(game.engine2.path);
-                break;
-            default:
-                return {};
-        }
-        (*engine2)->init();
-        for (const auto &[key, val] : game.engine2.options) {
-            (*engine2)->set_option(key, val);
-        }
+        engine2 = make_engine(game.engine2, settings.debug);
     }
 
     try {

@@ -2,6 +2,7 @@
 #define ENGINE_PROCESS_HPP
 
 #include <boost/process.hpp>
+#include <functional>
 #include <libataxx/move.hpp>
 #include <libataxx/position.hpp>
 #include <string>
@@ -23,8 +24,10 @@ class Engine {
     virtual void newgame() = 0;
 
    protected:
-    [[nodiscard]] Engine(const std::string &path)
-        : m_child(path, boost::process::std_out > m_out, boost::process::std_in < m_in) {
+    [[nodiscard]] Engine(const std::string &path,
+                         std::function<void(const std::string &msg)> send = {},
+                         std::function<void(const std::string &msg)> recv = {})
+        : m_child(path, boost::process::std_out > m_out, boost::process::std_in < m_in), m_send(send), m_recv(recv) {
     }
 
     virtual ~Engine() {
@@ -44,12 +47,18 @@ class Engine {
     virtual void stop() = 0;
 
     auto send(const std::string &msg) -> void {
+        if (m_send) {
+            m_send(msg);
+        }
         m_in << msg << std::endl;
     }
 
     [[nodiscard]] auto get_output() -> std::string {
         std::string line;
         std::getline(m_out, line);
+        if (m_recv) {
+            m_recv(line);
+        }
         return line;
     }
 
@@ -57,6 +66,8 @@ class Engine {
     boost::process::opstream m_in;
     boost::process::ipstream m_out;
     boost::process::child m_child;
+    std::function<void(const std::string &msg)> m_send;
+    std::function<void(const std::string &msg)> m_recv;
 };
 
 #endif

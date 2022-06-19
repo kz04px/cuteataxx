@@ -40,7 +40,10 @@
 
 class UCIEngine : public Engine {
    public:
-    [[nodiscard]] UCIEngine(const std::string &path) : Engine(path) {
+    [[nodiscard]] UCIEngine(const std::string &path,
+                            std::function<void(const std::string &msg)> send = {},
+                            std::function<void(const std::string &msg)> recv = {})
+        : Engine(path, send, recv) {
     }
 
     ~UCIEngine() {

@@ -11,7 +11,10 @@
 
 class UAIEngine : public Engine {
    public:
-    [[nodiscard]] UAIEngine(const std::string &path) : Engine(path) {
+    [[nodiscard]] UAIEngine(const std::string &path,
+                            std::function<void(const std::string &msg)> send = {},
+                            std::function<void(const std::string &msg)> recv = {})
+        : Engine(path, send, recv) {
     }
 
     ~UAIEngine() {

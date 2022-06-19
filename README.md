@@ -43,8 +43,8 @@ How often to print updates
 > verbose
 Print extra information about the match
 
-> debug (not implemented)
-Enable debug to print engine output
+> debug
+Enable debug to print engine communication
 
 > recover (not implemented)
 Continue the match in the event of an engine crash
