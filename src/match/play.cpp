@@ -103,10 +103,18 @@ auto info_recv(const std::string &msg) noexcept -> void {
 
     // Create new engine processes if necessary, knowing we have the resources available
     if (!engine1) {
+        if (settings.verbose) {
+            std::cout << "Create engine process " << game.engine1.name << "\n";
+        }
+
         engine1 = make_engine(game.engine1, settings.debug);
     }
 
     if (!engine2) {
+        if (settings.verbose) {
+            std::cout << "Create engine process " << game.engine1.name << "\n";
+        }
+
         engine2 = make_engine(game.engine2, settings.debug);
     }
 
