@@ -5,10 +5,11 @@
 #include <memory>
 #include <mutex>
 #include "../cache.hpp"
+#include "../engine.hpp"
 #include "../uaiengine.hpp"
 #include "settings.hpp"
 
-thread_local Cache<int, std::shared_ptr<UAIEngine>> engine_cache(2);
+thread_local Cache<int, std::shared_ptr<Engine>> engine_cache(2);
 
 enum class ResultReason : int
 {
@@ -59,16 +60,28 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
 
     // Create new engine processes if necessary, knowing we have the resources available
     if (!engine1) {
-        engine1 = std::make_shared<UAIEngine>(game.engine1.path);
-        (*engine1)->uai();
+        switch (game.engine1.proto) {
+            case EngineProtocol::UAI:
+                engine1 = std::make_shared<UAIEngine>(game.engine1.path);
+                break;
+            default:
+                return {};
+        }
+        (*engine1)->init();
         for (const auto &[key, val] : game.engine1.options) {
             (*engine1)->set_option(key, val);
         }
     }
 
     if (!engine2) {
-        engine2 = std::make_shared<UAIEngine>(game.engine2.path);
-        (*engine2)->uai();
+        switch (game.engine2.proto) {
+            case EngineProtocol::UAI:
+                engine2 = std::make_shared<UAIEngine>(game.engine2.path);
+                break;
+            default:
+                return {};
+        }
+        (*engine2)->init();
         for (const auto &[key, val] : game.engine2.options) {
             (*engine2)->set_option(key, val);
         }

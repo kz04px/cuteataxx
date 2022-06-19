@@ -63,6 +63,9 @@ The material advantage required for the game to be ruled a win
 
 > adjudicate:easyfill
 Award a victory if the opponent is forced to pass while you can fill the rest of the empty squares
+
+> engines:protocol
+This has to be set to one of the following values: UAI
 ```
 
 ---

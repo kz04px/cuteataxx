@@ -1,93 +1,57 @@
-#ifndef ENGINE_PROCESS_HPP
-#define ENGINE_PROCESS_HPP
+#ifndef UAI_ENGINE_PROCESS_HPP
+#define UAI_ENGINE_PROCESS_HPP
 
-#include <boost/process.hpp>
 #include <libataxx/move.hpp>
 #include <libataxx/position.hpp>
 #include <string>
 #include <string_view>
 #include <utils.hpp>
+#include "engine.hpp"
 #include "match/settings.hpp"
 
-class UAIEngine {
-   private:
-    auto send(const std::string &msg) -> void {
-        m_in << msg << std::endl;
-    }
-
-    auto wait_for(const std::string &msg) {
-        std::string line;
-        while (is_running()) {
-            std::getline(m_out, line);
-            if (line == msg) {
-                break;
-            }
-        }
-    }
-
-    auto wait_for(const std::function<bool(const std::string_view msg)> func) {
-        std::string line;
-        auto exit = false;
-        while (is_running() && !exit) {
-            std::getline(m_out, line);
-            exit = func(line);
-        }
-    }
-
-    boost::process::opstream m_in;
-    boost::process::ipstream m_out;
-    boost::process::child m_child;
-
+class UAIEngine : public Engine {
    public:
-    [[nodiscard]] UAIEngine(const std::string &path)
-        : m_child(path, boost::process::std_out > m_out, boost::process::std_in < m_in) {
+    [[nodiscard]] UAIEngine(const std::string &path) : Engine(path) {
     }
 
     ~UAIEngine() {
         if (is_running()) {
             send("stop");
             send("quit");
-            m_in.close();
-            m_out.close();
-            m_child.wait();
         }
     }
 
-    [[nodiscard]] auto is_running() -> bool {
-        return m_child.running();
-    }
-
-    void uai() {
+    virtual auto init() -> void override {
         send("uai");
         wait_for("uaiok");
     }
 
-    void isready() {
+    virtual void isready() override {
         send("isready");
         wait_for("readyok");
     }
 
-    void uainewgame() {
+    virtual void newgame() override {
         send("uainewgame");
     }
 
-    void quit() {
+    virtual void quit() override {
         send("quit");
     }
 
-    void stop() {
+    virtual void stop() override {
         send("stop");
     }
 
-    auto position(const libataxx::Position &pos) -> void {
+    virtual auto position(const libataxx::Position &pos) -> void override {
         send("position fen " + pos.get_fen());
     }
 
-    auto set_option(const std::string &name, const std::string &value) -> void {
+    virtual auto set_option(const std::string &name, const std::string &value) -> void override {
         send("setoption name " + name + " value " + value);
     }
 
-    [[nodiscard]] auto go(const SearchSettings &settings) -> libataxx::Move {
+    [[nodiscard]] virtual auto go(const SearchSettings &settings) -> libataxx::Move override {
         switch (settings.type) {
             case SearchSettings::Type::Time: {
                 auto str = std::string();
@@ -129,6 +93,24 @@ class UAIEngine {
         });
 
         return libataxx::Move::from_uai(movestr);
+    }
+
+   private:
+    auto wait_for(const std::string &msg) -> void {
+        while (is_running()) {
+            const auto line = get_output();
+            if (line == msg) {
+                break;
+            }
+        }
+    }
+
+    auto wait_for(const std::function<bool(const std::string_view msg)> func) -> void {
+        auto exit = false;
+        while (is_running() && !exit) {
+            const auto line = get_output();
+            exit = func(line);
+        }
     }
 };
 

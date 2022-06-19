@@ -27,6 +27,11 @@ int main(int argc, char **argv) {
                 std::cerr << "Engine path not found " << engine.path << "\n";
                 return 1;
             }
+
+            if (engine.proto == EngineProtocol::Unknown) {
+                std::cerr << "Unrecognised engine protocol\n";
+                return 1;
+            }
         }
 
         const auto openings = parse::openings(settings.openings_path);

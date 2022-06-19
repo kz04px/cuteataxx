@@ -125,6 +125,11 @@ namespace parse {
         for (const auto &[a, b] : engine.items()) {
             if (a == "path") {
                 details.path = b.get<std::string>();
+            } else if (a == "protocol") {
+                const auto proto = b.get<std::string>();
+                if (proto == "UAI" || proto == "uai") {
+                    details.proto = EngineProtocol::UAI;
+                }
             } else if (a == "name") {
                 details.name = b.get<std::string>();
             } else if (a == "options") {

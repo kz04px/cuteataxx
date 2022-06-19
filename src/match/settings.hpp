@@ -6,6 +6,12 @@
 #include <string>
 #include <vector>
 
+enum class EngineProtocol : int
+{
+    UAI,
+    Unknown,
+};
+
 struct SearchSettings {
     enum class Type : int
     {
@@ -59,6 +65,7 @@ struct SearchSettings {
 
 struct EngineSettings {
     int id;
+    EngineProtocol proto = EngineProtocol::Unknown;
     std::string name;
     std::string path;
     std::vector<std::pair<std::string, std::string>> options;

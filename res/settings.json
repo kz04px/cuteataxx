@@ -39,13 +39,15 @@
         {
             "name": "Engine1",
             "path": "./engines/engine1",
+            "protocol": "UAI",
             "options": {
                 "ownbook": "true"
             }
         },
         {
             "name": "Engine2",
-            "path": "./engines/engine2"
+            "path": "./engines/engine2",
+            "protocol": "UAI"
         }
     ]
 }
