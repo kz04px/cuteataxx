@@ -128,6 +128,9 @@ auto info_recv(const std::string &msg) noexcept -> void {
 
         assert(*engine1 != *engine2);
 
+        (*engine1)->newgame();
+        (*engine2)->newgame();
+
         (*engine1)->isready();
         (*engine2)->isready();
 
