@@ -6,7 +6,7 @@
 
 namespace parse {
 
-[[nodiscard]] std::vector<std::string> openings(const std::string &path);
+[[nodiscard]] std::vector<std::string> openings(const std::string &path, const bool shuffle);
 
 }  // namespace parse
 

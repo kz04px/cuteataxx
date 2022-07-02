@@ -1,10 +1,13 @@
 #include "openings.hpp"
+#include <algorithm>
+#include <ctime>
 #include <fstream>
+#include <random>
 #include "../match/settings.hpp"
 
 namespace parse {
 
-[[nodiscard]] std::vector<std::string> openings(const std::string &path) {
+[[nodiscard]] std::vector<std::string> openings(const std::string &path, const bool shuffle) {
     std::ifstream f(path);
     std::vector<std::string> openings;
 
@@ -21,6 +24,11 @@ namespace parse {
             continue;
         }
         openings.push_back(line);
+    }
+
+    if (shuffle) {
+        std::mt19937 rng(std::time(nullptr));
+        std::shuffle(openings.begin(), openings.end(), rng);
     }
 
     return openings;

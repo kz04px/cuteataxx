@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
             }
         }
 
-        const auto openings = parse::openings(settings.openings_path);
+        const auto openings = parse::openings(settings.openings_path, settings.shuffle);
 
         std::cout << "Settings:\n";
         std::cout << "- games " << settings.num_games << "\n";
