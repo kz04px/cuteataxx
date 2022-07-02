@@ -6,7 +6,7 @@
 #include <string_view>
 #include <utils.hpp>
 #include "engine.hpp"
-#include "match/settings.hpp"
+#include "../match/settings.hpp"
 
 class UAIEngine : public Engine {
    public:

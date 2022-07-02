@@ -6,7 +6,7 @@
 #include <libataxx/position.hpp>
 #include <string>
 #include <string_view>
-#include "match/settings.hpp"
+#include "../match/settings.hpp"
 
 class Engine {
    public:
