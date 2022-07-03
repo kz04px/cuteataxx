@@ -5,7 +5,6 @@
 #include <string>
 #include <string_view>
 #include <utils.hpp>
-#include "../match/settings.hpp"
 #include "engine.hpp"
 
 [[nodiscard]] inline auto fen_to_ucifen(const std::string &fen) noexcept -> std::string {
