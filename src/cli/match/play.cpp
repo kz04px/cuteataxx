@@ -10,6 +10,7 @@
 #include "../engine/engine.hpp"
 #include "../engine/uaiengine.hpp"
 #include "../engine/uciengine.hpp"
+#include "parse_move.hpp"
 #include "settings.hpp"
 
 thread_local Cache<int, std::shared_ptr<Engine>> engine_cache(2);
@@ -205,7 +206,7 @@ auto info_recv(const std::string &msg) noexcept -> void {
 
             try {
                 // Parse move string
-                move = libataxx::Move::from_uai(movestr);
+                move = parse_move(movestr);
 
                 // Illegal move
                 if (!pos.legal_move(move)) {

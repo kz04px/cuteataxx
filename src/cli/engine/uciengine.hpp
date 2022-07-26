@@ -123,17 +123,6 @@ class UCIEngine : public Engine {
             return got_bestmove;
         });
 
-        // Passing moves are encoded as [sq][sq] instead of 0000
-        if (movestr[0] == movestr[2] && movestr[1] == movestr[3]) {
-            return "0000";
-        }
-
-        // Turn long form dropping moves into short form
-        // Example: X@g2 ---> g2
-        if (movestr[1] == '@') {
-            return movestr.substr(2, 2);
-        }
-
         return movestr;
     }
 
