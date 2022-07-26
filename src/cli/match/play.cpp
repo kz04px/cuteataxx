@@ -8,6 +8,7 @@
 #include <thread>
 #include "../cache.hpp"
 #include "../engine/engine.hpp"
+#include "../engine/katago.hpp"
 #include "../engine/uaiengine.hpp"
 #include "../engine/uciengine.hpp"
 #include "parse_move.hpp"
@@ -58,6 +59,13 @@ auto info_recv(const std::string &msg) noexcept -> void {
                 engine = std::make_shared<UCIEngine>(settings.path, info_send, info_recv);
             } else {
                 engine = std::make_shared<UCIEngine>(settings.path);
+            }
+            break;
+        case EngineProtocol::KataGo:
+            if (debug) {
+                engine = std::make_shared<KataGo>(settings.path, info_send, info_recv);
+            } else {
+                engine = std::make_shared<KataGo>(settings.path);
             }
             break;
         default:

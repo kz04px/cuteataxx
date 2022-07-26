@@ -131,6 +131,8 @@ namespace parse {
                     details.proto = EngineProtocol::UAI;
                 } else if (proto == "UCI" || proto == "uci") {
                     details.proto = EngineProtocol::UCI;
+                } else if (proto == "KATAGO" || proto == "KataGo" || proto == "katago") {
+                    details.proto = EngineProtocol::KataGo;
                 }
             } else if (a == "name") {
                 details.name = b.get<std::string>();
