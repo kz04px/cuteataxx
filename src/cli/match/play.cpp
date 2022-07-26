@@ -95,6 +95,7 @@ auto info_recv(const std::string &msg) noexcept -> void {
     pgn.header().add(settings.colour1, game.engine1.name);
     pgn.header().add(settings.colour2, game.engine2.name);
     pgn.header().add("FEN", game.fen);
+    pgn.set_black_first(pos.turn() == libataxx::Side::Black);
     auto node = pgn.root();
 
     int ply_count = 0;
