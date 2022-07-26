@@ -1,5 +1,5 @@
-#ifndef UCI_ENGINE_PROCESS_HPP
-#define UCI_ENGINE_PROCESS_HPP
+#ifndef FAIRY_STOCKFISH_ENGINE_PROCESS_HPP
+#define FAIRY_STOCKFISH_ENGINE_PROCESS_HPP
 
 #include <libataxx/position.hpp>
 #include <string>
@@ -7,7 +7,7 @@
 #include <utils.hpp>
 #include "engine.hpp"
 
-[[nodiscard]] inline auto fen_to_ucifen(const std::string &fen) noexcept -> std::string {
+[[nodiscard]] inline auto fen_to_fsf_fen(const std::string &fen) noexcept -> std::string {
     auto nfen = fen;
     std::size_t idx = 0;
 
@@ -36,15 +36,15 @@
     return nfen;
 }
 
-class UCIEngine : public Engine {
+class FairyStockfish : public Engine {
    public:
-    [[nodiscard]] UCIEngine(const std::string &path,
-                            std::function<void(const std::string &msg)> send = {},
-                            std::function<void(const std::string &msg)> recv = {})
+    [[nodiscard]] FairyStockfish(const std::string &path,
+                                 std::function<void(const std::string &msg)> send = {},
+                                 std::function<void(const std::string &msg)> recv = {})
         : Engine(path, send, recv) {
     }
 
-    ~UCIEngine() {
+    ~FairyStockfish() {
         if (is_running()) {
             send("stop");
             send("quit");
@@ -74,7 +74,7 @@ class UCIEngine : public Engine {
     }
 
     virtual auto position(const libataxx::Position &pos) -> void override {
-        const auto nfen = fen_to_ucifen(pos.get_fen());
+        const auto nfen = fen_to_fsf_fen(pos.get_fen());
         send("position fen " + nfen);
     }
 

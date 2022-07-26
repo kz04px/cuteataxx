@@ -129,8 +129,8 @@ namespace parse {
                 const auto proto = b.get<std::string>();
                 if (proto == "UAI" || proto == "uai") {
                     details.proto = EngineProtocol::UAI;
-                } else if (proto == "UCI" || proto == "uci") {
-                    details.proto = EngineProtocol::UCI;
+                } else if (proto == "FSF" || proto == "fsf") {
+                    details.proto = EngineProtocol::FSF;
                 } else if (proto == "KATAGO" || proto == "KataGo" || proto == "katago") {
                     details.proto = EngineProtocol::KataGo;
                 }

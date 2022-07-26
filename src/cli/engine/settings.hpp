@@ -7,7 +7,7 @@
 enum class EngineProtocol : int
 {
     UAI,
-    UCI,
+    FSF,
     KataGo,
     Unknown,
 };

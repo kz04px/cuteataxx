@@ -8,9 +8,9 @@
 #include <thread>
 #include "../cache.hpp"
 #include "../engine/engine.hpp"
+#include "../engine/fairy_stockfish.hpp"
 #include "../engine/katago.hpp"
 #include "../engine/uaiengine.hpp"
-#include "../engine/uciengine.hpp"
 #include "parse_move.hpp"
 #include "settings.hpp"
 
@@ -54,11 +54,11 @@ auto info_recv(const std::string &msg) noexcept -> void {
                 engine = std::make_shared<UAIEngine>(settings.path);
             }
             break;
-        case EngineProtocol::UCI:
+        case EngineProtocol::FSF:
             if (debug) {
-                engine = std::make_shared<UCIEngine>(settings.path, info_send, info_recv);
+                engine = std::make_shared<FairyStockfish>(settings.path, info_send, info_recv);
             } else {
-                engine = std::make_shared<UCIEngine>(settings.path);
+                engine = std::make_shared<FairyStockfish>(settings.path);
             }
             break;
         case EngineProtocol::KataGo:
