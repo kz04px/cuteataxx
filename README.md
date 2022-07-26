@@ -64,6 +64,9 @@ The material advantage required for the game to be ruled a win
 ### __adjudicate:easyfill__
 Award a victory if the opponent is forced to pass while you can fill the rest of the empty squares
 
+### __engines:arguments__
+Command line arguments to be passed to the engine
+
 ### __engines:protocol__
 - UAI -- the only protocol engines should use based on UCI from chess.
 - FSF -- supported exclusively for the sake of Fairy-Stockfish found [here](https://github.com/ianfab/Fairy-Stockfish).

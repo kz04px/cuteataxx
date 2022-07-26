@@ -49,23 +49,23 @@ auto info_recv(const std::string &msg) noexcept -> void {
     switch (settings.proto) {
         case EngineProtocol::UAI:
             if (debug) {
-                engine = std::make_shared<UAIEngine>(settings.path, info_send, info_recv);
+                engine = std::make_shared<UAIEngine>(settings.path, settings.arguments, info_send, info_recv);
             } else {
-                engine = std::make_shared<UAIEngine>(settings.path);
+                engine = std::make_shared<UAIEngine>(settings.path, settings.arguments);
             }
             break;
         case EngineProtocol::FSF:
             if (debug) {
-                engine = std::make_shared<FairyStockfish>(settings.path, info_send, info_recv);
+                engine = std::make_shared<FairyStockfish>(settings.path, settings.arguments, info_send, info_recv);
             } else {
-                engine = std::make_shared<FairyStockfish>(settings.path);
+                engine = std::make_shared<FairyStockfish>(settings.path, settings.arguments);
             }
             break;
         case EngineProtocol::KataGo:
             if (debug) {
-                engine = std::make_shared<KataGo>(settings.path, info_send, info_recv);
+                engine = std::make_shared<KataGo>(settings.path, settings.arguments, info_send, info_recv);
             } else {
-                engine = std::make_shared<KataGo>(settings.path);
+                engine = std::make_shared<KataGo>(settings.path, settings.arguments);
             }
             break;
         default:

@@ -24,9 +24,14 @@ class Engine {
 
    protected:
     [[nodiscard]] Engine(const std::string &path,
+                         const std::string &arguments,
                          std::function<void(const std::string &msg)> send = {},
                          std::function<void(const std::string &msg)> recv = {})
-        : m_child(path, boost::process::std_out > m_out, boost::process::std_in < m_in), m_send(send), m_recv(recv) {
+        : m_child(path + (arguments.empty() ? "" : (" " + arguments)),
+                  boost::process::std_out > m_out,
+                  boost::process::std_in < m_in),
+          m_send(send),
+          m_recv(recv) {
     }
 
     virtual ~Engine() {

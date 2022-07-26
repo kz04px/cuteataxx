@@ -40,6 +40,7 @@
             "name": "Engine1",
             "path": "./engines/engine1",
             "protocol": "UAI",
+            "arguments": "--fast",
             "options": {
                 "ownbook": "true"
             }

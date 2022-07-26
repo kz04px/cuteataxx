@@ -10,9 +10,10 @@
 class KataGo : public Engine {
    public:
     [[nodiscard]] KataGo(const std::string &path,
+                         const std::string &arguments,
                          std::function<void(const std::string &msg)> send = {},
                          std::function<void(const std::string &msg)> recv = {})
-        : Engine(path, send, recv) {
+        : Engine(path, arguments, send, recv) {
     }
 
     ~KataGo() {
