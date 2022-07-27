@@ -5,7 +5,7 @@
 #include <string>
 #include <string_view>
 #include <utils.hpp>
-#include "engine.hpp"
+#include "process.hpp"
 
 [[nodiscard]] inline auto fen_to_fsf_fen(const std::string &fen) noexcept -> std::string {
     auto nfen = fen;
@@ -36,13 +36,13 @@
     return nfen;
 }
 
-class FairyStockfish : public Engine {
+class FairyStockfish : public ProcessEngine {
    public:
     [[nodiscard]] FairyStockfish(const std::string &path,
                                  const std::string &arguments,
                                  std::function<void(const std::string &msg)> send = {},
                                  std::function<void(const std::string &msg)> recv = {})
-        : Engine(path, arguments, send, recv) {
+        : ProcessEngine(path, arguments, send, recv) {
     }
 
     ~FairyStockfish() {

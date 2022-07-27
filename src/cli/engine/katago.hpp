@@ -5,15 +5,15 @@
 #include <string>
 #include <string_view>
 #include <utils.hpp>
-#include "engine.hpp"
+#include "process.hpp"
 
-class KataGo : public Engine {
+class KataGo : public ProcessEngine {
    public:
     [[nodiscard]] KataGo(const std::string &path,
                          const std::string &arguments,
                          std::function<void(const std::string &msg)> send = {},
                          std::function<void(const std::string &msg)> recv = {})
-        : Engine(path, arguments, send, recv) {
+        : ProcessEngine(path, arguments, send, recv) {
     }
 
     ~KataGo() {
