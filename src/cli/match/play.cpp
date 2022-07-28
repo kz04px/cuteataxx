@@ -10,14 +10,14 @@
 #include "parse_move.hpp"
 #include "settings.hpp"
 // Engines
-#include "../engine/engine.hpp"
-#include "../engine/fairy_stockfish.hpp"
-#include "../engine/katago.hpp"
-#include "../engine/uaiengine.hpp"
+#include "engine/engine.hpp"
+#include "engine/fairy_stockfish.hpp"
+#include "engine/katago.hpp"
+#include "engine/uaiengine.hpp"
 // Players
-#include "../players/least_captures.hpp"
-#include "../players/most_captures.hpp"
-#include "../players/random.hpp"
+#include "players/least_captures.hpp"
+#include "players/most_captures.hpp"
+#include "players/random.hpp"
 
 thread_local Cache<int, std::shared_ptr<Engine>> engine_cache(2);
 

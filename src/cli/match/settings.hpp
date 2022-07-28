@@ -5,7 +5,7 @@
 #include <ostream>
 #include <string>
 #include <vector>
-#include "../engine/settings.hpp"
+#include "engine/settings.hpp"
 
 struct Settings {
     int ratinginterval = 10;
