@@ -5,6 +5,7 @@
 #include <libataxx/pgn.hpp>
 #include <memory>
 #include <mutex>
+#include <stdexcept>
 #include <thread>
 #include "../cache.hpp"
 #include "parse_move.hpp"
@@ -54,25 +55,25 @@ auto info_recv(const std::string &msg) noexcept -> void {
         switch (settings.proto) {
             case EngineProtocol::UAI:
                 if (debug) {
-                engine = std::make_shared<UAIEngine>(settings.path, settings.arguments, info_send, info_recv);
-            } else {
-                engine = std::make_shared<UAIEngine>(settings.path, settings.arguments);
-            }
-            break;
-        case EngineProtocol::FSF:
-            if (debug) {
-                engine = std::make_shared<FairyStockfish>(settings.path, settings.arguments, info_send, info_recv);
-            } else {
-                engine = std::make_shared<FairyStockfish>(settings.path, settings.arguments);
-            }
-            break;
-        case EngineProtocol::KataGo:
-            if (debug) {
-                engine = std::make_shared<KataGo>(settings.path, settings.arguments, info_send, info_recv);
-            } else {
-                engine = std::make_shared<KataGo>(settings.path, settings.arguments);
-            }
-            break;
+                    engine = std::make_shared<UAIEngine>(settings.path, settings.arguments, info_send, info_recv);
+                } else {
+                    engine = std::make_shared<UAIEngine>(settings.path, settings.arguments);
+                }
+                break;
+            case EngineProtocol::FSF:
+                if (debug) {
+                    engine = std::make_shared<FairyStockfish>(settings.path, settings.arguments, info_send, info_recv);
+                } else {
+                    engine = std::make_shared<FairyStockfish>(settings.path, settings.arguments);
+                }
+                break;
+            case EngineProtocol::KataGo:
+                if (debug) {
+                    engine = std::make_shared<KataGo>(settings.path, settings.arguments, info_send, info_recv);
+                } else {
+                    engine = std::make_shared<KataGo>(settings.path, settings.arguments);
+                }
+                break;
             default:
                 throw std::invalid_argument("Unknown engine protocol");
         }
@@ -217,12 +218,6 @@ auto info_recv(const std::string &msg) noexcept -> void {
 
             auto search = settings.tc;
 
-            if (search.type == SearchSettings::Type::Time) {
-                if (btime <= 0 || wtime <= 0) {
-                    throw "meh";
-                }
-            }
-
             // Update tc
             search.btime = btime;
             search.wtime = wtime;
@@ -247,7 +242,7 @@ auto info_recv(const std::string &msg) noexcept -> void {
 
                 // Illegal move
                 if (!pos.legal_move(move)) {
-                    throw;
+                    throw std::logic_error("Illegal move");
                 }
             } catch (...) {
                 result_reason = ResultReason::IllegalMove;

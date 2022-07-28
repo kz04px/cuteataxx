@@ -20,7 +20,7 @@ namespace parse {
         } catch (nlohmann::json::exception &e) {
             throw e;
         } catch (...) {
-            throw "Failure parsing .json";
+            throw std::logic_error("Failure parsing .json");
         }
     }
 
