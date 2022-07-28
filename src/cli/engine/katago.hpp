@@ -124,7 +124,7 @@ class KataGo : public ProcessEngine {
         }
 
         if (tostr == "pass") {
-            return "0000";
+            return "pass";
         }
 
         return fromstr + tostr;
