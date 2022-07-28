@@ -53,11 +53,11 @@ class KataGo : public ProcessEngine {
 
         std::string command = "set_position";
 
-        for (const auto sq : pos.black()) {
+        for (const auto sq : pos.us()) {
             command += " black " + static_cast<std::string>(sq);
         }
 
-        for (const auto sq : pos.white()) {
+        for (const auto sq : pos.them()) {
             command += " white " + static_cast<std::string>(sq);
         }
 
