@@ -30,47 +30,7 @@ make
 ---
 
 # Settings
-
-### __games__
-The number of games to play in the match
-
-### __concurrency__
-The number of games to play simultaneously
-
-### __ratinginterval__
-How often to print updates
-
-### __verbose__
-Print extra information about the match
-
-### __debug__
-Enable debug to print engine communication
-
-### __recover__ (not implemented)
-Continue the match in the event of an engine crash
-
-### __colour1__
-The colour of player 1 in the .pgn file
-
-### __colour2__
-The colour of player 2 in the .pgn file
-
-### __adjudicate:gamelength__
-The maximimum game length before being ruled a draw
-
-### __adjudicate:material__
-The material advantage required for the game to be ruled a win
-
-### __adjudicate:easyfill__
-Award a victory if the opponent is forced to pass while you can fill the rest of the empty squares
-
-### __engines:arguments__
-Command line arguments to be passed to the engine
-
-### __engines:protocol__
-- UAI -- the only protocol engines should use based on UCI from chess.
-- FSF -- supported exclusively for the sake of Fairy-Stockfish found [here](https://github.com/ianfab/Fairy-Stockfish).
-- KataGo -- partial support exclusively for a KataGo fork found [here](https://github.com/hzyhhzy/KataGo/tree/Ataxx).
+Match settings are provided in the [JSON](https://en.wikipedia.org/wiki/JSON) file format. An example of which can be found in the `res` directory [here](./res/settings.json). Details of the settings available can be found [here](./settings.md).
 
 ---
 
