@@ -29,8 +29,8 @@ struct Settings {
     // pgn
     std::string pgn_path = "games.pgn";
     std::string pgn_event = "*";
-    std::string colour1 = "white";
-    std::string colour2 = "black";
+    std::string colour1 = "black";
+    std::string colour2 = "white";
     bool pgn_enabled = true;
     bool pgn_verbose = false;
     bool pgn_override = false;
