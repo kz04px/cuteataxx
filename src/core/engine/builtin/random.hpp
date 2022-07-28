@@ -1,14 +1,14 @@
-#ifndef PLAYER_MOST_CAPTURES_HPP
-#define PLAYER_MOST_CAPTURES_HPP
+#ifndef BUILTIN_RANDOM_HPP
+#define BUILTIN_RANDOM_HPP
 
 #include <functional>
 #include <string>
-#include "../engine/engine.hpp"
+#include "../engine.hpp"
 
-class MostCapturesPlayer : public Engine {
+class RandomBuiltin : public Engine {
    public:
-    [[nodiscard]] MostCapturesPlayer(std::function<void(const std::string &msg)> send = {},
-                                     std::function<void(const std::string &msg)> recv = {})
+    [[nodiscard]] RandomBuiltin(std::function<void(const std::string &msg)> send = {},
+                                std::function<void(const std::string &msg)> recv = {})
         : Engine(send, recv) {
     }
 
@@ -38,21 +38,10 @@ class MostCapturesPlayer : public Engine {
         if (m_pos.gameover()) {
             return "0000";
         }
-
         const auto moves = m_pos.legal_moves();
-        std::vector<int> scores(moves.size());
-        auto best_score = -1;
-        auto best_move = libataxx::Move::nullmove();
-
-        for (const auto &move : moves) {
-            const auto score = m_pos.count_captures(move) + move.is_single();
-            if (score > best_score) {
-                best_score = score;
-                best_move = move;
-            }
-        }
-
-        return static_cast<std::string>(best_move);
+        const auto idx = rand() % moves.size();
+        const auto move = moves.at(idx);
+        return static_cast<std::string>(move);
     }
 
     [[nodiscard]] virtual auto is_running() -> bool override {

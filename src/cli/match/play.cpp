@@ -10,14 +10,13 @@
 #include "parse_move.hpp"
 #include "settings.hpp"
 // Engines
+#include "engine/builtin/least_captures.hpp"
+#include "engine/builtin/most_captures.hpp"
+#include "engine/builtin/random.hpp"
 #include "engine/engine.hpp"
 #include "engine/fairy_stockfish.hpp"
 #include "engine/katago.hpp"
 #include "engine/uaiengine.hpp"
-// Players
-#include "players/least_captures.hpp"
-#include "players/most_captures.hpp"
-#include "players/random.hpp"
 
 thread_local Cache<int, std::shared_ptr<Engine>> engine_cache(2);
 
@@ -80,21 +79,21 @@ auto info_recv(const std::string &msg) noexcept -> void {
     } else {
         if (settings.builtin == "random") {
             if (debug) {
-                engine = std::make_shared<RandomPlayer>(info_send, info_recv);
+                engine = std::make_shared<RandomBuiltin>(info_send, info_recv);
             } else {
-                engine = std::make_shared<RandomPlayer>();
+                engine = std::make_shared<RandomBuiltin>();
             }
         } else if (settings.builtin == "mostcaptures") {
             if (debug) {
-                engine = std::make_shared<MostCapturesPlayer>(info_send, info_recv);
+                engine = std::make_shared<MostCapturesBuiltin>(info_send, info_recv);
             } else {
-                engine = std::make_shared<MostCapturesPlayer>();
+                engine = std::make_shared<MostCapturesBuiltin>();
             }
         } else if (settings.builtin == "leastcaptures") {
             if (debug) {
-                engine = std::make_shared<LeastCapturesPlayer>(info_send, info_recv);
+                engine = std::make_shared<LeastCapturesBuiltin>(info_send, info_recv);
             } else {
-                engine = std::make_shared<LeastCapturesPlayer>();
+                engine = std::make_shared<LeastCapturesBuiltin>();
             }
         } else {
             throw std::invalid_argument("Unknown engine builtin");

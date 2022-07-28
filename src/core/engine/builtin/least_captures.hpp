@@ -1,14 +1,14 @@
-#ifndef PLAYER_LEAST_CAPTURES_HPP
-#define PLAYER_LEAST_CAPTURES_HPP
+#ifndef BUILTIN_LEAST_CAPTURES_HPP
+#define BUILTIN_LEAST_CAPTURES_HPP
 
 #include <functional>
 #include <string>
-#include "../engine/engine.hpp"
+#include "../engine.hpp"
 
-class LeastCapturesPlayer : public Engine {
+class LeastCapturesBuiltin : public Engine {
    public:
-    [[nodiscard]] LeastCapturesPlayer(std::function<void(const std::string &msg)> send = {},
-                                      std::function<void(const std::string &msg)> recv = {})
+    [[nodiscard]] LeastCapturesBuiltin(std::function<void(const std::string &msg)> send = {},
+                                       std::function<void(const std::string &msg)> recv = {})
         : Engine(send, recv) {
     }
 
