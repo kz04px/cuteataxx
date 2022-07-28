@@ -336,9 +336,13 @@ auto info_recv(const std::string &msg) noexcept -> void {
     switch (result) {
         case libataxx::Result::BlackWin:
             pgn.header().add("Result", "1-0");
+            pgn.header().add("Winner", game.engine1.name);
+            pgn.header().add("Loser", game.engine2.name);
             break;
         case libataxx::Result::WhiteWin:
             pgn.header().add("Result", "0-1");
+            pgn.header().add("Winner", game.engine2.name);
+            pgn.header().add("Loser", game.engine1.name);
             break;
         case libataxx::Result::Draw:
             pgn.header().add("Result", "1/2-1/2");
