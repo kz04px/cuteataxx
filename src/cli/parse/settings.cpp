@@ -136,6 +136,8 @@ namespace parse {
                 }
             } else if (a == "name") {
                 details.name = b.get<std::string>();
+            } else if (a == "builtin") {
+                details.builtin = b.get<std::string>();
             } else if (a == "arguments") {
                 details.arguments = b.get<std::string>();
             } else if (a == "options") {

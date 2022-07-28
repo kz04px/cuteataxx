@@ -22,7 +22,12 @@ int main(int argc, char **argv) {
             std::cerr << "Openings path not found " << settings.openings_path << "\n";
             return 1;
         }
+
         for (const auto &engine : settings.engines) {
+            if (!engine.builtin.empty()) {
+                continue;
+            }
+
             if (!std::filesystem::exists(engine.path)) {
                 std::cerr << "Engine path not found " << engine.path << "\n";
                 return 1;

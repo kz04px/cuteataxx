@@ -7,12 +7,17 @@
 #include <mutex>
 #include <thread>
 #include "../cache.hpp"
+#include "parse_move.hpp"
+#include "settings.hpp"
+// Engines
 #include "../engine/engine.hpp"
 #include "../engine/fairy_stockfish.hpp"
 #include "../engine/katago.hpp"
 #include "../engine/uaiengine.hpp"
-#include "parse_move.hpp"
-#include "settings.hpp"
+// Players
+#include "../players/least_captures.hpp"
+#include "../players/most_captures.hpp"
+#include "../players/random.hpp"
 
 thread_local Cache<int, std::shared_ptr<Engine>> engine_cache(2);
 
@@ -46,9 +51,10 @@ auto info_recv(const std::string &msg) noexcept -> void {
 [[nodiscard]] auto make_engine(const EngineSettings &settings, const bool debug = false) -> std::shared_ptr<Engine> {
     std::shared_ptr<Engine> engine;
 
-    switch (settings.proto) {
-        case EngineProtocol::UAI:
-            if (debug) {
+    if (settings.builtin.empty()) {
+        switch (settings.proto) {
+            case EngineProtocol::UAI:
+                if (debug) {
                 engine = std::make_shared<UAIEngine>(settings.path, settings.arguments, info_send, info_recv);
             } else {
                 engine = std::make_shared<UAIEngine>(settings.path, settings.arguments);
@@ -68,8 +74,31 @@ auto info_recv(const std::string &msg) noexcept -> void {
                 engine = std::make_shared<KataGo>(settings.path, settings.arguments);
             }
             break;
-        default:
-            throw std::invalid_argument("Unknown engine protocol");
+            default:
+                throw std::invalid_argument("Unknown engine protocol");
+        }
+    } else {
+        if (settings.builtin == "random") {
+            if (debug) {
+                engine = std::make_shared<RandomPlayer>(info_send, info_recv);
+            } else {
+                engine = std::make_shared<RandomPlayer>();
+            }
+        } else if (settings.builtin == "mostcaptures") {
+            if (debug) {
+                engine = std::make_shared<MostCapturesPlayer>(info_send, info_recv);
+            } else {
+                engine = std::make_shared<MostCapturesPlayer>();
+            }
+        } else if (settings.builtin == "leastcaptures") {
+            if (debug) {
+                engine = std::make_shared<LeastCapturesPlayer>(info_send, info_recv);
+            } else {
+                engine = std::make_shared<LeastCapturesPlayer>();
+            }
+        } else {
+            throw std::invalid_argument("Unknown engine builtin");
+        }
     }
 
     engine->init();

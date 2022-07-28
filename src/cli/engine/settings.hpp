@@ -16,6 +16,7 @@ struct EngineSettings {
     int id;
     EngineProtocol proto = EngineProtocol::Unknown;
     std::string name;
+    std::string builtin;
     std::string path;
     std::string arguments;
     std::vector<std::pair<std::string, std::string>> options;
