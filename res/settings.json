@@ -28,6 +28,13 @@
         "hash": "128",
         "ownbook": "false"
     },
+    "sprt": {
+        "enabled": false,
+        "autostop": true,
+        "elo0": 0.0,
+        "elo1": 5.0,
+        "confidence": 0.95
+    },
     "pgn": {
         "enabled": true,
         "verbose": true,

@@ -109,6 +109,25 @@ namespace parse {
                     settings.pgn_event = val.get<std::string>();
                 }
             }
+        } else if (a == "sprt") {
+            for (const auto &[key, val] : b.items()) {
+                if (key == "enabled") {
+                    settings.sprt_enabled = val.get<bool>();
+                } else if (key == "autostop") {
+                    settings.sprt_autostop = val.get<bool>();
+                } else if (key == "confidence") {
+                    settings.sprt_alpha = 1.0f - val.get<float>();
+                    settings.sprt_beta = 1.0f - val.get<float>();
+                } else if (key == "alpha") {
+                    settings.sprt_alpha = val.get<float>();
+                } else if (key == "beta") {
+                    settings.sprt_beta = val.get<float>();
+                } else if (key == "elo0") {
+                    settings.sprt_elo0 = val.get<float>();
+                } else if (key == "elo1") {
+                    settings.sprt_elo1 = val.get<float>();
+                }
+            }
         } else if (a == "options") {
             for (const auto &[key, val] : b.items()) {
                 engine_options.emplace_back(key, val);

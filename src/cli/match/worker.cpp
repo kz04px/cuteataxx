@@ -5,6 +5,7 @@
 #include <iostream>
 #include <libataxx/pgn.hpp>
 #include <mutex>
+#include <sprt.hpp>
 #include "play.hpp"
 #include "results.hpp"
 #include "settings.hpp"
@@ -12,7 +13,8 @@
 std::mutex mtx_output;
 std::mutex mtx_games;
 
-void print_score(const EngineSettings &engine1,
+void print_score(const Settings &settings,
+                 const EngineSettings &engine1,
                  const EngineSettings &engine2,
                  const Results &results,
                  const bool show_elo = true) {
@@ -27,6 +29,13 @@ void print_score(const EngineSettings &engine1,
     std::cout << "\n";
     if (show_elo) {
         std::cout << std::fixed << std::setprecision(2) << get_elo(w, l, d) << " +/- " << get_err(w, l, d) << "\n";
+
+        if (settings.sprt_enabled && settings.engines.size() == 2) {
+            const auto llr = sprt::get_llr(w, l, d, settings.sprt_elo0, settings.sprt_elo1);
+            const auto lbound = sprt::get_lbound(settings.sprt_alpha, settings.sprt_beta);
+            const auto ubound = sprt::get_ubound(settings.sprt_alpha, settings.sprt_beta);
+            std::cout << "SPRT: llr " << llr << ", lbound " << lbound << ", ubound " << ubound << "\n";
+        }
     }
 }
 
@@ -103,19 +112,27 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
                 }
             }
 
+            const auto w = results.scores.at(game.engine1.name).wins;
+            const auto l = results.scores.at(game.engine1.name).losses;
+            const auto d = results.scores.at(game.engine1.name).draws;
+            const auto llr = sprt::get_llr(w, l, d, settings.sprt_elo0, settings.sprt_elo1);
+            const auto lbound = sprt::get_lbound(settings.sprt_alpha, settings.sprt_beta);
+            const auto ubound = sprt::get_ubound(settings.sprt_alpha, settings.sprt_beta);
+            const auto sprt_stop = settings.sprt_enabled && settings.sprt_autostop && (llr <= lbound || llr >= ubound);
+
             // Print results
             if (results.scores.size() == 2) {
                 const auto print_result = results.games_played < settings.ratinginterval ||
                                           results.games_played % settings.ratinginterval == 0 ||
                                           results.games_played == results.games_total;
-                const auto show_elo =
-                    results.games_played >= settings.ratinginterval || settings.num_games == results.games_played;
+                const auto show_elo = results.games_played >= settings.ratinginterval ||
+                                      settings.num_games == results.games_played || sprt_stop;
 
                 if (print_result) {
                     if (game.engine1.id < game.engine2.id) {
-                        print_score(game.engine1, game.engine2, results, show_elo);
+                        print_score(settings, game.engine1, game.engine2, results, show_elo);
                     } else {
-                        print_score(game.engine2, game.engine1, results, show_elo);
+                        print_score(settings, game.engine2, game.engine1, results, show_elo);
                     }
 
                     if (show_elo) {

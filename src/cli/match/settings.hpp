@@ -34,6 +34,13 @@ struct Settings {
     bool pgn_enabled = true;
     bool pgn_verbose = false;
     bool pgn_override = false;
+    // SPRT
+    bool sprt_enabled = false;
+    bool sprt_autostop = false;
+    float sprt_alpha = 0.05f;
+    float sprt_beta = 0.05f;
+    float sprt_elo0 = 0.0f;
+    float sprt_elo1 = 5.0f;
 };
 
 struct GameSettings {
