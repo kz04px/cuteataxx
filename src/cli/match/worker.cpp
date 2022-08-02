@@ -39,7 +39,7 @@ void print_score(const Settings &settings,
     }
 }
 
-void worker(const Settings &settings, std::stack<GameSettings> &games, Results &results) {
+void worker(const Settings &settings, std::queue<GameSettings> &games, Results &results) {
     while (true) {
         GameSettings game;
 
@@ -49,7 +49,7 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
             if (games.empty()) {
                 return;
             }
-            game = games.top();
+            game = games.front();
             games.pop();
         }
 
@@ -73,6 +73,8 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
             std::cerr << "Error woops\n";
             continue;
         }
+
+        auto should_stop = false;
 
         // Results & printing
         {
@@ -120,11 +122,13 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
             const auto ubound = sprt::get_ubound(settings.sprt_alpha, settings.sprt_beta);
             const auto sprt_stop = settings.sprt_enabled && settings.sprt_autostop && (llr <= lbound || llr >= ubound);
 
+            should_stop |= sprt_stop;
+
             // Print results
             if (results.scores.size() == 2) {
                 const auto print_result = results.games_played < settings.ratinginterval ||
                                           results.games_played % settings.ratinginterval == 0 ||
-                                          results.games_played == results.games_total;
+                                          results.games_played == results.games_total || sprt_stop;
                 const auto show_elo = results.games_played >= settings.ratinginterval ||
                                       settings.num_games == results.games_played || sprt_stop;
 
@@ -149,6 +153,11 @@ void worker(const Settings &settings, std::stack<GameSettings> &games, Results &
                 }
                 std::cout << "\n";
             }
+        }
+
+        if (should_stop) {
+            std::lock_guard<std::mutex> lock(mtx_games);
+            games = {};
         }
     }
 }

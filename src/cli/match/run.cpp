@@ -2,7 +2,7 @@
 #include <chrono>
 #include <iomanip>
 #include <iostream>
-#include <stack>
+#include <queue>
 #include <thread>
 #include <vector>
 #include "results.hpp"
@@ -11,16 +11,16 @@
 
 void run(const Settings &settings, const std::vector<std::string> &openings) {
     // Create games
-    std::stack<GameSettings> games;
+    std::queue<GameSettings> games;
     for (std::size_t i = 0; i < settings.engines.size(); ++i) {
         for (std::size_t j = i + 1; j < settings.engines.size(); ++j) {
             int idx_opening = 0;
 
             for (int n = 0; n < settings.num_games; n += 2) {
-                games.push(GameSettings{openings[idx_opening], settings.engines[i], settings.engines[j]});
+                games.push(GameSettings(openings[idx_opening], settings.engines[i], settings.engines[j]));
 
                 if (n + 1 < settings.num_games) {
-                    games.push(GameSettings{openings[idx_opening], settings.engines[j], settings.engines[i]});
+                    games.push(GameSettings(openings[idx_opening], settings.engines[j], settings.engines[i]));
                 }
 
                 // Next opening
@@ -69,10 +69,10 @@ void run(const Settings &settings, const std::vector<std::string> &openings) {
     std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.hours().count() << "h ";
     std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.minutes().count() << "m ";
     std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.seconds().count() << "s\n";
-    std::cout << "Total games: " << results.games_total << "\n";
+    std::cout << "Total games: " << results.games_played << "\n";
     std::cout << "Threads: " << settings.concurrency << "\n";
     if (diff.count() > 0) {
-        const auto games_per_sec = static_cast<float>(results.games_total) / diff.count();
+        const auto games_per_sec = static_cast<float>(results.games_played) / diff.count();
         std::cout << std::setprecision(2);
         std::cout << "games/sec: " << games_per_sec << "\n";
         std::cout << "games/min: " << games_per_sec * 60.0f << "\n";
