@@ -40,7 +40,6 @@ class MostCapturesBuiltin : public Engine {
         }
 
         const auto moves = m_pos.legal_moves();
-        std::vector<int> scores(moves.size());
         auto best_score = -1;
         auto best_move = libataxx::Move::nullmove();
 
