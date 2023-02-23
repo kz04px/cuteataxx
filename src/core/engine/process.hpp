@@ -37,12 +37,21 @@ class ProcessEngine : public Engine {
         if (m_send) {
             m_send(msg);
         }
-        m_in << msg << std::endl;
+        m_in << msg;
+#ifdef _WIN32
+        m_in << "\r";
+#endif
+        m_in << std::endl;
     }
 
     [[nodiscard]] auto get_output() -> std::string {
         std::string line;
         std::getline(m_out, line);
+#ifdef _WIN32
+        if (line.back() == '\r') {
+            line.pop_back();
+        }
+#endif
         if (m_recv) {
             m_recv(line);
         }
