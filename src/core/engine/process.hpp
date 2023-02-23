@@ -4,6 +4,7 @@
 #include <boost/process.hpp>
 #include <functional>
 #include <string>
+#include <filesystem>
 #include "engine.hpp"
 
 class ProcessEngine : public Engine {
@@ -15,6 +16,7 @@ class ProcessEngine : public Engine {
                                 std::function<void(const std::string &msg)> recv = {})
         : Engine(send, recv),
           m_child(path + (arguments.empty() ? "" : (" " + arguments)),
+                  boost::process::start_dir(std::filesystem::path(path).parent_path().string()),
                   boost::process::std_out > m_out,
                   boost::process::std_in < m_in) {
     }
