@@ -13,18 +13,11 @@ Match settings are read from a .json file passed to cuteataxx through command li
 
 # Building
 ```
-git clone --recurse-submodules https://github.com/kz04px/cuteataxx
-cd ./cuteataxx
-sh build-linux.sh
-```
-or
-```
-git clone --recurse-submodules https://github.com/kz04px/cuteataxx
-follow libataxx build instructions
+git clone https://github.com/kz04px/cuteataxx
 mkdir ./cuteataxx/build
 cd ./cuteataxx/build
 cmake ..
-make
+cmake --build .
 ```
 
 ---

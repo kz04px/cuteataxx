@@ -9,3 +9,5 @@ bin/games.pgn
 obj/
 
 .vscode/
+
+build/

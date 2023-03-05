@@ -7,23 +7,25 @@ project(
     LANGUAGES CXX
 )
 
-# Default build type
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
+include(FetchContent)
 
-# Flags
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wshadow -pedantic -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wpedantic -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast -Wdouble-promotion -Wformat=2")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -fsanitize=address")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")
+FetchContent_Declare(
+    libataxx
+    GIT_REPOSITORY https://github.com/kz04px/libataxx
+    GIT_TAG 5240a0ae30144b7df6c1bdcfa1a37466806bbedd
+)
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+FetchContent_Declare(
+    json
+    URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz
+)
+
+FetchContent_MakeAvailable(libataxx json)
 
 find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 if(Boost_FOUND AND Threads_FOUND)
     add_subdirectory(src/cli)

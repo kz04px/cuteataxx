@@ -35,7 +35,7 @@ class RandomBuiltin : public Engine {
     }
 
     [[nodiscard]] virtual auto go(const SearchSettings &) -> std::string override {
-        if (m_pos.gameover()) {
+        if (m_pos.is_gameover()) {
             return "0000";
         }
         const auto moves = m_pos.legal_moves();

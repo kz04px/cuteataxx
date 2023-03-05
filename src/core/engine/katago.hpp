@@ -49,15 +49,15 @@ class KataGo : public ProcessEngine {
     }
 
     virtual auto position(const libataxx::Position &pos) -> void override {
-        m_is_black = pos.turn() == libataxx::Side::Black;
+        m_is_black = pos.get_turn() == libataxx::Side::Black;
 
         std::string command = "set_position";
 
-        for (const auto sq : pos.us()) {
+        for (const auto sq : pos.get_us()) {
             command += " black " + static_cast<std::string>(sq);
         }
 
-        for (const auto sq : pos.them()) {
+        for (const auto sq : pos.get_them()) {
             command += " white " + static_cast<std::string>(sq);
         }
 
