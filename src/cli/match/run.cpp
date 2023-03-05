@@ -60,7 +60,7 @@ void run(const Settings &settings, const std::vector<std::string> &openings) {
     const auto t1 = std::chrono::high_resolution_clock::now();
 
     // Elapsed time
-    const auto diff = std::chrono::duration_cast<std::chrono::seconds>(t1 - t0);
+    const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
     const auto hh_mm_ss = std::chrono::hh_mm_ss(diff);
 
     // Print stats
@@ -72,8 +72,9 @@ void run(const Settings &settings, const std::vector<std::string> &openings) {
     std::cout << "Total games: " << results.games_played << "\n";
     std::cout << "Threads: " << settings.concurrency << "\n";
     if (diff.count() > 0) {
-        const auto games_per_sec = static_cast<float>(results.games_played) / diff.count();
-        std::cout << std::setprecision(2);
+        const auto games_per_ms = static_cast<float>(results.games_played) / diff.count();
+        const auto games_per_sec = games_per_ms * 1000;
+        std::cout << std::setprecision(games_per_sec >= 100 ? 0 : 2);
         std::cout << "games/sec: " << games_per_sec << "\n";
         std::cout << "games/min: " << games_per_sec * 60.0f << "\n";
     }
