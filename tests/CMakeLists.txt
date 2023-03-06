@@ -19,6 +19,10 @@ add_executable(
     test
 
     main.cpp
+
+    ../src/core/ataxx/parse_move.cpp
+
+    core/ataxx/parse_move.cpp
 )
 
 target_link_libraries(
