@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <thread>
 #include "../cache.hpp"
+#include "ataxx/adjudicate.hpp"
 #include "ataxx/parse_move.hpp"
 #include "settings.hpp"
 // Engines
@@ -176,35 +177,22 @@ auto info_recv(const std::string &msg) noexcept -> void {
         // Play
         while (!pos.is_gameover()) {
             // Try to adjudicate based on material imbalance
-            if (settings.adjudicate_material) {
-                const auto material_imbalance = pos.get_us().count() - pos.get_them().count();
-                if (material_imbalance >= *settings.adjudicate_material) {
-                    result = make_win_for(pos.get_turn());
-                    result_reason = ResultReason::MaterialImbalance;
-                    break;
-                }
+            if (settings.adjudicate_material && can_adjudicate_material(pos, *settings.adjudicate_material)) {
+                result = make_win_for(pos.get_turn());
+                result_reason = ResultReason::MaterialImbalance;
+                break;
             }
 
             // Try to adjudicate based on "easy fill"
             // This is when one side has to pass and the other can fill the rest of the board trivially to win
-            if (settings.adjudicate_easyfill && pos.must_pass()) {
-                const auto them_stuck = (pos.get_us().singles() | pos.get_us().doubles()) & pos.get_them();
-                const auto them_unstuck = pos.get_them() ^ them_stuck;
-                assert(pos.get_them() == (them_stuck | them_unstuck));
-                const auto their_reach = pos.get_reachable(
-                    (them_stuck.singles() | them_unstuck.doubles()) & pos.get_empty(), pos.get_empty());
-                const auto all_them = pos.get_them() | their_reach;
-                const auto is_easyfill = (all_them | pos.get_empty()) == all_them;
-                const auto is_winning = all_them.count() > pos.get_us().count();
-                if (is_easyfill && is_winning) {
-                    result = make_win_for(!pos.get_turn());
-                    result_reason = ResultReason::EasyFill;
-                    break;
-                }
+            if (settings.adjudicate_easyfill && can_adjudicate_easyfill(pos)) {
+                result = make_win_for(!pos.get_turn());
+                result_reason = ResultReason::EasyFill;
+                break;
             }
 
             // Try to adjudicate based on game length
-            if (settings.adjudicate_gamelength && pos.get_fullmoves() >= *settings.adjudicate_gamelength) {
+            if (settings.adjudicate_gamelength && can_adjudicate_gamelength(pos, *settings.adjudicate_gamelength)) {
                 result = libataxx::Result::Draw;
                 result_reason = ResultReason::Gamelength;
                 break;
