@@ -32,7 +32,7 @@ add_executable(
     match/worker.cpp
 
     # Core
-    ../core/parse_move.cpp
+    ../core/ataxx/parse_move.cpp
 )
 
 target_link_libraries(

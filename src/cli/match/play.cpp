@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <thread>
 #include "../cache.hpp"
-#include "parse_move.hpp"
+#include "ataxx/parse_move.hpp"
 #include "settings.hpp"
 // Engines
 #include "engine/builtin/least_captures.hpp"
