@@ -22,6 +22,7 @@ add_executable(
 
     ../src/core/ataxx/parse_move.cpp
 
+    core/ataxx/adjudicate.cpp
     core/ataxx/parse_move.cpp
 )
 
