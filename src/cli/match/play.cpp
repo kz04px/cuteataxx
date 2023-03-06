@@ -10,15 +10,9 @@
 #include "../cache.hpp"
 #include "ataxx/adjudicate.hpp"
 #include "ataxx/parse_move.hpp"
-#include "settings.hpp"
-// Engines
-#include "engine/builtin/least_captures.hpp"
-#include "engine/builtin/most_captures.hpp"
-#include "engine/builtin/random.hpp"
+#include "engine/create.hpp"
 #include "engine/engine.hpp"
-#include "engine/fairy_stockfish.hpp"
-#include "engine/katago.hpp"
-#include "engine/uaiengine.hpp"
+#include "settings.hpp"
 
 thread_local Cache<int, std::shared_ptr<Engine>> engine_cache(2);
 
@@ -47,69 +41,6 @@ auto info_send(const std::string &msg) noexcept -> void {
 
 auto info_recv(const std::string &msg) noexcept -> void {
     std::cout << std::this_thread::get_id() << "< " << msg << "\n";
-}
-
-[[nodiscard]] auto make_engine(const EngineSettings &settings, const bool debug = false) -> std::shared_ptr<Engine> {
-    std::shared_ptr<Engine> engine;
-
-    if (settings.builtin.empty()) {
-        switch (settings.proto) {
-            case EngineProtocol::UAI:
-                if (debug) {
-                    engine = std::make_shared<UAIEngine>(settings.path, settings.arguments, info_send, info_recv);
-                } else {
-                    engine = std::make_shared<UAIEngine>(settings.path, settings.arguments);
-                }
-                break;
-            case EngineProtocol::FSF:
-                if (debug) {
-                    engine = std::make_shared<FairyStockfish>(settings.path, settings.arguments, info_send, info_recv);
-                } else {
-                    engine = std::make_shared<FairyStockfish>(settings.path, settings.arguments);
-                }
-                break;
-            case EngineProtocol::KataGo:
-                if (debug) {
-                    engine = std::make_shared<KataGo>(settings.path, settings.arguments, info_send, info_recv);
-                } else {
-                    engine = std::make_shared<KataGo>(settings.path, settings.arguments);
-                }
-                break;
-            default:
-                throw std::invalid_argument("Unknown engine protocol");
-        }
-    } else {
-        if (settings.builtin == "random") {
-            if (debug) {
-                engine = std::make_shared<RandomBuiltin>(info_send, info_recv);
-            } else {
-                engine = std::make_shared<RandomBuiltin>();
-            }
-        } else if (settings.builtin == "mostcaptures") {
-            if (debug) {
-                engine = std::make_shared<MostCapturesBuiltin>(info_send, info_recv);
-            } else {
-                engine = std::make_shared<MostCapturesBuiltin>();
-            }
-        } else if (settings.builtin == "leastcaptures") {
-            if (debug) {
-                engine = std::make_shared<LeastCapturesBuiltin>(info_send, info_recv);
-            } else {
-                engine = std::make_shared<LeastCapturesBuiltin>();
-            }
-        } else {
-            throw std::invalid_argument("Unknown engine builtin");
-        }
-    }
-
-    engine->init();
-    for (const auto &[key, val] : settings.options) {
-        engine->set_option(key, val);
-    }
-
-    engine->isready();
-
-    return engine;
 }
 
 [[nodiscard]] libataxx::pgn::PGN play(const Settings &settings, const GameSettings &game) {
@@ -148,7 +79,11 @@ auto info_recv(const std::string &msg) noexcept -> void {
             std::cout << "Create engine process " << game.engine1.name << "\n";
         }
 
-        engine1 = make_engine(game.engine1, settings.debug);
+        if (settings.debug) {
+            engine1 = make_engine(game.engine1, info_send, info_recv);
+        } else {
+            engine1 = make_engine(game.engine1);
+        }
     }
 
     if (!engine2) {
@@ -156,7 +91,11 @@ auto info_recv(const std::string &msg) noexcept -> void {
             std::cout << "Create engine process " << game.engine1.name << "\n";
         }
 
-        engine2 = make_engine(game.engine2, settings.debug);
+        if (settings.debug) {
+            engine2 = make_engine(game.engine2, info_send, info_recv);
+        } else {
+            engine2 = make_engine(game.engine2);
+        }
     }
 
     try {

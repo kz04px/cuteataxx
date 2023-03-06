@@ -33,6 +33,7 @@ add_executable(
 
     # Core
     ../core/ataxx/parse_move.cpp
+    ../core/engine/create.cpp
 )
 
 target_link_libraries(
