@@ -157,10 +157,56 @@ void worker(const Settings &settings,
                     }
                 }
             } else if (results.games_played % settings.ratinginterval == 0 || is_complete) {
+                auto name_length = 8;
+                auto max_wins = 999;
+                auto max_losses = 9999;
+                auto max_draws = 9999;
+                auto max_played = 999999;
+
                 for (const auto &[name, score] : results.scores) {
-                    std::cout << name << ": ";
-                    std::cout << score;
-                    std::cout << " " << score.played;
+                    if (name.size() > name_length) {
+                        name_length = name.size() + 2;
+                    }
+
+                    if (score.wins > max_wins) {
+                        max_wins = score.wins;
+                    }
+
+                    if (score.losses > max_losses) {
+                        max_losses = score.losses;
+                    }
+
+                    if (score.draws > max_draws) {
+                        max_draws = score.draws;
+                    }
+
+                    if (score.draws > max_draws) {
+                        max_draws = score.draws;
+                    }
+                }
+
+                const auto win_length = std::to_string(max_wins).size() + 2;
+                const auto lose_length = std::to_string(max_losses).size() + 2;
+                const auto draw_length = std::to_string(max_draws).size() + 2;
+                const auto played_length = std::to_string(max_played).size() + 2;
+
+                std::cout << std::setw(name_length) << std::left << "Engines";
+                std::cout << std::setw(win_length) << std::right << "Win";
+                std::cout << std::setw(lose_length) << std::right << "Lose";
+                std::cout << std::setw(draw_length) << std::right << "Draw";
+                std::cout << std::setw(played_length) << std::right << "Played";
+                std::cout << std::setw(7) << std::right << "Rate";
+                std::cout << "\n";
+                for (const auto &[name, score] : results.scores) {
+                    const float points = score.wins + static_cast<float>(score.draws) / 2;
+                    const float rate = score.played ? points / score.played : 0.0f;
+
+                    std::cout << std::setw(name_length) << std::left << name;
+                    std::cout << std::setw(win_length) << std::right << score.wins;
+                    std::cout << std::setw(lose_length) << std::right << score.losses;
+                    std::cout << std::setw(draw_length) << std::right << score.draws;
+                    std::cout << std::setw(played_length) << std::right << score.played;
+                    std::cout << std::setw(7) << std::right << std::fixed << std::setprecision(3) << rate;
                     std::cout << "\n";
                 }
                 std::cout << "\n";
