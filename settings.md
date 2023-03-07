@@ -33,6 +33,9 @@ The colour of player 1 in the .pgn file.
 ### __colour2__
 The colour of player 2 in the .pgn file.
 
+### __tournament__
+The type of tournament to play: roundrobin, gauntlet
+
 ---
 
 # Time control

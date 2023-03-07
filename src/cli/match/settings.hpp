@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "engine/settings.hpp"
+#include "tournament/types.hpp"
 
 struct Settings {
     int ratinginterval = 10;
@@ -19,6 +20,7 @@ struct Settings {
     bool repeat = true;
     bool shuffle = false;
     bool adjudicate = false;
+    TournamentType tournament_type = TournamentType::RoundRobin;
     SearchSettings tc;
     std::string openings_path;
     std::vector<EngineSettings> engines;

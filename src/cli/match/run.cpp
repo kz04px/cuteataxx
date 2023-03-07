@@ -10,6 +10,7 @@
 #include "settings.hpp"
 #include "worker.hpp"
 // Tournaments
+#include "tournament/gauntlet.hpp"
 #include "tournament/generator.hpp"
 #include "tournament/roundrobin.hpp"
 
@@ -21,8 +22,18 @@ void run(const Settings &settings, const std::vector<std::string> &openings) {
     }
 
     // Create tournament
-    std::shared_ptr<TournamentGenerator> game_generator = std::make_shared<RoundRobinGenerator>(
-        settings.engines.size(), settings.num_games, openings.size(), settings.repeat);
+    std::shared_ptr<TournamentGenerator> game_generator;
+
+    if (settings.tournament_type == TournamentType::RoundRobin) {
+        game_generator =
+            std::make_shared<RoundRobinGenerator>(settings.engines.size(), settings.num_games, openings.size(), true);
+    } else if (settings.tournament_type == TournamentType::Gauntlet) {
+        game_generator =
+            std::make_shared<GauntletGenerator>(settings.engines.size(), settings.num_games, openings.size(), true);
+    } else {
+        game_generator =
+            std::make_shared<RoundRobinGenerator>(settings.engines.size(), settings.num_games, openings.size(), true);
+    }
 
     // Create threads
     std::vector<std::thread> threads;

@@ -3,11 +3,6 @@
 
 #include <cstdint>
 
-enum class TournamentType
-{
-    RoundRobin,
-};
-
 struct [[nodiscard]] GameInfo {
     std::size_t id = 0;
     std::size_t idx_opening = 0;

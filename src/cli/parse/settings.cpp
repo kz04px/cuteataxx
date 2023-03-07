@@ -54,6 +54,13 @@ namespace parse {
             settings.debug = b.get<bool>();
         } else if (a == "verbose") {
             settings.verbose = b.get<bool>();
+        } else if (a == "tournament") {
+            const auto tournament_type = b.get<std::string>();
+            if (tournament_type == "roundrobin") {
+                settings.tournament_type = TournamentType::RoundRobin;
+            } else if (tournament_type == "gauntlet") {
+                settings.tournament_type = TournamentType::Gauntlet;
+            }
         } else if (a == "adjudicate") {
             for (const auto &[key, val] : b.items()) {
                 if (key == "material") {

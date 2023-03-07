@@ -8,6 +8,7 @@
     "recover": false,
     "colour1": "Black",
     "colour2": "White",
+    "tournament": "roundrobin",
     "adjudicate": {
         "gamelength": 300,
         "material": 30,
