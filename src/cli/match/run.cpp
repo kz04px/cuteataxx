@@ -2,41 +2,27 @@
 #include <chrono>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <queue>
 #include <thread>
 #include <vector>
 #include "results.hpp"
 #include "settings.hpp"
 #include "worker.hpp"
+// Tournaments
+#include "tournament/generator.hpp"
+#include "tournament/roundrobin.hpp"
 
 void run(const Settings &settings, const std::vector<std::string> &openings) {
-    // Create games
-    std::queue<GameSettings> games;
-    for (std::size_t i = 0; i < settings.engines.size(); ++i) {
-        for (std::size_t j = i + 1; j < settings.engines.size(); ++j) {
-            int idx_opening = 0;
-
-            for (int n = 0; n < settings.num_games; n += 2) {
-                games.push(GameSettings(openings[idx_opening], settings.engines[i], settings.engines[j]));
-
-                if (n + 1 < settings.num_games) {
-                    games.push(GameSettings(openings[idx_opening], settings.engines[j], settings.engines[i]));
-                }
-
-                // Next opening
-                idx_opening++;
-                idx_opening = idx_opening % openings.size();
-            }
-        }
-    }
-
     // Create results & initialise
     Results results;
     for (const auto &engine : settings.engines) {
         results.scores[engine.name];
     }
 
-    results.games_total = games.size();
+    // Create tournament
+    std::shared_ptr<TournamentGenerator> game_generator = std::make_shared<RoundRobinGenerator>(
+        settings.engines.size(), settings.num_games, openings.size(), settings.repeat);
 
     // Create threads
     std::vector<std::thread> threads;
@@ -46,7 +32,7 @@ void run(const Settings &settings, const std::vector<std::string> &openings) {
 
     // Start game threads
     for (int i = 0; i < settings.concurrency; ++i) {
-        threads.emplace_back(worker, settings, std::ref(games), std::ref(results));
+        threads.emplace_back(worker, settings, openings, game_generator, std::ref(results));
     }
 
     // Wait for game threads to finish

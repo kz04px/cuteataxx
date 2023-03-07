@@ -24,6 +24,7 @@ add_executable(
 
     core/ataxx/adjudicate.cpp
     core/ataxx/parse_move.cpp
+    core/tournament/roundrobin.cpp
 )
 
 target_link_libraries(

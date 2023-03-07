@@ -4,11 +4,15 @@
 #include <iomanip>
 #include <iostream>
 #include <libataxx/pgn.hpp>
+#include <memory>
 #include <mutex>
 #include <sprt.hpp>
 #include "play.hpp"
 #include "results.hpp"
 #include "settings.hpp"
+// Tournaments
+#include "tournament/generator.hpp"
+#include "tournament/roundrobin.hpp"
 
 std::mutex mtx_output;
 std::mutex mtx_games;
@@ -39,19 +43,29 @@ void print_score(const Settings &settings,
     }
 }
 
-void worker(const Settings &settings, std::queue<GameSettings> &games, Results &results) {
-    while (true) {
-        GameSettings game;
+void worker(const Settings &settings,
+            const std::vector<std::string> &openings,
+            std::shared_ptr<TournamentGenerator> game_generator,
+            Results &results) {
+    auto should_stop = false;
+    GameInfo game_info;
 
-        // Get something to do
+    while (!should_stop) {
         {
             std::lock_guard<std::mutex> lock(mtx_games);
-            if (games.empty()) {
+
+            // Return if we're out of things to do
+            if (game_generator->is_finished()) {
                 return;
             }
-            game = games.front();
-            games.pop();
+
+            // Get the next game to play
+            game_info = game_generator->next();
         }
+
+        const auto game = GameSettings(openings[game_info.idx_opening],
+                                       settings.engines[game_info.idx_player1],
+                                       settings.engines[game_info.idx_player2]);
 
         if (settings.verbose) {
             std::lock_guard<std::mutex> lock(mtx_output);
@@ -74,8 +88,6 @@ void worker(const Settings &settings, std::queue<GameSettings> &games, Results &
             continue;
         }
 
-        auto should_stop = false;
-
         // Results & printing
         {
             std::lock_guard<std::mutex> lock(mtx_output);
@@ -85,6 +97,8 @@ void worker(const Settings &settings, std::queue<GameSettings> &games, Results &
             }
 
             results.games_played++;
+
+            assert(results.games_played <= results.games_started);
 
             // Update engine results
             results.scores[game.engine1.name].played++;
@@ -121,16 +135,15 @@ void worker(const Settings &settings, std::queue<GameSettings> &games, Results &
             const auto lbound = sprt::get_lbound(settings.sprt_alpha, settings.sprt_beta);
             const auto ubound = sprt::get_ubound(settings.sprt_alpha, settings.sprt_beta);
             const auto sprt_stop = settings.sprt_enabled && settings.sprt_autostop && (llr <= lbound || llr >= ubound);
+            const auto is_complete = settings.num_games == results.games_played;
 
             should_stop |= sprt_stop;
 
             // Print results
             if (results.scores.size() == 2) {
                 const auto print_result = results.games_played < settings.ratinginterval ||
-                                          results.games_played % settings.ratinginterval == 0 ||
-                                          results.games_played == results.games_total || sprt_stop;
-                const auto show_elo = results.games_played >= settings.ratinginterval ||
-                                      settings.num_games == results.games_played || sprt_stop;
+                                          results.games_played % settings.ratinginterval == 0 || sprt_stop;
+                const auto show_elo = results.games_played >= settings.ratinginterval || is_complete || sprt_stop;
 
                 if (print_result) {
                     if (game.engine1.id < game.engine2.id) {
@@ -143,8 +156,7 @@ void worker(const Settings &settings, std::queue<GameSettings> &games, Results &
                         std::cout << "\n";
                     }
                 }
-            } else if (results.games_played % settings.ratinginterval == 0 ||
-                       results.games_played == results.games_total) {
+            } else if (results.games_played % settings.ratinginterval == 0 || is_complete) {
                 for (const auto &[name, score] : results.scores) {
                     std::cout << name << ": ";
                     std::cout << score;
@@ -153,11 +165,6 @@ void worker(const Settings &settings, std::queue<GameSettings> &games, Results &
                 }
                 std::cout << "\n";
             }
-        }
-
-        if (should_stop) {
-            std::lock_guard<std::mutex> lock(mtx_games);
-            games = {};
         }
     }
 }

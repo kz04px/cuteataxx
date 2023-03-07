@@ -14,8 +14,8 @@ struct Score {
 };
 
 struct Results {
+    int games_started = 0;
     int games_played = 0;
-    int games_total = 0;
     int black_wins = 0;
     int white_wins = 0;
     int draws = 0;
