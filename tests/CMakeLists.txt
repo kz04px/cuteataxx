@@ -24,6 +24,7 @@ add_executable(
 
     core/ataxx/adjudicate.cpp
     core/ataxx/parse_move.cpp
+    core/tournament/gauntlet.cpp
     core/tournament/roundrobin.cpp
 )
 
