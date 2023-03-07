@@ -141,7 +141,7 @@ void worker(const Settings &settings,
 
             // Print results
             if (results.scores.size() == 2) {
-                const auto print_result = results.games_played < settings.ratinginterval ||
+                const auto print_result = (results.games_played < settings.ratinginterval && settings.print_early) ||
                                           results.games_played % settings.ratinginterval == 0 || sprt_stop;
                 const auto show_elo = results.games_played >= settings.ratinginterval || is_complete || sprt_stop;
 

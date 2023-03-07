@@ -9,6 +9,7 @@
     "colour1": "Black",
     "colour2": "White",
     "tournament": "roundrobin",
+    "print_early": true,
     "adjudicate": {
         "gamelength": 300,
         "material": 30,

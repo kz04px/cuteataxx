@@ -20,6 +20,7 @@ struct Settings {
     bool repeat = true;
     bool shuffle = false;
     bool adjudicate = false;
+    bool print_early = true;
     TournamentType tournament_type = TournamentType::RoundRobin;
     SearchSettings tc;
     std::string openings_path;

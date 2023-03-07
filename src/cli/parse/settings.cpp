@@ -54,6 +54,8 @@ namespace parse {
             settings.debug = b.get<bool>();
         } else if (a == "verbose") {
             settings.verbose = b.get<bool>();
+        } else if (a == "print_early") {
+            settings.print_early = b.get<bool>();
         } else if (a == "tournament") {
             const auto tournament_type = b.get<std::string>();
             if (tournament_type == "roundrobin") {
