@@ -49,6 +49,12 @@ The number of milliseconds initially on each engine's clock.
 ### __timecontrol:increment__
 The number of milliseconds added to the clock after each move is made.
 
+### __timecontrol:nodes__
+The maximum number of nodes to search.
+
+### __timecontrol:depth__
+The maximum depth to search to.
+
 ---
 
 # Adjudication
@@ -72,19 +78,31 @@ This setting does nothing for `time + increment` matches.
 # Engines
 Where to find and what to call engines, as well as what settings they need.
 
-### __engines:arguments__
-Command line arguments to be passed to the engine.
+### __engines:name__
+The name the engine will play under.
+
+### __engines:path__
+Global path to the engine.
 
 ### __engines:protocol__
 - UAI -- the only protocol engines should use based on UCI from chess.
 - FSF -- supported exclusively for the sake of Fairy-Stockfish found [here](https://github.com/ianfab/Fairy-Stockfish).
 - KataGo -- partial support exclusively for a KataGo fork found [here](https://github.com/hzyhhzy/KataGo/tree/Ataxx).
 
+### __engines:arguments__
+Command line arguments to be passed to the engine.
+
+### __engines:timecontrol__
+An engine specific override for the global time control setting. Allows time odds to be used.
+
 ### __engines:builtin__
-This command lets you choose from a limited selection of built in engines. They are mostly intended as opponents for weak engines to test correctness.
+This command lets you choose from a limited selection of built in engines. They are mostly intended as opponents for weak engines to test correctness. When using this option, only specify the built in player and the name it will use.
 - random -- play a random legal move.
 - mostcaptures -- play the move that maximises `num_captures + is_single`.
 - leastcaptures -- play the move that minimises `num_captures + is_single`.
 
-### __engines:timecontrol__
-An engine specific override for the global time control setting. Allows time odds to be used.
+Example:
+```
+    "name": "RandomPlayer",
+    "builtin": "random"
+```
