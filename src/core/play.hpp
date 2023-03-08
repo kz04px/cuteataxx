@@ -50,7 +50,6 @@ struct GameThingy {
 };
 
 [[nodiscard]] GameThingy play(const AdjudicationSettings &adjudication,
-                              const SearchSettings &tc,
                               const GameSettings &game,
                               std::shared_ptr<Engine> engine1,
                               std::shared_ptr<Engine> engine2);

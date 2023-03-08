@@ -121,7 +121,7 @@ void worker(const Settings &settings,
 
         // Play the game
         try {
-            game_data = play(settings.adjudication, settings.tc, game, *engine1, *engine2);
+            game_data = play(settings.adjudication, game, *engine1, *engine2);
         } catch (std::invalid_argument &e) {
             std::cerr << e.what() << "\n";
         } catch (const char *e) {

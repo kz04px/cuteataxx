@@ -12,16 +12,6 @@ enum class EngineProtocol : int
     Unknown,
 };
 
-struct EngineSettings {
-    int id;
-    EngineProtocol proto = EngineProtocol::Unknown;
-    std::string name;
-    std::string builtin;
-    std::string path;
-    std::string arguments;
-    std::vector<std::pair<std::string, std::string>> options;
-};
-
 struct SearchSettings {
     enum class Type : int
     {
@@ -71,6 +61,17 @@ struct SearchSettings {
     int movetime = 0;
     int ply = 0;
     int nodes = 0;
+};
+
+struct EngineSettings {
+    int id;
+    EngineProtocol proto = EngineProtocol::Unknown;
+    std::string name;
+    std::string builtin;
+    std::string path;
+    std::string arguments;
+    SearchSettings tc;
+    std::vector<std::pair<std::string, std::string>> options;
 };
 
 #endif

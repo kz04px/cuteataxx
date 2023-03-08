@@ -149,6 +149,7 @@ namespace parse {
 
         details.id = settings.engines.size();
         details.options = engine_options;
+        details.tc = settings.tc;
 
         for (const auto &[a, b] : engine.items()) {
             if (a == "path") {
@@ -181,6 +182,27 @@ namespace parse {
                     }
 
                     details.options.emplace_back(key, val.get<std::string>());
+                }
+            } else if (a == "timecontrol") {
+                for (const auto &[key, val] : b.items()) {
+                    if (key == "movetime") {
+                        details.tc.type = SearchSettings::Type::Movetime;
+                        details.tc.movetime = val.get<int>();
+                    } else if (key == "nodes") {
+                        details.tc.type = SearchSettings::Type::Nodes;
+                        details.tc.nodes = val.get<int>();
+                    } else if (key == "time") {
+                        details.tc.type = SearchSettings::Type::Time;
+                        details.tc.btime = val.get<int>();
+                        details.tc.wtime = val.get<int>();
+                    } else if (key == "increment" || key == "inc") {
+                        details.tc.type = SearchSettings::Type::Time;
+                        details.tc.binc = val.get<int>();
+                        details.tc.winc = val.get<int>();
+                    } else if (key == "depth") {
+                        details.tc.type = SearchSettings::Type::Depth;
+                        details.tc.ply = val.get<int>();
+                    }
                 }
             }
         }

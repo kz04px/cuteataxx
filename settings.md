@@ -85,3 +85,6 @@ This command lets you choose from a limited selection of built in engines. They 
 - random -- play a random legal move.
 - mostcaptures -- play the move that maximises `num_captures + is_single`.
 - leastcaptures -- play the move that minimises `num_captures + is_single`.
+
+### __engines:timecontrol__
+An engine specific override for the global time control setting. Allows time odds to be used.

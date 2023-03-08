@@ -16,7 +16,6 @@ static_assert(make_win_for(libataxx::Side::Black) == libataxx::Result::BlackWin)
 static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin);
 
 [[nodiscard]] GameThingy play(const AdjudicationSettings &adjudication,
-                              const SearchSettings &tc,
                               const GameSettings &game,
                               std::shared_ptr<Engine> engine1,
                               std::shared_ptr<Engine> engine2) {
@@ -27,9 +26,10 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
 
     // Get engine & position settings
     auto pos = libataxx::Position{game.fen};
-    auto game_clock = tc;
     int ply_count = 0;
     info.startpos = pos;
+    auto tc1 = game.engine1.tc;
+    auto tc2 = game.engine2.tc;
 
     try {
         engine1->newgame();
@@ -63,6 +63,7 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
             }
 
             auto &engine = pos.get_turn() == libataxx::Side::Black ? engine1 : engine2;
+            auto &tc = pos.get_turn() == libataxx::Side::Black ? tc1 : tc2;
 
             engine->position(pos);
 
@@ -72,7 +73,7 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
             const auto t0 = std::chrono::high_resolution_clock::now();
 
             // Get move
-            const auto movestr = engine->go(game_clock);
+            const auto movestr = engine->go(tc);
 
             // Stop move timer
             const auto t1 = std::chrono::high_resolution_clock::now();
@@ -107,25 +108,25 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
             // Update clock
             if (tc.type == SearchSettings::Type::Time) {
                 if (pos.get_turn() == libataxx::Side::Black) {
-                    game_clock.btime -= diff.count();
+                    tc.btime -= diff.count();
                 } else {
-                    game_clock.wtime -= diff.count();
+                    tc.wtime -= diff.count();
                 }
             }
 
             // Out of time?
             if (tc.type == SearchSettings::Type::Movetime) {
-                if (diff.count() > game_clock.movetime + adjudication.timeout_buffer) {
+                if (diff.count() > tc.movetime + adjudication.timeout_buffer) {
                     info.result = make_win_for(!pos.get_turn());
                     info.reason = ResultReason::OutOfTime;
                     break;
                 }
             } else if (tc.type == SearchSettings::Type::Time) {
-                if (game_clock.btime <= 0) {
+                if (tc.btime <= 0) {
                     info.result = libataxx::Result::WhiteWin;
                     info.reason = ResultReason::OutOfTime;
                     break;
-                } else if (game_clock.wtime <= 0) {
+                } else if (tc.wtime <= 0) {
                     info.result = libataxx::Result::BlackWin;
                     info.reason = ResultReason::OutOfTime;
                     break;
@@ -135,9 +136,9 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
             // Increments
             if (tc.type == SearchSettings::Type::Time) {
                 if (pos.get_turn() == libataxx::Side::Black) {
-                    game_clock.btime += tc.binc;
+                    tc.btime += tc.binc;
                 } else {
-                    game_clock.wtime += tc.winc;
+                    tc.wtime += tc.winc;
                 }
             }
 
