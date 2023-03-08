@@ -1,0 +1,61 @@
+{
+    "games": 100000,
+    "concurrency": 1,
+    "ratinginterval": 100000,
+    "verbose": false,
+    "debug": false,
+    "recover": false,
+    "colour1": "Black",
+    "colour2": "White",
+    "tournament": "gauntlet",
+    "print_early": false,
+    "output": {
+        "early": true,
+        "interval": 100
+    },
+    "adjudicate": {
+        "gamelength": 300,
+        "material": 30,
+        "easyfill": true,
+        "timeout_buffer": 25
+    },
+    "openings": {
+        "path": "openings/ply2.txt",
+        "repeat": true,
+        "shuffle": false
+    },
+    "timecontrol": {
+        "time": 1000,
+        "inc": 10
+    },
+    "options": {
+        "debug": "false",
+        "threads": "1",
+        "hash": "128",
+        "ownbook": "false"
+    },
+    "sprt": {
+        "enabled": false,
+        "autostop": true,
+        "elo0": 0.0,
+        "elo1": 5.0,
+        "confidence": 0.95
+    },
+    "pgn": {
+        "enabled": false,
+        "verbose": true,
+        "override": false,
+        "path": "games.pgn",
+        "event": "?"
+    },
+    "engines": [
+        {
+            "name": "mostcaptures1",
+            "builtin": "mostcaptures"
+        },
+        {
+            "name": "mostcaptures2",
+            "builtin": "mostcaptures"
+        }
+    ]
+}
