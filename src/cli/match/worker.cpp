@@ -3,7 +3,6 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <libataxx/pgn.hpp>
 #include <memory>
 #include <mutex>
 #include <sprt.hpp>
@@ -47,10 +46,10 @@ void print_score(const Settings &settings,
     if (show_elo) {
         std::cout << std::fixed << std::setprecision(2) << get_elo(w, l, d) << " +/- " << get_err(w, l, d) << "\n";
 
-        if (settings.sprt_enabled && settings.engines.size() == 2) {
-            const auto llr = sprt::get_llr(w, l, d, settings.sprt_elo0, settings.sprt_elo1);
-            const auto lbound = sprt::get_lbound(settings.sprt_alpha, settings.sprt_beta);
-            const auto ubound = sprt::get_ubound(settings.sprt_alpha, settings.sprt_beta);
+        if (settings.sprt.enabled && settings.engines.size() == 2) {
+            const auto llr = sprt::get_llr(w, l, d, settings.sprt.elo0, settings.sprt.elo1);
+            const auto lbound = sprt::get_lbound(settings.sprt.alpha, settings.sprt.beta);
+            const auto ubound = sprt::get_ubound(settings.sprt.alpha, settings.sprt.beta);
             std::cout << "SPRT: llr " << llr << ", lbound " << lbound << ", ubound " << ubound << "\n";
         }
     }
@@ -86,8 +85,6 @@ void worker(const Settings &settings,
             std::cout << "Starting game " << game.engine1.name << " vs " << game.engine2.name << "\n";
         }
 
-        libataxx::pgn::PGN pgn;
-
         // If the engines we need aren't in the cache, we get nothing
         auto engine1 = engine_cache.get(game.engine1.id);
         auto engine2 = engine_cache.get(game.engine2.id);
@@ -120,9 +117,11 @@ void worker(const Settings &settings,
             }
         }
 
+        GameThingy game_data;
+
         // Play the game
         try {
-            pgn = play(settings, game, *engine1, *engine2);
+            game_data = play(settings.adjudication, settings.tc, game, *engine1, *engine2);
         } catch (std::invalid_argument &e) {
             std::cerr << e.what() << "\n";
         } catch (const char *e) {
@@ -155,38 +154,39 @@ void worker(const Settings &settings,
             // Update engine results
             results.scores[game.engine1.name].played++;
             results.scores[game.engine2.name].played++;
-            if (pgn.header().get("Result") == "1-0") {
-                results.scores[game.engine1.name].wins++;
-                results.scores[game.engine2.name].losses++;
-                results.black_wins++;
-            } else if (pgn.header().get("Result") == "0-1") {
-                results.scores[game.engine1.name].losses++;
-                results.scores[game.engine2.name].wins++;
-                results.white_wins++;
-            } else if (pgn.header().get("Result") == "1/2-1/2") {
-                results.scores[game.engine1.name].draws++;
-                results.scores[game.engine2.name].draws++;
-                results.draws++;
+
+            switch (game_data.result) {
+                case libataxx::Result::BlackWin:
+                    results.scores[game.engine1.name].wins++;
+                    results.scores[game.engine2.name].losses++;
+                    results.black_wins++;
+                    break;
+                case libataxx::Result::WhiteWin:
+                    results.scores[game.engine1.name].losses++;
+                    results.scores[game.engine2.name].wins++;
+                    results.white_wins++;
+                    break;
+                case libataxx::Result::Draw:
+                    results.scores[game.engine1.name].draws++;
+                    results.scores[game.engine2.name].draws++;
+                    results.draws++;
+                    break;
+                default:
+                    break;
             }
 
             // Write to .pgn
-            if (settings.pgn_enabled && !settings.pgn_path.empty()) {
-                std::ofstream file(settings.pgn_path, std::fstream::out | std::fstream::app);
-
-                if (file.is_open()) {
-                    file << pgn;
-                } else {
-                    std::cerr << "Could not open " << settings.pgn_path << "\n";
-                }
+            if (settings.pgn.enabled && !settings.pgn.path.empty()) {
+                write_as_pgn(settings.pgn, game.engine1.name, game.engine2.name, game_data);
             }
 
             const auto w = results.scores.at(game.engine1.name).wins;
             const auto l = results.scores.at(game.engine1.name).losses;
             const auto d = results.scores.at(game.engine1.name).draws;
-            const auto llr = sprt::get_llr(w, l, d, settings.sprt_elo0, settings.sprt_elo1);
-            const auto lbound = sprt::get_lbound(settings.sprt_alpha, settings.sprt_beta);
-            const auto ubound = sprt::get_ubound(settings.sprt_alpha, settings.sprt_beta);
-            const auto sprt_stop = settings.sprt_enabled && settings.sprt_autostop && (llr <= lbound || llr >= ubound);
+            const auto llr = sprt::get_llr(w, l, d, settings.sprt.elo0, settings.sprt.elo1);
+            const auto lbound = sprt::get_lbound(settings.sprt.alpha, settings.sprt.beta);
+            const auto ubound = sprt::get_ubound(settings.sprt.alpha, settings.sprt.beta);
+            const auto sprt_stop = settings.sprt.enabled && settings.sprt.autostop && (llr <= lbound || llr >= ubound);
             const auto is_complete = settings.num_games == results.games_played;
 
             should_stop |= sprt_stop;

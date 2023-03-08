@@ -59,8 +59,8 @@ int main(int argc, char **argv) {
         }
 
         // Clear pgn
-        if (settings.pgn_override) {
-            std::ofstream file(settings.pgn_path, std::ofstream::trunc);
+        if (settings.pgn.override) {
+            std::ofstream file(settings.pgn.path, std::ofstream::trunc);
         }
 
         run(settings, openings);

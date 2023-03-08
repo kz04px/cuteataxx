@@ -6,7 +6,17 @@
 #include <string>
 #include <vector>
 #include "engine/settings.hpp"
+#include "pgn.hpp"
 #include "tournament/types.hpp"
+
+struct SPRTSettings {
+    bool enabled = false;
+    bool autostop = false;
+    float alpha = 0.05f;
+    float beta = 0.05f;
+    float elo0 = 0.0f;
+    float elo1 = 5.0f;
+};
 
 struct Settings {
     int ratinginterval = 10;
@@ -22,34 +32,12 @@ struct Settings {
     bool adjudicate = false;
     bool print_early = true;
     TournamentType tournament_type = TournamentType::RoundRobin;
-    SearchSettings tc;
     std::string openings_path;
     std::vector<EngineSettings> engines;
-    // Adjudication
-    std::optional<int> adjudicate_gamelength;
-    std::optional<int> adjudicate_material;
-    std::optional<bool> adjudicate_easyfill;
-    // pgn
-    std::string pgn_path = "games.pgn";
-    std::string pgn_event = "*";
-    std::string colour1 = "black";
-    std::string colour2 = "white";
-    bool pgn_enabled = true;
-    bool pgn_verbose = false;
-    bool pgn_override = false;
-    // SPRT
-    bool sprt_enabled = false;
-    bool sprt_autostop = false;
-    float sprt_alpha = 0.05f;
-    float sprt_beta = 0.05f;
-    float sprt_elo0 = 0.0f;
-    float sprt_elo1 = 5.0f;
-};
-
-struct GameSettings {
-    std::string fen;
-    EngineSettings engine1;
-    EngineSettings engine2;
+    SearchSettings tc;
+    AdjudicationSettings adjudication;
+    PGNSettings pgn;
+    SPRTSettings sprt;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const SearchSettings &ss) {

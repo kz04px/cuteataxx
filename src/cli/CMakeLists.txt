@@ -27,13 +27,14 @@ add_executable(
     # CLI
     parse/openings.cpp
     parse/settings.cpp
-    match/play.cpp
     match/run.cpp
     match/worker.cpp
 
     # Core
     ../core/ataxx/parse_move.cpp
     ../core/engine/create.cpp
+    ../core/play.cpp
+    ../core/pgn.cpp
 )
 
 target_link_libraries(

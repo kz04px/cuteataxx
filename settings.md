@@ -14,10 +14,6 @@ The number of games to play simultaneously.
 ### __ratinginterval__
 How often to print updates.
 
-### __timeoutbuffer__
-How far past the specified `movetime` an engine can think before losing on time.<br>
-This setting does nothing for `time + increment` matches.
-
 ### __verbose__
 Print extra information about the match.
 
@@ -66,6 +62,10 @@ The material advantage required for the game to be ruled a win.
 
 ### __adjudicate:easyfill__
 Award a victory if the opponent is forced to pass while you can fill the rest of the empty squares.
+
+### __adjudicate:timeout_buffer__
+How far past the specified `movetime` an engine can think before losing on time.<br>
+This setting does nothing for `time + increment` matches.
 
 ---
 

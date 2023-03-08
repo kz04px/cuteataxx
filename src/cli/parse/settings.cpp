@@ -44,12 +44,10 @@ namespace parse {
             settings.ratinginterval = b.get<int>();
         } else if (a == "concurrency") {
             settings.concurrency = b.get<int>();
-        } else if (a == "timeoutbuffer") {
-            settings.timeout_buffer = b.get<int>();
         } else if (a == "colour1") {
-            settings.colour1 = b.get<std::string>();
+            settings.pgn.colour1 = b.get<std::string>();
         } else if (a == "colour2") {
-            settings.colour2 = b.get<std::string>();
+            settings.pgn.colour2 = b.get<std::string>();
         } else if (a == "debug") {
             settings.debug = b.get<bool>();
         } else if (a == "verbose") {
@@ -66,11 +64,13 @@ namespace parse {
         } else if (a == "adjudicate") {
             for (const auto &[key, val] : b.items()) {
                 if (key == "material") {
-                    settings.adjudicate_material = val.get<int>();
+                    settings.adjudication.material = val.get<int>();
                 } else if (key == "easyfill") {
-                    settings.adjudicate_easyfill = val.get<bool>();
+                    settings.adjudication.easyfill = val.get<bool>();
                 } else if (key == "gamelength") {
-                    settings.adjudicate_gamelength = val.get<int>();
+                    settings.adjudication.gamelength = val.get<int>();
+                } else if (a == "timeout_buffer") {
+                    settings.timeout_buffer = b.get<int>();
                 }
             }
         } else if (a == "openings") {
@@ -107,34 +107,34 @@ namespace parse {
         } else if (a == "pgn") {
             for (const auto &[key, val] : b.items()) {
                 if (key == "enabled") {
-                    settings.pgn_enabled = val.get<bool>();
+                    settings.pgn.enabled = val.get<bool>();
                 } else if (key == "verbose") {
-                    settings.pgn_verbose = val.get<bool>();
+                    settings.pgn.verbose = val.get<bool>();
                 } else if (key == "override") {
-                    settings.pgn_override = val.get<bool>();
+                    settings.pgn.override = val.get<bool>();
                 } else if (key == "path") {
-                    settings.pgn_path = val.get<std::string>();
+                    settings.pgn.path = val.get<std::string>();
                 } else if (key == "event") {
-                    settings.pgn_event = val.get<std::string>();
+                    settings.pgn.event = val.get<std::string>();
                 }
             }
         } else if (a == "sprt") {
             for (const auto &[key, val] : b.items()) {
                 if (key == "enabled") {
-                    settings.sprt_enabled = val.get<bool>();
+                    settings.sprt.enabled = val.get<bool>();
                 } else if (key == "autostop") {
-                    settings.sprt_autostop = val.get<bool>();
+                    settings.sprt.autostop = val.get<bool>();
                 } else if (key == "confidence") {
-                    settings.sprt_alpha = 1.0f - val.get<float>();
-                    settings.sprt_beta = 1.0f - val.get<float>();
+                    settings.sprt.alpha = 1.0f - val.get<float>();
+                    settings.sprt.beta = 1.0f - val.get<float>();
                 } else if (key == "alpha") {
-                    settings.sprt_alpha = val.get<float>();
+                    settings.sprt.alpha = val.get<float>();
                 } else if (key == "beta") {
-                    settings.sprt_beta = val.get<float>();
+                    settings.sprt.beta = val.get<float>();
                 } else if (key == "elo0") {
-                    settings.sprt_elo0 = val.get<float>();
+                    settings.sprt.elo0 = val.get<float>();
                 } else if (key == "elo1") {
-                    settings.sprt_elo1 = val.get<float>();
+                    settings.sprt.elo1 = val.get<float>();
                 }
             }
         } else if (a == "options") {

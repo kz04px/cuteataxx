@@ -2,7 +2,6 @@
     "games": 40,
     "concurrency": 3,
     "ratinginterval": 10,
-    "timeoutbuffer": 25,
     "verbose": false,
     "debug": false,
     "recover": false,
@@ -13,7 +12,8 @@
     "adjudicate": {
         "gamelength": 300,
         "material": 30,
-        "easyfill": true
+        "easyfill": true,
+        "timeout_buffer": 25
     },
     "openings": {
         "path": "openings/ply2.txt",
