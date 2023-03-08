@@ -7,14 +7,10 @@
 #include <mutex>
 #include <stdexcept>
 #include <thread>
-#include "../cache.hpp"
 #include "ataxx/adjudicate.hpp"
 #include "ataxx/parse_move.hpp"
-#include "engine/create.hpp"
 #include "engine/engine.hpp"
 #include "settings.hpp"
-
-thread_local Cache<int, std::shared_ptr<Engine>> engine_cache(2);
 
 enum class ResultReason : int
 {
@@ -35,15 +31,10 @@ enum class ResultReason : int
 static_assert(make_win_for(libataxx::Side::Black) == libataxx::Result::BlackWin);
 static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin);
 
-auto info_send(const std::string &msg) noexcept -> void {
-    std::cout << std::this_thread::get_id() << "> " << msg << "\n";
-}
-
-auto info_recv(const std::string &msg) noexcept -> void {
-    std::cout << std::this_thread::get_id() << "< " << msg << "\n";
-}
-
-[[nodiscard]] libataxx::pgn::PGN play(const Settings &settings, const GameSettings &game) {
+[[nodiscard]] libataxx::pgn::PGN play(const Settings &settings,
+                                      const GameSettings &game,
+                                      std::shared_ptr<Engine> engine1,
+                                      std::shared_ptr<Engine> engine2) {
     assert(!game.fen.empty());
     assert(game.engine1.id != game.engine2.id);
 
@@ -66,52 +57,12 @@ auto info_recv(const std::string &msg) noexcept -> void {
     auto result_reason = ResultReason::None;
     auto movestr = std::string();
 
-    // If the engines we need aren't in the cache, we get nothing
-    auto engine1 = engine_cache.get(game.engine1.id);
-    auto engine2 = engine_cache.get(game.engine2.id);
-
-    // Free resources by removing any engine processes left in the cache
-    engine_cache.clear();
-
-    // Create new engine processes if necessary, knowing we have the resources available
-    if (!engine1) {
-        if (settings.verbose) {
-            std::cout << "Create engine process " << game.engine1.name << "\n";
-        }
-
-        if (settings.debug) {
-            engine1 = make_engine(game.engine1, info_send, info_recv);
-        } else {
-            engine1 = make_engine(game.engine1);
-        }
-    }
-
-    if (!engine2) {
-        if (settings.verbose) {
-            std::cout << "Create engine process " << game.engine1.name << "\n";
-        }
-
-        if (settings.debug) {
-            engine2 = make_engine(game.engine2, info_send, info_recv);
-        } else {
-            engine2 = make_engine(game.engine2);
-        }
-    }
-
     try {
-        assert(engine1);
-        assert(engine2);
+        engine1->newgame();
+        engine2->newgame();
 
-        assert(*engine1);
-        assert(*engine2);
-
-        assert(*engine1 != *engine2);
-
-        (*engine1)->newgame();
-        (*engine2)->newgame();
-
-        (*engine1)->isready();
-        (*engine2)->isready();
+        engine1->isready();
+        engine2->isready();
 
         // Play
         while (!pos.is_gameover()) {
@@ -137,7 +88,7 @@ auto info_recv(const std::string &msg) noexcept -> void {
                 break;
             }
 
-            auto engine = pos.get_turn() == libataxx::Side::Black ? *engine1 : *engine2;
+            auto &engine = pos.get_turn() == libataxx::Side::Black ? engine1 : engine2;
 
             engine->position(pos);
 
@@ -242,12 +193,6 @@ auto info_recv(const std::string &msg) noexcept -> void {
         result_reason = ResultReason::EngineCrash;
         result = make_win_for(!pos.get_turn());
     }
-
-    engine_cache.push(game.engine1.id, *engine1);
-    engine_cache.push(game.engine2.id, *engine2);
-
-    (*engine1).reset();
-    (*engine2).reset();
 
     // Game finished normally
     if (result == libataxx::Result::None) {

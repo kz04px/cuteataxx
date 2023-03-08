@@ -7,15 +7,28 @@
 #include <memory>
 #include <mutex>
 #include <sprt.hpp>
+#include <thread>
+#include "../cache.hpp"
 #include "play.hpp"
 #include "results.hpp"
 #include "settings.hpp"
+// Engines
+#include "engine/create.hpp"
+#include "engine/engine.hpp"
 // Tournaments
 #include "tournament/generator.hpp"
 #include "tournament/roundrobin.hpp"
 
 std::mutex mtx_output;
 std::mutex mtx_games;
+
+auto info_send(const std::string &msg) noexcept -> void {
+    std::cout << std::this_thread::get_id() << "> " << msg << "\n";
+}
+
+auto info_recv(const std::string &msg) noexcept -> void {
+    std::cout << std::this_thread::get_id() << "< " << msg << "\n";
+}
 
 void print_score(const Settings &settings,
                  const EngineSettings &engine1,
@@ -49,6 +62,7 @@ void worker(const Settings &settings,
             Results &results) {
     auto should_stop = false;
     GameInfo game_info;
+    Cache<int, std::shared_ptr<Engine>> engine_cache(2);
 
     while (!should_stop) {
         {
@@ -74,9 +88,41 @@ void worker(const Settings &settings,
 
         libataxx::pgn::PGN pgn;
 
+        // If the engines we need aren't in the cache, we get nothing
+        auto engine1 = engine_cache.get(game.engine1.id);
+        auto engine2 = engine_cache.get(game.engine2.id);
+
+        // Free resources by removing any engine processes left in the cache
+        engine_cache.clear();
+
+        // Create new engine processes if necessary, knowing we have the resources available
+        if (!engine1) {
+            if (settings.verbose) {
+                std::cout << "Create engine process " << game.engine1.name << "\n";
+            }
+
+            if (settings.debug) {
+                engine1 = make_engine(game.engine1, info_send, info_recv);
+            } else {
+                engine1 = make_engine(game.engine1);
+            }
+        }
+
+        if (!engine2) {
+            if (settings.verbose) {
+                std::cout << "Create engine process " << game.engine1.name << "\n";
+            }
+
+            if (settings.debug) {
+                engine2 = make_engine(game.engine2, info_send, info_recv);
+            } else {
+                engine2 = make_engine(game.engine2);
+            }
+        }
+
         // Play the game
         try {
-            pgn = play(settings, game);
+            pgn = play(settings, game, *engine1, *engine2);
         } catch (std::invalid_argument &e) {
             std::cerr << e.what() << "\n";
         } catch (const char *e) {
@@ -87,6 +133,12 @@ void worker(const Settings &settings,
             std::cerr << "Error woops\n";
             continue;
         }
+
+        engine_cache.push(game.engine1.id, *engine1);
+        engine_cache.push(game.engine2.id, *engine2);
+
+        (*engine1).reset();
+        (*engine2).reset();
 
         // Results & printing
         {
