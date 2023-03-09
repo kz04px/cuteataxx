@@ -31,6 +31,7 @@ add_executable(
     match/worker.cpp
 
     # Core
+    ../core/ataxx/adjudicate.cpp
     ../core/ataxx/parse_move.cpp
     ../core/engine/create.cpp
     ../core/play.cpp

@@ -20,8 +20,12 @@ add_executable(
 
     main.cpp
 
+    ../src/core/play.cpp
+    ../src/core/ataxx/adjudicate.cpp
     ../src/core/ataxx/parse_move.cpp
+    ../src/core/engine/create.cpp
 
+    core/play.cpp
     core/ataxx/adjudicate.cpp
     core/ataxx/parse_move.cpp
     core/tournament/gauntlet.cpp

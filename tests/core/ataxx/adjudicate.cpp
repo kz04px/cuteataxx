@@ -2,6 +2,7 @@
 #include <doctest/doctest.h>
 #include <array>
 #include <libataxx/move.hpp>
+#include <libataxx/position.hpp>
 #include <string>
 
 TEST_CASE("Adjudicate - easyfill true") {
