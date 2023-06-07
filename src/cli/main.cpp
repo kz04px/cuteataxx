@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 
         // Check the paths given
         if (!std::filesystem::exists(settings.openings_path)) {
-            std::cerr << "Openings path not found " << settings.openings_path << "\n";
+            std::cerr << "Openings path not found: '" << settings.openings_path << "'\n";
             return 1;
         }
 
@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
             }
 
             if (!std::filesystem::exists(engine.path)) {
-                std::cerr << "Engine path not found " << engine.path << "\n";
+                std::cerr << "Engine path not found: '" << engine.path << "'\n";
                 return 1;
             }
 
