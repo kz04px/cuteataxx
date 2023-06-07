@@ -63,7 +63,7 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
             }
 
             auto &engine = pos.get_turn() == libataxx::Side::Black ? engine1 : engine2;
-            auto &tc = pos.get_turn() == libataxx::Side::Black ? tc1 : tc2;
+            auto &tc_us = pos.get_turn() == libataxx::Side::Black ? tc1 : tc2;
 
             engine->position(pos);
 
@@ -73,7 +73,7 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
             const auto t0 = std::chrono::high_resolution_clock::now();
 
             // Get move
-            const auto movestr = engine->go(tc);
+            const auto movestr = engine->go(tc_us);
 
             // Stop move timer
             const auto t1 = std::chrono::high_resolution_clock::now();
@@ -105,28 +105,30 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
             // Add move to .pgn
             info.history.emplace_back(move, diff.count());
 
-            // Update clock
-            if (tc.type == SearchSettings::Type::Time) {
+            // Update clocks
+            if (tc_us.type == SearchSettings::Type::Time) {
                 if (pos.get_turn() == libataxx::Side::Black) {
-                    tc.btime -= diff.count();
+                    tc1.btime -= diff.count();
+                    tc2.btime -= diff.count();
                 } else {
-                    tc.wtime -= diff.count();
+                    tc1.wtime -= diff.count();
+                    tc2.wtime -= diff.count();
                 }
             }
 
             // Out of time?
-            if (tc.type == SearchSettings::Type::Movetime) {
-                if (diff.count() > tc.movetime + adjudication.timeout_buffer) {
+            if (tc_us.type == SearchSettings::Type::Movetime) {
+                if (diff.count() > tc_us.movetime + adjudication.timeout_buffer) {
                     info.result = make_win_for(!pos.get_turn());
                     info.reason = ResultReason::OutOfTime;
                     break;
                 }
-            } else if (tc.type == SearchSettings::Type::Time) {
-                if (tc.btime <= 0) {
+            } else if (tc_us.type == SearchSettings::Type::Time) {
+                if (tc_us.btime <= 0) {
                     info.result = libataxx::Result::WhiteWin;
                     info.reason = ResultReason::OutOfTime;
                     break;
-                } else if (tc.wtime <= 0) {
+                } else if (tc_us.wtime <= 0) {
                     info.result = libataxx::Result::BlackWin;
                     info.reason = ResultReason::OutOfTime;
                     break;
@@ -134,11 +136,13 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
             }
 
             // Increments
-            if (tc.type == SearchSettings::Type::Time) {
+            if (tc_us.type == SearchSettings::Type::Time) {
                 if (pos.get_turn() == libataxx::Side::Black) {
-                    tc.btime += tc.binc;
+                    tc1.btime += tc_us.binc;
+                    tc2.btime += tc_us.binc;
                 } else {
-                    tc.wtime += tc.winc;
+                    tc1.wtime += tc_us.winc;
+                    tc2.wtime += tc_us.winc;
                 }
             }
 
