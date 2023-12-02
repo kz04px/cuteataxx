@@ -69,8 +69,8 @@ namespace parse {
                     settings.adjudication.easyfill = val.get<bool>();
                 } else if (key == "gamelength") {
                     settings.adjudication.gamelength = val.get<int>();
-                } else if (a == "timeout_buffer") {
-                    settings.adjudication.timeout_buffer = b.get<int>();
+                } else if (key == "timeout_buffer") {
+                    settings.adjudication.timeout_buffer = val.get<int>();
                 }
             }
         } else if (a == "openings") {
