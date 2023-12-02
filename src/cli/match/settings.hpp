@@ -23,7 +23,6 @@ struct Settings {
     int concurrency = 1;
     int num_games = 100;
     int hash_size = 16;
-    int timeout_buffer = 10;
     bool debug = false;
     bool recover = false;
     bool verbose = false;
