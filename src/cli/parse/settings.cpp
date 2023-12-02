@@ -70,7 +70,7 @@ namespace parse {
                 } else if (key == "gamelength") {
                     settings.adjudication.gamelength = val.get<int>();
                 } else if (a == "timeout_buffer") {
-                    settings.timeout_buffer = b.get<int>();
+                    settings.adjudication.timeout_buffer = b.get<int>();
                 }
             }
         } else if (a == "openings") {
