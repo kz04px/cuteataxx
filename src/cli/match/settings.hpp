@@ -22,13 +22,11 @@ struct Settings {
     int ratinginterval = 10;
     int concurrency = 1;
     int num_games = 100;
-    int hash_size = 16;
     bool debug = false;
     bool recover = false;
     bool verbose = false;
     bool repeat = true;
     bool shuffle = false;
-    bool adjudicate = false;
     bool print_early = true;
     TournamentType tournament_type = TournamentType::RoundRobin;
     std::string openings_path;
