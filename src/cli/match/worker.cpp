@@ -180,9 +180,12 @@ void worker(const Settings &settings,
                 write_as_pgn(settings.pgn, game.engine1.name, game.engine2.name, game_data);
             }
 
-            const auto w = results.scores.at(game.engine1.name).wins;
-            const auto l = results.scores.at(game.engine1.name).losses;
-            const auto d = results.scores.at(game.engine1.name).draws;
+            const auto &e1 = game.engine1.id < game.engine2.id ? game.engine1 : game.engine2;
+            const auto &e2 = game.engine1.id < game.engine2.id ? game.engine2 : game.engine1;
+
+            const auto w = results.scores.at(e1.name).wins;
+            const auto l = results.scores.at(e1.name).losses;
+            const auto d = results.scores.at(e1.name).draws;
             const auto llr = sprt::get_llr(w, l, d, settings.sprt.elo0, settings.sprt.elo1);
             const auto lbound = sprt::get_lbound(settings.sprt.alpha, settings.sprt.beta);
             const auto ubound = sprt::get_ubound(settings.sprt.alpha, settings.sprt.beta);
@@ -198,12 +201,7 @@ void worker(const Settings &settings,
                 const auto show_elo = results.games_played >= settings.ratinginterval || is_complete || sprt_stop;
 
                 if (print_result) {
-                    if (game.engine1.id < game.engine2.id) {
-                        print_score(settings, game.engine1, game.engine2, results, show_elo);
-                    } else {
-                        print_score(settings, game.engine2, game.engine1, results, show_elo);
-                    }
-
+                    print_score(settings, e1, e2, results, show_elo);
                     if (show_elo) {
                         std::cout << "\n";
                     }
