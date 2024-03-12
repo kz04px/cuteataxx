@@ -35,5 +35,6 @@ add_executable(
 target_link_libraries(
     test
     Threads::Threads
+    doctest::doctest
     ataxx_static
 )
