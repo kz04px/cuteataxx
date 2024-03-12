@@ -26,7 +26,13 @@ FetchContent_Declare(
     GIT_TAG v2.4.10
 )
 
-FetchContent_MakeAvailable(libataxx json doctest)
+FetchContent_Declare(
+    ftxui
+    GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI
+    GIT_TAG cdf28903a7781f97ba94d30b79c3a4b0c97ccce7
+)
+
+FetchContent_MakeAvailable(libataxx json doctest ftxui)
 
 find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
@@ -35,6 +41,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 if(Boost_FOUND AND Threads_FOUND)
     add_subdirectory(src/cli)
+    add_subdirectory(src/tui)
     add_subdirectory(tests)
 else()
     message(WARNING "Can't build cuteataxx-cli: Boost and Threads required")
