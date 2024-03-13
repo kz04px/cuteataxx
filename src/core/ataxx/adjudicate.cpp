@@ -1,4 +1,6 @@
 #include "adjudicate.hpp"
+#include <iostream>
+#include <libataxx/bitboard.hpp>
 #include <libataxx/position.hpp>
 
 [[nodiscard]] auto can_adjudicate_material(const libataxx::Position &pos, const int threshold) -> bool {
@@ -7,19 +9,56 @@
 }
 
 [[nodiscard]] auto can_adjudicate_easyfill(const libataxx::Position &pos) -> bool {
-    if (!pos.must_pass()) {
+    const auto our_reach = (pos.get_us().singles() | pos.get_us().doubles());
+    const auto them_stuck = our_reach & pos.get_them();
+    const auto them_free = pos.get_them() ^ them_stuck;
+    const auto both_reach = pos.get_both().singles() | pos.get_both().doubles();
+
+    // Is the game already over?
+    if (pos.is_gameover()) {
         return false;
     }
 
-    const auto them_stuck = (pos.get_us().singles() | pos.get_us().doubles()) & pos.get_them();
-    const auto them_unstuck = pos.get_them() ^ them_stuck;
-    assert(pos.get_them() == (them_stuck | them_unstuck));
-    const auto their_reach =
-        pos.get_reachable((them_stuck.singles() | them_unstuck.doubles()) & pos.get_empty(), pos.get_empty());
-    const auto all_them = pos.get_them() | their_reach;
-    const auto is_easyfill = (all_them | pos.get_empty()) == all_them;
-    const auto is_winning = all_them.count() > pos.get_us().count();
-    return is_winning;
+    // Can we still move?
+    if (our_reach & pos.get_empty()) {
+        return false;
+    }
+
+    // Can they move without releasing us?
+    if (!((pos.get_them().singles() | them_free.doubles()) & pos.get_empty())) {
+        return false;
+    }
+
+    // Pretend they get everything, is it enough?
+    if (pos.get_us().count() > pos.get_them().count() + pos.get_empty().count()) {
+        return false;
+    }
+
+    const auto reachable = [&] {
+        auto bb = (pos.get_them().singles() | them_free.doubles()) & pos.get_empty();
+        bb |= (bb.singles() | bb.doubles()) & pos.get_empty();
+        bb |= (bb.singles() | bb.doubles()) & pos.get_empty();
+        bb |= (bb.singles() | bb.doubles()) & pos.get_empty();
+        bb |= (bb.singles() | bb.doubles()) & pos.get_empty();
+        bb |= (bb.singles() | bb.doubles()) & pos.get_empty();
+        bb |= (bb.singles() | bb.doubles()) & pos.get_empty();
+        bb |= (bb.singles() | bb.doubles()) & pos.get_empty();
+        bb |= (bb.singles() | bb.doubles()) & pos.get_empty();
+        bb |= (bb.singles() | bb.doubles()) & pos.get_empty();
+        bb |= (bb.singles() | bb.doubles()) & pos.get_empty();
+        return bb;
+    }();
+
+    const auto reservoirs = (pos.get_empty() | pos.get_them()).singles() & (pos.get_empty() | pos.get_them());
+    if (!(reachable & reservoirs)) {
+        return false;
+    }
+
+    if ((reachable & reservoirs) && pos.get_them().count() + reachable.count() < pos.get_us().count()) {
+        return false;
+    }
+
+    return true;
 }
 
 [[nodiscard]] auto can_adjudicate_gamelength(const libataxx::Position &pos, const int limit) -> bool {
