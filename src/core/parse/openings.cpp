@@ -3,6 +3,7 @@
 #include <ctime>
 #include <fstream>
 #include <random>
+#include <stdexcept>
 #include "../match/settings.hpp"
 
 namespace parse {
@@ -24,6 +25,10 @@ namespace parse {
             continue;
         }
         openings.push_back(line);
+    }
+
+    if (openings.empty()) {
+        throw std::invalid_argument("Must be at least 1 opening position");
     }
 
     if (shuffle) {

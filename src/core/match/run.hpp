@@ -2,10 +2,11 @@
 #define MATCH_RUN_HPP
 
 #include <vector>
+#include "results.hpp"
 #include "settings.hpp"
 
 class Settings;
 
-void run(const Settings &settings, const std::vector<std::string> &openings);
+Results run(const Settings &settings, const std::vector<std::string> &openings);
 
 #endif

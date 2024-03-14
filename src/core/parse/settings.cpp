@@ -1,4 +1,5 @@
 #include "settings.hpp"
+#include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
@@ -213,6 +214,33 @@ namespace parse {
         }
 
         settings.engines.emplace_back(details);
+    }
+
+    // Check the paths given
+    if (!std::filesystem::exists(settings.openings_path)) {
+        throw std::runtime_error("Openings path not found: '" + settings.openings_path + "'");
+    }
+
+    // Sanity checks
+    for (const auto &engine : settings.engines) {
+        if (!engine.builtin.empty()) {
+            continue;
+        }
+
+        if (!std::filesystem::exists(engine.path)) {
+            throw std::runtime_error("Engine path not found: '" + engine.path + "'");
+        }
+
+        if (engine.proto == EngineProtocol::Unknown) {
+            throw std::runtime_error("Unrecognised engine protocol");
+        }
+    }
+
+    // Sanity checks
+    if (settings.engines.size() < 2) {
+        throw std::invalid_argument("Must be at least 2 engines");
+    } else if (settings.concurrency < 1) {
+        throw std::invalid_argument("Must be at least 1 thread");
     }
 
     return settings;

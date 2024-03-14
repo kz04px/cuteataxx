@@ -1,5 +1,6 @@
-#include <filesystem>
+#include <chrono>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <stdexcept>
 #include "core/engine/engine.hpp"
@@ -16,29 +17,6 @@ int main(int argc, char **argv) {
 
     try {
         const auto settings = parse::settings(argv[1]);
-
-        // Check the paths given
-        if (!std::filesystem::exists(settings.openings_path)) {
-            std::cerr << "Openings path not found: '" << settings.openings_path << "'\n";
-            return 1;
-        }
-
-        for (const auto &engine : settings.engines) {
-            if (!engine.builtin.empty()) {
-                continue;
-            }
-
-            if (!std::filesystem::exists(engine.path)) {
-                std::cerr << "Engine path not found: '" << engine.path << "'\n";
-                return 1;
-            }
-
-            if (engine.proto == EngineProtocol::Unknown) {
-                std::cerr << "Unrecognised engine protocol\n";
-                return 1;
-            }
-        }
-
         const auto openings = parse::openings(settings.openings_path, settings.shuffle);
 
         std::cout << "Settings:\n";
@@ -49,21 +27,43 @@ int main(int argc, char **argv) {
         std::cout << "- openings " << openings.size() << "\n";
         std::cout << "\n";
 
-        // Sanity checks
-        if (openings.size() < 1) {
-            throw std::invalid_argument("Must be at least 1 opening position");
-        } else if (settings.engines.size() < 2) {
-            throw std::invalid_argument("Must be at least 2 engines");
-        } else if (settings.concurrency < 1) {
-            throw std::invalid_argument("Must be at least 1 thread");
-        }
-
         // Clear pgn
         if (settings.pgn.override) {
             std::ofstream file(settings.pgn.path, std::ofstream::trunc);
         }
 
-        run(settings, openings);
+        // Start timer
+        const auto t0 = std::chrono::high_resolution_clock::now();
+
+        const auto results = run(settings, openings);
+
+        // End timer
+        const auto t1 = std::chrono::high_resolution_clock::now();
+        const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+        const auto hh_mm_ss = std::chrono::hh_mm_ss(diff);
+
+        // Print stats
+        std::cout << "\n";
+        std::cout << "Time taken: ";
+        std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.hours().count() << "h ";
+        std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.minutes().count() << "m ";
+        std::cout << std::setfill('0') << std::setw(2) << hh_mm_ss.seconds().count() << "s\n";
+        std::cout << "Total games: " << results.games_played << "\n";
+        std::cout << "Threads: " << settings.concurrency << "\n";
+        if (diff.count() > 0) {
+            const auto games_per_ms = static_cast<float>(results.games_played) / diff.count();
+            const auto games_per_sec = games_per_ms * 1000;
+            std::cout << std::setprecision(games_per_sec >= 100 ? 0 : 2);
+            std::cout << "games/sec: " << games_per_sec << "\n";
+            std::cout << "games/min: " << games_per_sec * 60.0f << "\n";
+        }
+        std::cout << "\n";
+
+        // Print match statistics
+        std::cout << "Result  Games\n";
+        std::cout << "1-0     " << results.black_wins << "\n";
+        std::cout << "0-1     " << results.white_wins << "\n";
+        std::cout << "1/2-1/2 " << results.draws << "\n";
     } catch (std::invalid_argument &e) {
         std::cerr << e.what() << "\n";
     } catch (const char *e) {
