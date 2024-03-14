@@ -5,9 +5,9 @@
 #include <ostream>
 #include <string>
 #include <vector>
-#include "engine/settings.hpp"
-#include "pgn.hpp"
-#include "tournament/types.hpp"
+#include "../engine/settings.hpp"
+#include "../pgn.hpp"
+#include "../tournament/types.hpp"
 
 struct SPRTSettings {
     bool enabled = false;

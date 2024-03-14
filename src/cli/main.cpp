@@ -2,11 +2,11 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
-#include "engine/engine.hpp"
-#include "match/run.hpp"
-#include "match/settings.hpp"
-#include "parse/openings.hpp"
-#include "parse/settings.hpp"
+#include "core/engine/engine.hpp"
+#include "core/match/run.hpp"
+#include "core/match/settings.hpp"
+#include "core/parse/openings.hpp"
+#include "core/parse/settings.hpp"
 
 int main(int argc, char **argv) {
     if (argc < 2) {

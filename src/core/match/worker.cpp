@@ -8,15 +8,15 @@
 #include <sprt.hpp>
 #include <thread>
 #include "../cache.hpp"
-#include "play.hpp"
+#include "../play.hpp"
 #include "results.hpp"
 #include "settings.hpp"
 // Engines
-#include "engine/create.hpp"
-#include "engine/engine.hpp"
+#include "../engine/create.hpp"
+#include "../engine/engine.hpp"
 // Tournaments
-#include "tournament/generator.hpp"
-#include "tournament/roundrobin.hpp"
+#include "../tournament/generator.hpp"
+#include "../tournament/roundrobin.hpp"
 
 std::mutex mtx_output;
 std::mutex mtx_games;

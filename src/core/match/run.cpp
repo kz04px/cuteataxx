@@ -10,9 +10,9 @@
 #include "settings.hpp"
 #include "worker.hpp"
 // Tournaments
-#include "tournament/gauntlet.hpp"
-#include "tournament/generator.hpp"
-#include "tournament/roundrobin.hpp"
+#include "../tournament/gauntlet.hpp"
+#include "../tournament/generator.hpp"
+#include "../tournament/roundrobin.hpp"
 
 void run(const Settings &settings, const std::vector<std::string> &openings) {
     // Create results & initialise

@@ -5,7 +5,7 @@
 #include <queue>
 #include <string>
 #include <vector>
-#include "tournament/generator.hpp"
+#include "../tournament/generator.hpp"
 
 class Settings;
 class Results;

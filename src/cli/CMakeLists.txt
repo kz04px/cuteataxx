@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 # Project
 project(cuteataxx-cli VERSION 1.0 LANGUAGES CXX)
 
-include_directories(${CMAKE_SOURCE_DIR}/src/core/)
+include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(${CMAKE_SOURCE_DIR}/libs/)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -24,16 +24,13 @@ add_executable(
 
     main.cpp
 
-    # CLI
-    parse/openings.cpp
-    parse/settings.cpp
-    match/run.cpp
-    match/worker.cpp
-
-    # Core
     ../core/ataxx/adjudicate.cpp
     ../core/ataxx/parse_move.cpp
     ../core/engine/create.cpp
+    ../core/match/run.cpp
+    ../core/match/worker.cpp
+    ../core/parse/openings.cpp
+    ../core/parse/settings.cpp
     ../core/play.cpp
     ../core/pgn.cpp
 )
