@@ -9,7 +9,7 @@
 #include "../tournament/generator.hpp"
 #include "../tournament/roundrobin.hpp"
 
-Results run(const Settings &settings, const std::vector<std::string> &openings) {
+Results run(const Settings &settings, const std::vector<std::string> &openings, const Callbacks &callbacks) {
     // Create results & initialise
     Results results;
     for (const auto &engine : settings.engines) {
@@ -35,7 +35,7 @@ Results run(const Settings &settings, const std::vector<std::string> &openings) 
 
     // Start game threads
     for (int i = 0; i < settings.concurrency; ++i) {
-        threads.emplace_back(worker, settings, openings, game_generator, std::ref(results));
+        threads.emplace_back(worker, settings, openings, game_generator, std::ref(results), std::cref(callbacks));
     }
 
     // Wait for game threads to finish
