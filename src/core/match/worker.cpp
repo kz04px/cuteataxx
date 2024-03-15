@@ -130,7 +130,6 @@ void worker(const Settings &settings,
             std::cerr << e.what() << "\n";
         } catch (...) {
             std::cerr << "Error woops\n";
-            continue;
         }
 
         engine_cache.push(game.engine1.id, *engine1);
