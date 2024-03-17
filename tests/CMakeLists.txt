@@ -30,6 +30,7 @@ add_executable(
     core/ataxx/parse_move.cpp
     core/tournament/gauntlet.cpp
     core/tournament/roundrobin.cpp
+    core/tournament/roundrobin_mixed.cpp
 )
 
 target_link_libraries(

@@ -4,6 +4,7 @@
 enum class TournamentType
 {
     RoundRobin,
+    RoundRobinMixed,
     Gauntlet,
 };
 

@@ -59,6 +59,9 @@ namespace parse {
             const auto tournament_type = b.get<std::string>();
             if (tournament_type == "roundrobin") {
                 settings.tournament_type = TournamentType::RoundRobin;
+            } else if (tournament_type == "roundrobinmixed" || tournament_type == "roundrobin-mixed" ||
+                       tournament_type == "roundrobin_mixed") {
+                settings.tournament_type = TournamentType::RoundRobinMixed;
             } else if (tournament_type == "gauntlet") {
                 settings.tournament_type = TournamentType::Gauntlet;
             }

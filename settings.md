@@ -30,7 +30,7 @@ The colour of player 1 in the .pgn file.
 The colour of player 2 in the .pgn file.
 
 ### __tournament__
-The type of tournament to play: roundrobin, gauntlet
+The type of tournament to play: roundrobin, roundrobin-mixed, gauntlet
 
 ### __print_early__
 Whether to print the results before the rating interval.

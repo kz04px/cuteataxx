@@ -1,5 +1,6 @@
 #include "run.hpp"
 #include <memory>
+#include <stdexcept>
 #include <thread>
 #include <vector>
 #include "settings.hpp"
@@ -8,6 +9,7 @@
 #include "../tournament/gauntlet.hpp"
 #include "../tournament/generator.hpp"
 #include "../tournament/roundrobin.hpp"
+#include "../tournament/roundrobin_mixed.hpp"
 
 Results run(const Settings &settings, const std::vector<std::string> &openings, const Callbacks &callbacks) {
     // Create results & initialise
@@ -25,9 +27,11 @@ Results run(const Settings &settings, const std::vector<std::string> &openings, 
     } else if (settings.tournament_type == TournamentType::Gauntlet) {
         game_generator =
             std::make_shared<GauntletGenerator>(settings.engines.size(), settings.num_games, openings.size(), true);
+    } else if (settings.tournament_type == TournamentType::RoundRobinMixed) {
+        game_generator = std::make_shared<RoundRobinMixedGenerator>(
+            settings.engines.size(), settings.num_games, openings.size(), true);
     } else {
-        game_generator =
-            std::make_shared<RoundRobinGenerator>(settings.engines.size(), settings.num_games, openings.size(), true);
+        throw std::runtime_error("Unknown tournament type");
     }
 
     // Create threads
