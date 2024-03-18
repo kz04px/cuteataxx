@@ -36,7 +36,7 @@
     return nfen;
 }
 
-class FairyStockfish : public ProcessEngine {
+class FairyStockfish final : public ProcessEngine {
    public:
     [[nodiscard]] FairyStockfish(const std::string &path,
                                  const std::string &arguments,

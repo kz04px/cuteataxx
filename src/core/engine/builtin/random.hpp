@@ -5,7 +5,7 @@
 #include <string>
 #include "../engine.hpp"
 
-class RandomBuiltin : public Engine {
+class RandomBuiltin final : public Engine {
    public:
     [[nodiscard]] RandomBuiltin(std::function<void(const std::string &msg)> send = {},
                                 std::function<void(const std::string &msg)> recv = {})

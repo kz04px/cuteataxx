@@ -7,7 +7,7 @@
 #include <vector>
 #include "generator.hpp"
 
-class [[nodiscard]] RoundRobinMixedGenerator : public TournamentGenerator {
+class [[nodiscard]] RoundRobinMixedGenerator final : public TournamentGenerator {
    public:
     RoundRobinMixedGenerator(const std::size_t players,
                              const std::size_t games,

@@ -7,7 +7,7 @@
 #include <utils.hpp>
 #include "process.hpp"
 
-class KataGo : public ProcessEngine {
+class KataGo final : public ProcessEngine {
    public:
     [[nodiscard]] KataGo(const std::string &path,
                          const std::string &arguments,

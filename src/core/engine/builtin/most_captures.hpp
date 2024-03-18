@@ -5,7 +5,7 @@
 #include <string>
 #include "../engine.hpp"
 
-class MostCapturesBuiltin : public Engine {
+class MostCapturesBuiltin final : public Engine {
    public:
     [[nodiscard]] MostCapturesBuiltin(std::function<void(const std::string &msg)> send = {},
                                       std::function<void(const std::string &msg)> recv = {})

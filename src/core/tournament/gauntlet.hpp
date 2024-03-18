@@ -4,7 +4,7 @@
 #include <cstdint>
 #include "generator.hpp"
 
-class [[nodiscard]] GauntletGenerator : public TournamentGenerator {
+class [[nodiscard]] GauntletGenerator final : public TournamentGenerator {
    public:
     GauntletGenerator(const std::size_t players, const std::size_t games, const std::size_t openings, const bool r)
         : num_players(players), num_games(games), num_openings(openings), repeat(r) {

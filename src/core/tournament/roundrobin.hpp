@@ -5,7 +5,7 @@
 #include <cstdint>
 #include "generator.hpp"
 
-class [[nodiscard]] RoundRobinGenerator : public TournamentGenerator {
+class [[nodiscard]] RoundRobinGenerator final : public TournamentGenerator {
    public:
     RoundRobinGenerator(const std::size_t players, const std::size_t games, const std::size_t openings, const bool r)
         : num_players(players), num_games(games), num_openings(openings), repeat(r) {

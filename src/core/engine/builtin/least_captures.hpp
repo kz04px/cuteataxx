@@ -5,7 +5,7 @@
 #include <string>
 #include "../engine.hpp"
 
-class LeastCapturesBuiltin : public Engine {
+class LeastCapturesBuiltin final : public Engine {
    public:
     [[nodiscard]] LeastCapturesBuiltin(std::function<void(const std::string &msg)> send = {},
                                        std::function<void(const std::string &msg)> recv = {})

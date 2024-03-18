@@ -7,7 +7,7 @@
 #include <utils.hpp>
 #include "process.hpp"
 
-class UAIEngine : public ProcessEngine {
+class UAIEngine final : public ProcessEngine {
    public:
     [[nodiscard]] UAIEngine(const std::string &path,
                             const std::string &arguments,
