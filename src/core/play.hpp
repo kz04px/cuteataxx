@@ -1,6 +1,7 @@
 #ifndef PLAY_HPP
 #define PLAY_HPP
 
+#include <functional>
 #include <libataxx/move.hpp>
 #include <libataxx/position.hpp>
 #include <memory>
@@ -49,9 +50,14 @@ struct GameThingy {
     libataxx::Position endpos;
 };
 
-[[nodiscard]] GameThingy play(const AdjudicationSettings &adjudication,
-                              const GameSettings &game,
-                              std::shared_ptr<Engine> engine1,
-                              std::shared_ptr<Engine> engine2);
+[[nodiscard]] GameThingy play(
+    const AdjudicationSettings &adjudication,
+    const GameSettings &game,
+    std::shared_ptr<Engine> engine1,
+    std::shared_ptr<Engine> engine2,
+    std::function<bool(GameThingy info, SearchSettings tc1, SearchSettings tc2)> on_new_move_callback =
+        []([[maybe_unused]] GameThingy info, [[maybe_unused]] SearchSettings tc1, [[maybe_unused]] SearchSettings tc2) {
+            return true;
+        });
 
 #endif
