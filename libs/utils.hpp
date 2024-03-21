@@ -3,6 +3,7 @@
 
 #include <string_view>
 #include <vector>
+#include <algorithm>
 
 namespace utils {
 

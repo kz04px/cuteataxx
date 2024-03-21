@@ -1,5 +1,8 @@
 #include "pgn.hpp"
+#include <chrono>
+#include <format>
 #include <fstream>
+#include <sstream>
 
 [[nodiscard]] auto result_string(const libataxx::Result result) -> std::string {
     switch (result) {
@@ -33,20 +36,17 @@
     }
 }
 
-auto write_as_pgn(const PGNSettings &settings,
-                  const std::string &player1,
-                  const std::string &player2,
-                  const GameThingy &data) -> void {
-    std::ofstream f(settings.path, std::fstream::out | std::fstream::app);
-    if (!f.is_open()) {
-        return;
-    }
+auto get_pgn(const PGNSettings &settings,
+             const std::string &player1,
+             const std::string &player2,
+             const GameThingy &data) -> std::string {
+    std::ostringstream f{};
 
     const auto material_difference = data.endpos.get_black().count() - data.endpos.get_white().count();
 
     f << "[Event \"" << settings.event << "\"]\n";
     f << "[Site \"CuteAtaxx\"]\n";
-    f << "[Date \"??\"]\n";
+    f << "[Date \"" << std::format("{:%Y-%m-%d %H:%M}", std::chrono::system_clock::now()) << "\"]\n";
     f << "[Round \"1\"]\n";
     f << "[" << settings.colour1 << " \"" << player1 << "\"]\n";
     f << "[" << settings.colour2 << " \"" << player2 << "\"]\n";
@@ -94,4 +94,19 @@ auto write_as_pgn(const PGNSettings &settings,
     f << result_string(data.result) << "\n";
 
     f << "\n\n";
+
+    return f.str();
+}
+
+auto write_as_pgn(const PGNSettings &settings,
+                  const std::string &player1,
+                  const std::string &player2,
+                  const GameThingy &data) -> void {
+    std::ofstream f(settings.path, std::fstream::out | std::fstream::app);
+    if (!f.is_open()) {
+        return;
+    }
+    std::string pgn = get_pgn(settings, player1, player2, data);
+    f << pgn;
+    f.close();
 }

@@ -2,13 +2,22 @@
 #define ENGINE_PROCESS_HPP
 
 #include <boost/process.hpp>
+#include <filesystem>
 #include <functional>
 #include <string>
-#include <filesystem>
 #include "engine.hpp"
 
 class ProcessEngine : public Engine {
    public:
+    auto kill() -> void {
+        if (is_running()) {
+            m_child.terminate();
+            m_in.close();
+            m_out.close();
+            m_child.wait();
+        }
+    }
+
    protected:
     [[nodiscard]] ProcessEngine(const std::string &path,
                                 const std::string &arguments,

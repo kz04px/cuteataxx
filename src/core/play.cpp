@@ -15,19 +15,20 @@
 static_assert(make_win_for(libataxx::Side::Black) == libataxx::Result::BlackWin);
 static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin);
 
-[[nodiscard]] GameThingy play(const AdjudicationSettings &adjudication,
-                              const GameSettings &game,
-                              std::shared_ptr<Engine> engine1,
-                              std::shared_ptr<Engine> engine2) {
+[[nodiscard]] GameThingy play(
+    const AdjudicationSettings &adjudication,
+    const GameSettings &game,
+    std::shared_ptr<Engine> engine1,
+    std::shared_ptr<Engine> engine2,
+    std::function<bool(GameThingy info, SearchSettings tc1, SearchSettings tc2)> on_new_move_callback) {
     assert(!game.fen.empty());
     assert(game.engine1.id != game.engine2.id);
 
     GameThingy info;
 
     // Get engine & position settings
-    auto pos = libataxx::Position{game.fen};
-    int ply_count = 0;
-    info.startpos = pos;
+    info.endpos = libataxx::Position{game.fen};
+    info.startpos = info.endpos;
     auto tc1 = game.engine1.tc;
     auto tc2 = game.engine2.tc;
 
@@ -39,33 +40,33 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
         engine2->isready();
 
         // Play
-        while (!pos.is_gameover()) {
+        while (!info.endpos.is_gameover()) {
             // Try to adjudicate based on material imbalance
-            if (adjudication.material && can_adjudicate_material(pos, *adjudication.material)) {
-                info.result = make_win_for(pos.get_turn());
+            if (adjudication.material && can_adjudicate_material(info.endpos, *adjudication.material)) {
+                info.result = make_win_for(info.endpos.get_turn());
                 info.reason = ResultReason::MaterialImbalance;
                 break;
             }
 
             // Try to adjudicate based on "easy fill"
             // This is when one side has to pass and the other can fill the rest of the board trivially to win
-            if (adjudication.easyfill && can_adjudicate_easyfill(pos)) {
-                info.result = make_win_for(!pos.get_turn());
+            if (adjudication.easyfill && can_adjudicate_easyfill(info.endpos)) {
+                info.result = make_win_for(!info.endpos.get_turn());
                 info.reason = ResultReason::EasyFill;
                 break;
             }
 
             // Try to adjudicate based on game length
-            if (adjudication.gamelength && can_adjudicate_gamelength(pos, *adjudication.gamelength)) {
+            if (adjudication.gamelength && can_adjudicate_gamelength(info.endpos, *adjudication.gamelength)) {
                 info.result = libataxx::Result::Draw;
                 info.reason = ResultReason::Gamelength;
                 break;
             }
 
-            auto &engine = pos.get_turn() == libataxx::Side::Black ? engine1 : engine2;
-            auto &tc_us = pos.get_turn() == libataxx::Side::Black ? tc1 : tc2;
+            auto &engine = info.endpos.get_turn() == libataxx::Side::Black ? engine1 : engine2;
+            auto &tc_us = info.endpos.get_turn() == libataxx::Side::Black ? tc1 : tc2;
 
-            engine->position(pos);
+            engine->position(info.endpos);
 
             engine->isready();
 
@@ -88,26 +89,20 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
                 move = parse_move(movestr);
 
                 // Illegal move
-                if (!pos.is_legal_move(move)) {
+                if (!info.endpos.is_legal_move(move)) {
                     throw std::logic_error("Illegal move");
                 }
             } catch (...) {
-                info.result = make_win_for(!pos.get_turn());
+                info.result = make_win_for(!info.endpos.get_turn());
                 info.reason = ResultReason::IllegalMove;
                 std::cout << "Illegal move \"" << movestr << "\" played by "
-                          << (pos.get_turn() == libataxx::Side::Black ? game.engine1.name : game.engine2.name)
+                          << (info.endpos.get_turn() == libataxx::Side::Black ? game.engine1.name : game.engine2.name)
                           << "\n\n";
-                break;
             }
-
-            ply_count++;
-
-            // Add move to .pgn
-            info.history.emplace_back(move, diff.count());
 
             // Update clocks
             if (tc_us.type == SearchSettings::Type::Time) {
-                if (pos.get_turn() == libataxx::Side::Black) {
+                if (info.endpos.get_turn() == libataxx::Side::Black) {
                     tc1.btime -= diff.count();
                     tc2.btime -= diff.count();
                 } else {
@@ -119,7 +114,7 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
             // Out of time?
             if (tc_us.type == SearchSettings::Type::Movetime) {
                 if (diff.count() > tc_us.movetime + adjudication.timeout_buffer) {
-                    info.result = make_win_for(!pos.get_turn());
+                    info.result = make_win_for(!info.endpos.get_turn());
                     info.reason = ResultReason::OutOfTime;
                     break;
                 }
@@ -135,9 +130,16 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
                 }
             }
 
+            if (info.reason == ResultReason::IllegalMove) {
+                break;
+            }
+
+            // Add move to .pgn
+            info.history.emplace_back(move, diff.count());
+
             // Increments
             if (tc_us.type == SearchSettings::Type::Time) {
-                if (pos.get_turn() == libataxx::Side::Black) {
+                if (info.endpos.get_turn() == libataxx::Side::Black) {
                     tc1.btime += tc_us.binc;
                     tc2.btime += tc_us.binc;
                 } else {
@@ -146,19 +148,22 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
                 }
             }
 
-            pos.makemove(move);
+            info.endpos.makemove(move);
+
+            const bool continue_game = on_new_move_callback(info, tc1, tc2);
+            if (!continue_game) {
+                break;
+            }
         }
     } catch (...) {
         info.reason = ResultReason::EngineCrash;
-        info.result = make_win_for(!pos.get_turn());
+        info.result = make_win_for(!info.endpos.get_turn());
     }
 
     // Game finished normally
     if (info.result == libataxx::Result::None) {
-        info.result = pos.get_result();
+        info.result = info.endpos.get_result();
     }
-
-    info.endpos = pos;
 
     return info;
 }

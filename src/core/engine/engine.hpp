@@ -28,13 +28,13 @@ class Engine {
 
     virtual auto newgame() -> void = 0;
 
-   protected:
     [[nodiscard]] virtual auto is_running() -> bool = 0;
 
     virtual auto quit() -> void = 0;
 
     virtual auto stop() -> void = 0;
 
+   protected:
     std::function<void(const std::string &msg)> m_send;
     std::function<void(const std::string &msg)> m_recv;
 };
