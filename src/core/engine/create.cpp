@@ -30,9 +30,11 @@
     } else {
         if (settings.builtin == "random") {
             engine = std::make_shared<RandomBuiltin>(send, recv);
-        } else if (settings.builtin == "mostcaptures") {
+        } else if (settings.builtin == "mostcaptures" || settings.builtin == "most-captures" ||
+                   settings.builtin == "most captures") {
             engine = std::make_shared<MostCapturesBuiltin>(send, recv);
-        } else if (settings.builtin == "leastcaptures") {
+        } else if (settings.builtin == "leastcaptures" || settings.builtin == "least-captures" ||
+                   settings.builtin == "least captures") {
             engine = std::make_shared<LeastCapturesBuiltin>(send, recv);
         } else {
             throw std::invalid_argument("Unknown engine builtin");
