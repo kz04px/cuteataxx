@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 # Project
 project(cuteataxx-tui VERSION 1.0 LANGUAGES CXX)
 
-include_directories(${CMAKE_SOURCE_DIR}/src/core/)
+include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(${CMAKE_SOURCE_DIR}/libs/)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -30,6 +30,10 @@ add_executable(
     ../core/engine/create.cpp
     ../core/play.cpp
     ../core/pgn.cpp
+    ../core/parse/openings.cpp
+    ../core/parse/settings.cpp
+    ../core/match/run.cpp
+    ../core/match/worker.cpp
 )
 
 target_link_libraries(
@@ -38,4 +42,8 @@ target_link_libraries(
     PRIVATE ftxui::screen
     PRIVATE ftxui::dom
     PRIVATE ftxui::component
+
+    # Threads::Threads
+    nlohmann_json::nlohmann_json
+    # ataxx_static
 )

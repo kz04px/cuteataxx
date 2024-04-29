@@ -7,6 +7,7 @@
 #include <optional>
 #include <vector>
 #include "engine/settings.hpp"
+#include "match/callbacks.hpp"
 
 enum class ResultReason : int
 {
@@ -52,6 +53,7 @@ struct GameThingy {
 [[nodiscard]] GameThingy play(const AdjudicationSettings &adjudication,
                               const GameSettings &game,
                               std::shared_ptr<Engine> engine1,
-                              std::shared_ptr<Engine> engine2);
+                              std::shared_ptr<Engine> engine2,
+                              const Callbacks &callbacks);
 
 #endif

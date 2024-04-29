@@ -30,7 +30,8 @@ int main(int argc, char **argv) {
                     }
                 },
             .on_game_started =
-                [&settings](const int game_id, const std::string &engine1, const std::string &engine2) {
+                [&settings](
+                    const int game_id, const std::string &fen, const std::string &engine1, const std::string &engine2) {
                     if (settings.verbose) {
                         std::cout << "Started game " << engine1 << " vs " << engine2 << std::endl;
                     }
@@ -169,6 +170,9 @@ int main(int argc, char **argv) {
             .on_info_recv =
                 [](const std::string &msg) {
                     std::cout << std::this_thread::get_id() << "< " << msg << "\n";
+                },
+            .on_move =
+                [](const libataxx::Move &, const int) {
                 },
         };
 
