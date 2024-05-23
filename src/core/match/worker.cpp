@@ -96,7 +96,7 @@ void worker(const Settings &settings,
         (*engine1).reset();
         (*engine2).reset();
 
-        callbacks.on_game_finished(0, game.engine1.name, game.engine2.name);
+        callbacks.on_game_finished(game_data.result, game.engine1.name, game.engine2.name);
 
         // Results & printing
         {
