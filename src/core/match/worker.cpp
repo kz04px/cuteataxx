@@ -57,22 +57,12 @@ void worker(const Settings &settings,
         // Create new engine processes if necessary, knowing we have the resources available
         if (!engine1) {
             callbacks.on_engine_start(game.engine1.name);
-
-            if (settings.debug) {
-                engine1 = make_engine(game.engine1, callbacks.on_info_send, callbacks.on_info_recv);
-            } else {
-                engine1 = make_engine(game.engine1);
-            }
+            engine1 = make_engine(game.engine1, callbacks.on_info_send, callbacks.on_info_recv);
         }
 
         if (!engine2) {
             callbacks.on_engine_start(game.engine2.name);
-
-            if (settings.debug) {
-                engine2 = make_engine(game.engine2, callbacks.on_info_send, callbacks.on_info_recv);
-            } else {
-                engine2 = make_engine(game.engine2);
-            }
+            engine2 = make_engine(game.engine2, callbacks.on_info_send, callbacks.on_info_recv);
         }
 
         GameThingy game_data;
