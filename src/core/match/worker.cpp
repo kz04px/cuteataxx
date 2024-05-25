@@ -45,7 +45,7 @@ void worker(const Settings &settings,
                                        settings.engines[game_info.idx_player1],
                                        settings.engines[game_info.idx_player2]);
 
-        callbacks.on_game_started(0, game.engine1.name, game.engine2.name);
+        callbacks.on_game_started(0, game.fen, game.engine1.name, game.engine2.name);
 
         // If the engines we need aren't in the cache, we get nothing
         auto engine1 = engine_cache.get(game.engine1.id);
@@ -69,7 +69,7 @@ void worker(const Settings &settings,
 
         // Play the game
         try {
-            game_data = play(settings.adjudication, game, *engine1, *engine2);
+            game_data = play(settings.adjudication, game, *engine1, *engine2, callbacks);
         } catch (std::invalid_argument &e) {
             std::cerr << e.what() << "\n";
         } catch (const char *e) {

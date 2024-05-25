@@ -6,6 +6,7 @@
 #include "ataxx/adjudicate.hpp"
 #include "ataxx/parse_move.hpp"
 #include "engine/engine.hpp"
+#include "match/callbacks.hpp"
 #include "play.hpp"
 
 [[nodiscard]] constexpr auto make_win_for(const libataxx::Side s) noexcept {
@@ -18,7 +19,8 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
 [[nodiscard]] GameThingy play(const AdjudicationSettings &adjudication,
                               const GameSettings &game,
                               std::shared_ptr<Engine> engine1,
-                              std::shared_ptr<Engine> engine2) {
+                              std::shared_ptr<Engine> engine2,
+                              const Callbacks &callbacks) {
     assert(!game.fen.empty());
     assert(game.engine1.id != game.engine2.id);
 
@@ -91,6 +93,8 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
                 if (!pos.is_legal_move(move)) {
                     throw std::logic_error("Illegal move");
                 }
+
+                callbacks.on_move(move, diff.count());
             } catch (...) {
                 info.result = make_win_for(!pos.get_turn());
                 info.reason = ResultReason::IllegalMove;

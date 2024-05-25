@@ -5,6 +5,29 @@
 #include "core/engine/settings.hpp"
 
 TEST_CASE("Test 1") {
+    const auto callbacks = Callbacks{
+        .on_engine_start =
+            [](const std::string &) {
+            },
+        .on_game_started =
+            [](const int, const std::string &, const std::string &, const std::string &) {
+            },
+        .on_game_finished =
+            [](const int, const std::string &, const std::string &) {
+            },
+        .on_results_update =
+            [](const Results &) {
+            },
+        .on_info_send =
+            [](const std::string &) {
+            },
+        .on_info_recv =
+            [](const std::string &) {
+            },
+        .on_move =
+            [](const libataxx::Move &, const int) {
+            },
+    };
     const auto settings1 =
         EngineSettings{0, EngineProtocol::Unknown, "Test1", "mostcaptures", "", "", SearchSettings::as_depth(1), {}};
     const auto settings2 =
@@ -19,8 +42,8 @@ TEST_CASE("Test 1") {
     const auto adjudication = AdjudicationSettings{{}, {}, {}, 0};
     const auto game = GameSettings{"startpos", settings1, settings2};
 
-    const auto result1 = play(adjudication, game, mostcaptures1, mostcaptures2);
-    const auto result2 = play(adjudication, game, mostcaptures2, mostcaptures1);
+    const auto result1 = play(adjudication, game, mostcaptures1, mostcaptures2, callbacks);
+    const auto result2 = play(adjudication, game, mostcaptures2, mostcaptures1, callbacks);
 
     REQUIRE(result1.endpos.is_gameover());
     REQUIRE(result1.result == result2.result);
