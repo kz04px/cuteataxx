@@ -33,10 +33,11 @@
             std::cout << "Created engine " << name << std::endl;
         };
 
-        callbacks.on_game_started = [&settings](
-                                        const int game_id, const std::string &engine1, const std::string &engine2) {
-            std::cout << "Started game " << engine1 << " vs " << engine2 << std::endl;
-        };
+        callbacks.on_game_started =
+            [&settings](
+                const int game_id, const std::string &engine1, const std::string &engine2, const std::string &) {
+                std::cout << "Started game " << engine1 << " vs " << engine2 << std::endl;
+            };
 
         callbacks.on_game_finished = [&settings](
                                          const int game_id, const std::string &engine1, const std::string &engine2) {
