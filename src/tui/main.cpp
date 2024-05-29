@@ -61,17 +61,16 @@ struct Tabber {
                                     ScreenInteractive &screen) -> Callbacks {
     auto callbacks = Callbacks{};
 
-    callbacks.on_game_started =
-        [&settings, &game_tab, &screen](
-            const int, const std::string &fen, const std::string &name1, const std::string &name2) {
-            game_tab.new_game();
-            game_tab.set_title(name1 + " vs " + name2);
-            game_tab.set_position(fen);
-            game_tab.set_clock(settings.tc);
-            screen.PostEvent(Event::Custom);
-        };
+    callbacks.on_game_started = [&settings, &game_tab, &screen](
+                                    const std::string &fen, const std::string &name1, const std::string &name2) {
+        game_tab.new_game();
+        game_tab.set_title(name1 + " vs " + name2);
+        game_tab.set_position(fen);
+        game_tab.set_clock(settings.tc);
+        screen.PostEvent(Event::Custom);
+    };
 
-    callbacks.on_game_finished = [&settings](const int, const std::string &, const std::string &) {
+    callbacks.on_game_finished = [&settings](const libataxx::Result, const std::string &, const std::string &) {
         std::this_thread::sleep_for(std::chrono::seconds(3));
     };
 

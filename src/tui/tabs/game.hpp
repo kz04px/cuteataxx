@@ -135,9 +135,9 @@ class [[nodiscard]] GameTab : public BaseTab {
 
     auto makemove(const libataxx::Move &move, const int ms) -> void {
         if (m_board.pos.get_turn() == libataxx::Side::Black) {
-            m_clock_black.time -= ms;
+            m_clock_black.time = ms;
         } else {
-            m_clock_white.time -= ms;
+            m_clock_white.time = ms;
         }
 
         m_board.pos.makemove(move);

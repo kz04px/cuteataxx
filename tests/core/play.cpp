@@ -10,10 +10,10 @@ TEST_CASE("Test 1") {
             [](const std::string &) {
             },
         .on_game_started =
-            [](const int, const std::string &, const std::string &, const std::string &) {
+            [](const std::string &, const std::string &, const std::string &) {
             },
         .on_game_finished =
-            [](const int, const std::string &, const std::string &) {
+            [](const libataxx::Result, const std::string &, const std::string &) {
             },
         .on_results_update =
             [](const Results &) {
