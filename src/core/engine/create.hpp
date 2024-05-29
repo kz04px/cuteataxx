@@ -4,9 +4,7 @@
 #include <functional>
 #include <memory>
 #include <string>
-
-class Engine;
-class EngineSettings;
+#include "engine.hpp"
 
 [[nodiscard]] auto make_engine(const EngineSettings &settings,
                                std::function<void(const std::string &msg)> send = {},
