@@ -106,7 +106,6 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
                 }
 
                 const int time_left = pos.get_turn() == libataxx::Side::Black ? tc1.btime : tc2.wtime;
-
                 callbacks.on_move(move, time_left);
             } catch (...) {
                 info.result = make_win_for(!pos.get_turn());
