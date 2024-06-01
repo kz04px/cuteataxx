@@ -35,13 +35,13 @@
 
         callbacks.on_game_started =
             [&settings](
-                const std::string &engine1, const std::string &engine2, const std::string &) {
+                const std::size_t, const std::string &engine1, const std::string &engine2, const std::string &) {
                 std::cout << "Started game " << engine1 << " vs " << engine2 << std::endl;
             };
 
         callbacks.on_game_finished =
             [&settings](
-                const libataxx::Result, const std::string &engine1, const std::string &engine2) {
+                const std::size_t, const libataxx::Result, const std::string &engine1, const std::string &engine2) {
                 std::cout << "Finished game " << engine1 << " vs " << engine2 << std::endl;
             };
     }
