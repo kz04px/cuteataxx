@@ -93,8 +93,6 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
                 if (!pos.is_legal_move(move)) {
                     throw std::logic_error("Illegal move");
                 }
-
-                callbacks.on_move(move, diff.count());
             } catch (...) {
                 info.result = make_win_for(!pos.get_turn());
                 info.reason = ResultReason::IllegalMove;
@@ -125,16 +123,19 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
                 if (diff.count() > tc_us.movetime + adjudication.timeout_buffer) {
                     info.result = make_win_for(!pos.get_turn());
                     info.reason = ResultReason::OutOfTime;
+                    callbacks.on_move(move, diff.count(), tc_us);
                     break;
                 }
             } else if (tc_us.type == SearchSettings::Type::Time) {
                 if (tc_us.btime <= 0) {
                     info.result = libataxx::Result::WhiteWin;
                     info.reason = ResultReason::OutOfTime;
+                    callbacks.on_move(move, diff.count(), tc_us);
                     break;
                 } else if (tc_us.wtime <= 0) {
                     info.result = libataxx::Result::BlackWin;
                     info.reason = ResultReason::OutOfTime;
+                    callbacks.on_move(move, diff.count(), tc_us);
                     break;
                 }
             }
@@ -149,6 +150,9 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
                     tc2.wtime += tc_us.winc;
                 }
             }
+
+            // Move played callback
+            callbacks.on_move(move, diff.count(), tc_us);
 
             pos.makemove(move);
         }
