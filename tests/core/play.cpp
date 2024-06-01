@@ -25,7 +25,7 @@ TEST_CASE("Test 1") {
             [](const std::string &) {
             },
         .on_move =
-            [](const libataxx::Move &, const int) {
+            [](const libataxx::Move &, const int, const SearchSettings &) {
             },
     };
     const auto settings1 =

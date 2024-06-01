@@ -6,6 +6,8 @@
 #include <string>
 #include "results.hpp"
 
+class SearchSettings;
+
 struct Callbacks {
     std::function<void(const std::string &)> on_engine_start = [](const auto) {
     };
@@ -21,8 +23,9 @@ struct Callbacks {
     };
     std::function<void(const std::string &)> on_info_recv = [](const auto) {
     };
-    std::function<void(const libataxx::Move &, const int)> on_move = [](const auto, const auto) {
-    };
+    std::function<void(const libataxx::Move &, const int, const SearchSettings &)> on_move =
+        [](const auto, const auto, const auto &) {
+        };
 };
 
 #endif
