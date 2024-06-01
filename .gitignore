@@ -1,13 +1,8 @@
 bin/engines
-
 bin/openings
-
 bin/cuteataxx
-
 bin/games.pgn
-
 obj/
-
 .vscode/
-
+.cache/
 build/

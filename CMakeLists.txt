@@ -28,6 +28,8 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(libataxx json doctest)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
 
