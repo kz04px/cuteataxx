@@ -49,5 +49,8 @@ Results run(const Settings &settings, const std::vector<std::string> &openings, 
         }
     }
 
+    assert(results.games_started == results.games_played);
+    assert(results.black_wins + results.white_wins + results.draws == results.games_played);
+
     return results;
 }
