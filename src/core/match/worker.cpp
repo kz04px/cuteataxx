@@ -39,6 +39,8 @@ void worker(const Settings &settings,
 
             // Get the next game to play
             game_info = game_generator->next();
+
+            results.games_started++;
         }
 
         const auto game = GameSettings(openings[game_info.idx_opening],
