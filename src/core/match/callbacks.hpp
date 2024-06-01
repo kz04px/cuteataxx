@@ -24,6 +24,8 @@ struct Callbacks {
     };
     std::function<void(const libataxx::Move &, const int)> on_move = [](auto, auto) {
     };
+    std::function<void(const libataxx::Move &, const int)> on_move = [](const auto, const auto) {
+    };
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "pgn.hpp"
+#include <ctime>
 #include <fstream>
 
 [[nodiscard]] auto result_string(const libataxx::Result result) -> std::string {
@@ -33,6 +34,13 @@
     }
 }
 
+[[nodiscard]] auto current_time_string() -> std::string {
+    const auto now = std::time({});
+    char timeString[std::size("yyyy-mm-dd hh:mm:ss")];
+    std::strftime(std::data(timeString), std::size(timeString), "%F %T", std::localtime(&now));
+    return timeString;
+}
+
 auto write_as_pgn(const PGNSettings &settings,
                   const std::string &player1,
                   const std::string &player2,
@@ -46,7 +54,7 @@ auto write_as_pgn(const PGNSettings &settings,
 
     f << "[Event \"" << settings.event << "\"]\n";
     f << "[Site \"CuteAtaxx\"]\n";
-    f << "[Date \"??\"]\n";
+    f << "[Date \"" << current_time_string() << "\"]\n";
     f << "[Round \"1\"]\n";
     f << "[" << settings.colour1 << " \"" << player1 << "\"]\n";
     f << "[" << settings.colour2 << " \"" << player2 << "\"]\n";
