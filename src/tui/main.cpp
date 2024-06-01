@@ -80,8 +80,8 @@ struct Tabber {
         game_tab.update_results(results);
     };
 
-    callbacks.on_move = [&game_tab, &screen](const libataxx::Move &move, const int ms) {
-        game_tab.makemove(move, ms);
+    callbacks.on_move = [&game_tab, &screen](const libataxx::Move &move, const int ms, const SearchSettings &clock) {
+        game_tab.makemove(move, ms, clock);
         screen.PostEvent(Event::Custom);
     };
 

@@ -133,11 +133,20 @@ class [[nodiscard]] GameTab : public BaseTab {
         m_clock_white.time = tc.wtime;
     }
 
-    auto makemove(const libataxx::Move &move, const int ms) -> void {
-        if (m_board.pos.get_turn() == libataxx::Side::Black) {
-            m_clock_black.time = ms;
-        } else {
-            m_clock_white.time = ms;
+    auto makemove(const libataxx::Move &move, const int, const SearchSettings &clock) -> void {
+        switch (clock.type) {
+            case SearchSettings::Type::Time:
+                m_clock_black.time = clock.btime;
+                m_clock_white.time = clock.wtime;
+                break;
+            case SearchSettings::Type::Movetime:
+                break;
+            case SearchSettings::Type::Depth:
+                break;
+            case SearchSettings::Type::Nodes:
+                break;
+            default:
+                break;
         }
 
         m_board.pos.makemove(move);
