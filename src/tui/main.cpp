@@ -63,7 +63,7 @@ struct Tabber {
 
     callbacks.on_game_started =
         [&settings, &game_tab, &screen](
-            const std::size_t id, const std::string &fen, const std::string &name1, const std::string &name2) {
+            const std::size_t, const std::string &fen, const std::string &name1, const std::string &name2) {
             game_tab.new_game();
             game_tab.set_title(name1 + " vs " + name2);
             game_tab.set_position(fen);
@@ -72,7 +72,7 @@ struct Tabber {
         };
 
     callbacks.on_game_finished =
-        [&settings](const std::size_t id, const libataxx::Result, const std::string &, const std::string &) {
+        [&settings](const std::size_t, const libataxx::Result, const std::string &, const std::string &) {
             std::this_thread::sleep_for(std::chrono::seconds(3));
         };
 

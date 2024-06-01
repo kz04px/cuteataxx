@@ -85,17 +85,6 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
 
             libataxx::Move move;
 
-            // Update clocks
-            if (tc_us.type == SearchSettings::Type::Time) {
-                if (pos.get_turn() == libataxx::Side::Black) {
-                    tc1.btime -= diff.count();
-                    tc2.btime -= diff.count();
-                } else {
-                    tc1.wtime -= diff.count();
-                    tc2.wtime -= diff.count();
-                }
-            }
-
             try {
                 // Parse move string
                 move = parse_move(movestr);
@@ -117,6 +106,17 @@ static_assert(make_win_for(libataxx::Side::White) == libataxx::Result::WhiteWin)
 
             // Add move to .pgn
             info.history.emplace_back(move, diff.count());
+
+            // Update clocks
+            if (tc_us.type == SearchSettings::Type::Time) {
+                if (pos.get_turn() == libataxx::Side::Black) {
+                    tc1.btime -= diff.count();
+                    tc2.btime -= diff.count();
+                } else {
+                    tc1.wtime -= diff.count();
+                    tc2.wtime -= diff.count();
+                }
+            }
 
             // Out of time?
             if (tc_us.type == SearchSettings::Type::Movetime) {

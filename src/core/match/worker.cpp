@@ -94,6 +94,9 @@ void worker(const Settings &settings,
 
             results.games_played++;
 
+            // TODO: needs fixing
+            // assert(results.games_played <= results.games_started);
+
             // Update engine results
             results.scores[game.engine1.name].played++;
             results.scores[game.engine2.name].played++;
