@@ -45,7 +45,7 @@ void worker(const Settings &settings,
                                        settings.engines[game_info.idx_player1],
                                        settings.engines[game_info.idx_player2]);
 
-        callbacks.on_game_started(0, game.fen, game.engine1.name, game.engine2.name);
+        callbacks.on_game_started(game_info.id, game.fen, game.engine1.name, game.engine2.name);
 
         // If the engines we need aren't in the cache, we get nothing
         auto engine1 = engine_cache.get(game.engine1.id);
@@ -86,7 +86,7 @@ void worker(const Settings &settings,
         (*engine1).reset();
         (*engine2).reset();
 
-        callbacks.on_game_finished(0, game.engine1.name, game.engine2.name);
+        callbacks.on_game_finished(game_info.id, game_data.result, game.engine1.name, game.engine2.name);
 
         // Results & printing
         {
