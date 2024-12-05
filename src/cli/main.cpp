@@ -58,7 +58,8 @@
             const auto lbound = sprt::get_lbound(settings.sprt.alpha, settings.sprt.beta);
             const auto ubound = sprt::get_ubound(settings.sprt.alpha, settings.sprt.beta);
 
-            const auto is_sprt_stop = settings.sprt.enabled && (llr <= lbound || llr >= ubound);
+            const auto is_sprt_stop =
+                settings.sprt.enabled && settings.sprt.autostop && (llr <= lbound || llr >= ubound);
             const auto is_print_early = results.games_played < settings.ratinginterval && settings.print_early;
             const auto is_print_late = results.games_played % settings.ratinginterval == 0;
             const auto is_complete = settings.num_games == results.games_played;
