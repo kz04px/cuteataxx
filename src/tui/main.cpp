@@ -19,7 +19,6 @@
 #include "tabs/settings.hpp"
 // FTXUI
 #include <ftxui/dom/table.hpp>
-#include "ftxui/component/captured_mouse.hpp"      // for ftxui
 #include "ftxui/component/component.hpp"           // for Radiobox, Renderer, Tab, Toggle, Vertical
 #include "ftxui/component/component_base.hpp"      // for ComponentBase
 #include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
@@ -72,11 +71,11 @@ struct Tabber {
         };
 
     callbacks.on_game_finished =
-        [&settings](const std::size_t, const libataxx::Result, const std::string &, const std::string &) {
+        [](const std::size_t, const libataxx::Result, const std::string &, const std::string &) {
             std::this_thread::sleep_for(std::chrono::seconds(3));
         };
 
-    callbacks.on_results_update = [&settings, &game_tab](const Results &results) {
+    callbacks.on_results_update = [&game_tab](const Results &results) {
         game_tab.update_results(results);
     };
 
