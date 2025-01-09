@@ -176,7 +176,7 @@ int main(int argc, char **argv) {
     }
 
     try {
-        const auto settings = parse::settings(argv[1]);
+        const auto settings = parse::settings(argv[1], parse::ParseType::CLI);
         const auto openings = parse::openings(settings.openings_path, settings.shuffle);
         const auto callbacks = create_callbacks(settings);
 

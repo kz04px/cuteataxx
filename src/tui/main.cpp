@@ -101,7 +101,7 @@ auto main(const int argc, const char *const *const argv) -> int {
     auto settings_tab = SettingsTab();
     auto about_tab = AboutTab();
 
-    const auto settings = parse::settings(argv[1]);
+    const auto settings = parse::settings(argv[1], parse::ParseType::TUI);
     const auto openings = parse::openings(settings.openings_path, settings.shuffle);
     const auto callbacks = create_callbacks(settings, game_tab, screen);
 

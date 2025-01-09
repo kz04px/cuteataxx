@@ -6,7 +6,7 @@
 
 namespace parse {
 
-[[nodiscard]] Settings settings(const std::string &path) {
+[[nodiscard]] Settings settings(const std::string &path, const ParseType type) {
     Settings settings;
     nlohmann::ordered_json json;
 
@@ -44,7 +44,11 @@ namespace parse {
         } else if (a == "ratinginterval") {
             settings.ratinginterval = b.get<int>();
         } else if (a == "concurrency") {
-            settings.concurrency = b.get<int>();
+            if (type == ParseType::CLI) {
+                settings.concurrency = b.get<int>();
+            } else {
+                settings.concurrency = 1;
+            }
         } else if (a == "colour1") {
             settings.pgn.colour1 = b.get<std::string>();
         } else if (a == "colour2") {

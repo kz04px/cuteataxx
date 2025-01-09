@@ -6,7 +6,13 @@
 
 namespace parse {
 
-[[nodiscard]] Settings settings(const std::string &path);
+enum ParseType
+{
+    CLI = 0,
+    TUI,
+};
+
+[[nodiscard]] Settings settings(const std::string &path, const ParseType type);
 
 }  // namespace parse
 
