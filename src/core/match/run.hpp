@@ -6,7 +6,7 @@
 #include "results.hpp"
 #include "settings.hpp"
 
-class Settings;
+struct Settings;
 
 Results run(const Settings &settings, const std::vector<std::string> &openings, const Callbacks &callbacks);
 

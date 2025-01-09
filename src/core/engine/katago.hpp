@@ -65,7 +65,7 @@ class KataGo final : public ProcessEngine {
         wait_for_first("=");
     }
 
-    virtual auto set_option(const std::string &name, const std::string &value) -> void override {
+    virtual auto set_option(const std::string &, const std::string &) -> void override {
     }
 
     [[nodiscard]] virtual auto go(const SearchSettings &settings) -> std::string override {

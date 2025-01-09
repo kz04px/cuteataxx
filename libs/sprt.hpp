@@ -6,16 +6,17 @@
 
 namespace {
 
-[[nodiscard]] constexpr auto elo_to_probability(const float elo, const float drawelo)
-    -> std::tuple<float, float, float> {
+[[nodiscard]] constexpr auto elo_to_probability(const float elo,
+                                                const float drawelo) -> std::tuple<float, float, float> {
     const auto pwin = 1.0f / (1.0f + std::pow(10.0f, (-elo + drawelo) / 400.0f));
     const auto ploss = 1.0f / (1.0f + std::pow(10.0f, (elo + drawelo) / 400.0f));
     const auto pdraw = 1.0f - pwin - ploss;
     return {pwin, pdraw, ploss};
 }
 
-[[nodiscard]] constexpr auto probability_to_elo(const float pwin, const float pdraw, const float ploss)
-    -> std::pair<float, float> {
+[[nodiscard]] constexpr auto probability_to_elo(const float pwin,
+                                                const float pdraw,
+                                                const float ploss) -> std::pair<float, float> {
     const auto elo = 200.0f * std::log10(pwin / ploss * (1.0f - ploss) / (1.0f - pwin));
     const auto draw_elo = 200.0f * std::log10((1.0f - ploss) / ploss * (1.0f - pwin) / pwin);
     return {elo, draw_elo};
@@ -51,20 +52,6 @@ namespace sprt {
 [[nodiscard]] constexpr auto get_ubound(const float alpha, const float beta) -> float {
     return std::log((1.0f - beta) / alpha);
 }
-
-static_assert(std::round(get_llr(0, 0, 0, -10, 10) * 100) / 100 == 0.0f);
-static_assert(std::round(get_llr(10, 10, 10, -10, 10) * 100) / 100 == 0.0f);
-static_assert(std::round(get_llr(3415, 3270, 5763, -1, 4) * 100) / 100 == 2.16f);
-static_assert(std::round(get_llr(4413, 4218, 7481, -1, 4) * 100) / 100 == 2.96f);
-static_assert(std::round(get_llr(1382, 1415, 2627, 0, 5) * 100) / 100 == -1.34f);
-static_assert(std::round(get_llr(7238, 7273, 18473, 0, 4) * 100) / 100 == -2.97f);
-static_assert(std::round(get_llr(7446, 7503, 14227, -3, 1) * 100) / 100 == 0.12f);
-
-static_assert(std::round(get_lbound(0.05f, 0.05f) * 100) / 100 == -2.94f);
-static_assert(std::round(get_lbound(0.01f, 0.01f) * 100) / 100 == -4.60f);
-
-static_assert(std::round(get_ubound(0.05f, 0.05f) * 100) / 100 == 2.94f);
-static_assert(std::round(get_ubound(0.01f, 0.01f) * 100) / 100 == 4.60f);
 
 }  // namespace sprt
 

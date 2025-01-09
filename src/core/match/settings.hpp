@@ -1,7 +1,6 @@
 #ifndef MATCH_SETTINGS_HPP
 #define MATCH_SETTINGS_HPP
 
-#include <optional>
 #include <ostream>
 #include <string>
 #include <vector>

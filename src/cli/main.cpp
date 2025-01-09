@@ -6,7 +6,6 @@
 #include <sprt.hpp>
 #include <stdexcept>
 #include <thread>
-#include "core/engine/engine.hpp"
 #include "core/match/callbacks.hpp"
 #include "core/match/run.hpp"
 #include "core/match/settings.hpp"
@@ -29,17 +28,15 @@
 
     // Verbose mode only
     if (settings.verbose) {
-        callbacks.on_engine_start = [&settings](const std::string &name) -> void {
+        callbacks.on_engine_start = [](const std::string &name) -> void {
             std::cout << "Created engine " << name << std::endl;
         };
 
-        callbacks.on_game_started = [&settings](
-                                        const int game_id, const std::string &engine1, const std::string &engine2) {
+        callbacks.on_game_started = [](const int, const std::string &engine1, const std::string &engine2) {
             std::cout << "Started game " << engine1 << " vs " << engine2 << std::endl;
         };
 
-        callbacks.on_game_finished = [&settings](
-                                         const int game_id, const std::string &engine1, const std::string &engine2) {
+        callbacks.on_game_finished = [](const int, const std::string &engine1, const std::string &engine2) {
             std::cout << "Finished game " << engine1 << " vs " << engine2 << std::endl;
         };
     }
@@ -116,7 +113,7 @@
             auto max_played = 999999;
 
             for (const auto &[name, score] : results.scores) {
-                if (name.size() > name_length) {
+                if (name.size() > static_cast<std::size_t>(name_length)) {
                     name_length = name.size() + 2;
                 }
 

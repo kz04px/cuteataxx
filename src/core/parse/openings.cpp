@@ -4,7 +4,6 @@
 #include <fstream>
 #include <random>
 #include <stdexcept>
-#include "../match/settings.hpp"
 
 namespace parse {
 

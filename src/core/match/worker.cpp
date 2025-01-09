@@ -4,7 +4,6 @@
 #include <memory>
 #include <mutex>
 #include <sprt.hpp>
-#include <thread>
 #include "../cache.hpp"
 #include "../play.hpp"
 #include "results.hpp"
@@ -14,7 +13,6 @@
 #include "../engine/engine.hpp"
 // Tournaments
 #include "../tournament/generator.hpp"
-#include "../tournament/roundrobin.hpp"
 
 std::mutex mtx_output;
 std::mutex mtx_games;
@@ -128,7 +126,7 @@ void worker(const Settings &settings,
             }
 
             // Check SPRT stop
-            const auto is_sprt_stop = [&settings, &results, &game]() {
+            const auto is_sprt_stop = [&settings, &results]() {
                 if (!settings.sprt.enabled || !settings.sprt.autostop || settings.engines.size() != 2) {
                     return false;
                 }

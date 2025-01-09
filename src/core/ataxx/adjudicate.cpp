@@ -12,7 +12,6 @@
     const auto our_reach = (pos.get_us().singles() | pos.get_us().doubles());
     const auto them_stuck = our_reach & pos.get_them();
     const auto them_free = pos.get_them() ^ them_stuck;
-    const auto both_reach = pos.get_both().singles() | pos.get_both().doubles();
 
     // Is the game already over?
     if (pos.is_gameover()) {
