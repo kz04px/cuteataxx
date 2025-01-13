@@ -14,6 +14,9 @@ struct [[nodiscard]] MaterialBarComponent {
         std::vector<Element> bar;
 
         bar.emplace_back(bgcolor(Color::GrayDark, color(Color::Black, text(std::to_string(num_black) + " "))));
+        if (num_black < 10) {
+            bar.emplace_back(bgcolor(Color::GrayDark, text(" ")));
+        }
 
         for (int i = 0; i < 49; ++i) {
             const auto bg = i == 49 / 2 ? Color::Red : Color::GrayDark;
@@ -27,6 +30,9 @@ struct [[nodiscard]] MaterialBarComponent {
             }
         }
 
+        if (num_white < 10) {
+            bar.emplace_back(bgcolor(Color::GrayDark, text(" ")));
+        }
         bar.emplace_back(bgcolor(Color::GrayDark, color(Color::White, text(" " + std::to_string(num_white)))));
 
         return hbox({bar}) | center;
